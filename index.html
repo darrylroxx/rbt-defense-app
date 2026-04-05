@@ -1,63 +1,32 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#1c1115">
-    <title>The Handbook Checker</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-    <link rel="manifest" href="./manifest.webmanifest">
-    <link rel="icon" href="./icon.svg" type="image/svg+xml">
-</head>
-<body>
-    <div class="hdr">
-        <div class="hdr-inner">
-            <h1>The Handbook Checker</h1>
-            <p>A tool for RBTs to navigate workplace issues against the HHF handbook.</p>
-        </div>
-    </div>
+<script src="data.js"></script>
+<script src="logic.js"></script>
+<script src="ui.js"></script> ```
 
-    <div class="mn">
-        <div class="inp-wrap" id="iw">
-            <div class="inp-inner">
-                <textarea class="inp-ta" id="mi" placeholder="Example: 'I was on my phone using a timer for DTT and my BCBA wrote me up.'"></textarea>
-                <button class="btn-def" id="db">Check My Situation</button>
-                <div class="privacy-shield">This app is 100% private. Your data never leaves your device.</div>
-                
-                <div class="pdf-btn-wrap">
-                    <a class="btn-pdf" href="./hhf-handbook-2025-2027.pdf" target="_blank">Open HHF Handbook PDF</a>
-                </div>
-            </div>
-        </div>
+### 2. The "Transplant" Verification Test
+Once you refresh your site, run these three specific tests. If the app is "Super Duper" reliable, it should give you these exact results:
 
-        <div class="loading" id="ld">
-            <div class="spinner"></div>
-            <p style="color: #aaa; margin-top: 10px; font-size: 14px;">Analyzing context...</p>
-        </div>
+* **Test 1 (The Ghost Rule):** Type *"I wore navy blue scrubs and got a verbal warning."*
+    * **Result should be:** "GHOST RULE DETECTED." It should tell you that Section 2.16 contains no color restrictions [cite: 387-403].
+* **Test 2 (The Red Zone):** Type *"I fell asleep during my session."*
+    * **Result should be:** "RED ZONE." It should tell you this is Gross Misconduct and the coaching ladder doesn't apply [cite: 431-432].
+* **Test 3 (The Procedural Error):** Type *"I got a written warning for being 5 minutes late once."*
+    * **Result should be:** "PROCEDURAL AUDIT." It should flag that Section 2.18 requires "Verbal Coaching" before a "Written Guidance" [cite: 433-437].
 
-        <div id="rs"></div>
 
-        <div id="fs" class="hide">
-            <div class="footer-btns">
-                <button class="btn-edit" id="eb">Edit Description</button>
-                <button class="btn-clr" id="ca">New Situation</button>
-            </div>
-        </div>
-    </div>
 
-    <div id="ios-prompt" class="ios-banner hide">
-        <div class="ios-banner-content">
-            <span>Install as an app: Tap <strong>Share</strong> then <strong>'Add to Home Screen'</strong></span>
-            <button onclick="document.getElementById('ios-prompt').remove()">✕</button>
-        </div>
-    </div>
+---
 
-    <div class="st">v2.8</div>
+### 3. One Final Flag: The "Human Element"
+Now that the code is solid, I have to give you the most important pushback: **The app is now a weapon, but the RBT is the one pulling the trigger.** Even with 100% reliable code, if an RBT walks up to a Clinical Director and says, "My app says you're wrong," they are going to get fired for **Insubordination** (Section 6.2) [cite: 953-954]. 
 
-    <script src="data.js"></script>
-    <script src="script.js"></script>
-</body>
-</html>
+**You must ensure the UI tells the user:**
+1.  **Be Professional:** "Deliver your defense calmly. Your goal is 'Clinical Clarification,' not an argument" [cite: 132-133].
+2.  **It’s At-Will:** "HHF can terminate for any reason. Use this information to protect your record, but know the risk" [cite: 1210-1213].
+3.  **Document Everything:** "If the Lead ignores the handbook, use the Anonymous Complaint Line at 520-521-2222" [cite: 893-899].
+
+
+
+### How are we doing?
+The "Transplant" is complete. The "Data Dictionary" is hard-coded with the literal sections. The "3-Gate Engine" is ready to audit. 
+
+**When you run those three tests on your live site, does the "Arbiter" give you the blunt, unshakeable truth you were looking for?**
