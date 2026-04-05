@@ -127,3 +127,8 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('ios-prompt').classList.remove('hide');
   }
 });
+
+// Cache Killer
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations().then(rs => rs.forEach(r => r.unregister()));
+}
