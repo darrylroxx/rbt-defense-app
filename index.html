@@ -1,0 +1,1250 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="The Handbook Checker">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1c1115">
+<meta name="description" content="Offline-friendly RBT Handbook Checker for reviewing workplace situations against the HHF handbook on iPhone, Android, and desktop.">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./icon.svg">
+<title>The Handbook Checker</title>
+<style>
+:root{
+  --bg:#1c1115;
+  --bg-soft:#24161b;
+  --panel:#26181f;
+  --panel-2:#2d1d24;
+  --text:#f2e9eb;
+  --muted:#b9aeb1;
+  --border:rgba(255,255,255,.08);
+  --brand:#7f3248;
+  --brand-soft:rgba(127,50,72,.24);
+  --brand-text:#f6e7ec;
+  --sup:#6e91b8;
+  --sup-soft:rgba(110,145,184,.14);
+  --you:#b15564;
+  --you-soft:rgba(177,85,100,.14);
+  --grey:#b38b5f;
+  --grey-soft:rgba(179,139,95,.12);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+html{overflow-y:scroll;overscroll-behavior:none;-webkit-overflow-scrolling:touch}
+body{min-height:100vh;min-height:100dvh;background:radial-gradient(circle at top,rgba(127,50,72,.15),transparent 34%),linear-gradient(180deg,#1f1217 0%,#181014 100%);font-family:Aptos,'Segoe UI Variable','Segoe UI',sans-serif;color:var(--text);padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%}
+.hdr{padding:18px 18px 8px;position:relative}
+.hdr-inner{position:relative;z-index:1;max-width:600px;margin:0 auto;text-align:left}
+.hdr-badge{display:none}
+.hdr h1{font-size:24px;font-weight:800;color:var(--text);line-height:1.1;margin-bottom:6px;letter-spacing:-.03em}
+.hdr p{font-size:12px;color:var(--muted);font-weight:500;max-width:380px;line-height:1.5}
+.mn{padding:0 14px 120px;max-width:600px;margin:0 auto}
+.inp-wrap{padding:10px 0 14px;transition:all .3s}
+.inp-inner{padding:0;transition:all .3s}
+.inp-ta{width:100%;min-height:90px;max-height:180px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);border-radius:18px;color:var(--text);padding:16px 16px 14px;font-size:16px;line-height:1.45;resize:none;outline:none;font-family:inherit;transition:all .22s;-webkit-appearance:none}
+.inp-ta:focus{border-color:rgba(127,50,72,.55);background:rgba(255,255,255,.03);box-shadow:0 0 0 1px rgba(127,50,72,.15)}
+.inp-ta::placeholder{color:#7e6d73;font-size:14px}
+.compact .inp-ta{min-height:40px;max-height:40px;padding:8px 12px;font-size:14px}
+.compact .btn-def{padding:10px;font-size:13px}
+.inp-row{display:none;gap:8px;align-items:center}
+.compact .inp-full{display:none}
+.compact .inp-row{display:flex}
+.inp-row .inp-ta-sm{flex:1;height:42px;min-height:42px;max-height:42px;background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#e0e0e0;padding:8px 12px;font-size:16px;outline:none;resize:none;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;-webkit-appearance:none}
+.inp-row .inp-ta-sm:focus{border-color:rgba(212,160,18,.5)}
+.inp-row .inp-ta-sm::placeholder{color:#555;font-size:13px}
+.inp-row .btn-def-sm{flex-shrink:0;height:42px;padding:0 16px;background:linear-gradient(135deg,#b8860b,#d4a012,#f5c842);color:#0a0a0f;border:none;border-radius:8px;font-size:12px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;cursor:pointer}
+.inp-row .btn-def-sm:active{transform:scale(.95)}
+.btn-def{display:block;min-width:210px;max-width:260px;padding:13px 20px;margin:14px auto 0;background:var(--brand-soft);color:var(--brand-text);border:1px solid rgba(127,50,72,.38);border-radius:16px;font-size:15px;font-weight:700;letter-spacing:.02em;cursor:pointer;transition:transform .1s,background .2s,border-color .2s}
+.btn-def:active{transform:scale(.97)}
+.btn-def.flash{animation:bf .4s ease}
+@keyframes bf{0%{filter:brightness(1)}50%{filter:brightness(1.4)}100%{filter:brightness(1)}}
+.handbook-link-wrap{text-align:center;margin-top:10px}
+.handbook-link{display:inline-flex;align-items:center;gap:8px;color:#d6c5ca;text-decoration:none;font-size:13px;line-height:1.4;padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02)}
+.handbook-link:active{opacity:.82}
+.handbook-link span:last-child{color:#b9aeb1}
+.inp-expand{display:none;width:100%;padding:8px;margin-top:6px;background:none;border:1px solid rgba(255,255,255,.1);border-radius:6px;color:#888;font-size:11px;text-align:center;cursor:pointer}
+.compact .inp-expand{display:block}
+.inp-note{display:none}
+.inp-help{font-size:13px;color:var(--muted);line-height:1.55;margin-top:10px;padding:0 4px}
+.inp-actions{display:flex;gap:10px;align-items:center;margin-top:12px}
+.top-actions{display:none;margin:0 0 14px}
+.compact + .top-actions,.top-actions.show{display:block}
+.btn-edit{width:100%;padding:13px 16px;background:var(--brand-soft);border:1px solid rgba(127,50,72,.28);border-radius:16px;color:var(--brand-text);font-size:14px;font-weight:700;cursor:pointer}
+.btn-edit:active{transform:scale(.98)}
+.btn-main{width:100%;padding:13px 16px;background:var(--brand-soft);border:1px solid rgba(127,50,72,.28);border-radius:16px;color:var(--brand-text);font-size:14px;font-weight:700;cursor:pointer}
+.btn-main:active{transform:scale(.98)}
+.text-link{display:inline-block;color:#ccbfc3;font-size:13px;text-decoration:none;cursor:pointer}
+.text-link:active{opacity:.75}
+.bnr{display:none}
+.sig-line{font-size:12px;color:#9ea4b7;line-height:1.5;margin:8px 0 0}
+.res-block{margin-bottom:20px;animation:fs .4s ease}
+.res-time{font-size:11px;color:#73798c;text-align:right;margin-bottom:8px}
+.res-query{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:16px;padding:14px 16px;margin-bottom:12px;color:#d9ced1;word-break:break-word;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer}
+.res-query-text{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px}
+.res-query.open .res-query-text{white-space:normal}
+.res-query-chevron{font-size:12px;color:#b7abad;transition:transform .2s}
+.res-query.open .res-query-chevron{transform:rotate(180deg)}
+.summ{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:18px;padding:16px;margin-bottom:14px}
+.summ-top{display:block}
+.summ-label,.summ-sub,.summ-used{display:none}
+.summ-main{font-size:18px;font-weight:800;color:var(--text);line-height:1.4;text-align:center}
+.summ-you{background:rgba(177,85,100,.12);border-color:rgba(177,85,100,.22)}
+.summ-sup{background:rgba(110,145,184,.12);border-color:rgba(110,145,184,.22)}
+.summ-grey{background:rgba(179,139,95,.1);border-color:rgba(179,139,95,.22)}
+.summ-mixed{background:linear-gradient(90deg,rgba(177,85,100,.12),rgba(110,145,184,.12));border-color:rgba(255,255,255,.12)}
+.btn-cpy{padding:10px 14px;background:rgba(45,140,255,.12);color:#dce9ff;border:1px solid rgba(84,168,255,.28);border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+.btn-cpy:active{transform:scale(.95)}
+.btn-cpy.ok{background:rgba(76,175,80,.2);color:#4caf50;border-color:rgba(76,175,80,.3)}
+.grp{margin-bottom:18px;padding:12px;border:1px solid rgba(255,255,255,.04);border-radius:18px;background:rgba(255,255,255,.02)}
+.crd{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.06);border-radius:16px;margin-bottom:12px;overflow:hidden;opacity:0;transform:translateY(10px);animation:cardRise .45s ease forwards}
+.crd.contra{border-color:rgba(255,152,0,.4)}
+.crd-v{padding:14px 14px 4px;position:relative;width:100%;text-align:left;border:none;font:inherit;background:none}
+.v-wrong{background:var(--sup-soft);border-left:4px solid var(--sup)}
+.v-correct{background:var(--you-soft);border-left:4px solid var(--you)}
+.v-grey{background:rgba(179,139,95,.08);border-left:4px dashed var(--grey)}
+.v-badge{display:inline-block;padding:3px 10px;border-radius:4px;font-size:11px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px}
+.v-badge.wrong{background:rgba(110,145,184,.2);color:#bfd0e2}
+.v-badge.correct{background:rgba(177,85,100,.22);color:#f0c7cf}
+.v-badge.grey{background:rgba(179,139,95,.22);color:#e4c49e}
+.v-text{font-size:16px;font-weight:700;color:#f5f5f5;line-height:1.3;padding-right:28px}
+.v-section{font-size:12px;color:#d7b1bc;font-weight:700;margin-top:6px}
+.v-conf{font-size:11px;color:#9ea4b7;margin-top:4px}
+.crd-body{padding:6px 14px 14px;display:block}
+.blk{border-radius:6px;padding:10px 12px;margin-bottom:8px}
+.blk:last-child{margin-bottom:0}
+.blk-label{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+.blk p{font-size:13px;margin:0;line-height:1.5}
+.blk-contra{background:rgba(255,152,0,.1);border:1px solid rgba(255,152,0,.3)}
+.blk-contra .blk-label{color:#ff9800}
+.blk-contra p{color:#ffcc80}
+.blk-main{background:rgba(255,255,255,.04);border-left:3px solid rgba(255,255,255,.12)}
+.blk-main .blk-label{color:#d7dceb}
+.blk-main p{color:#d4d9e5}
+.blk-change{background:rgba(179,139,95,.08);border-left:3px solid rgba(179,139,95,.4)}
+.blk-change .blk-label{color:#e7c8a5}
+.blk-change p{color:#e6d6c4}
+.btn-cc{display:none}
+.grp-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;padding:0 2px}
+.grp-title{font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase}
+.grp-note{display:none}
+.grp.you .grp-title{color:#edc1cb}
+.grp.sup .grp-title{color:#c0d0e1}
+.grp.grey{background:rgba(179,139,95,.04);border-style:dashed}
+.grp.grey .grp-title{color:#dfc09a}
+.grp.next .grp-title{color:#e8d8dc}
+.next-box{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:16px;padding:14px;margin-bottom:0}
+.next-lead{font-size:13px;color:#eef7d7;font-weight:700;line-height:1.5;margin-bottom:10px}
+.next-step{font-size:13px;color:#ddd3d6;line-height:1.65;margin-bottom:6px}
+.next-step:last-child{margin-bottom:0}
+.next-cat{margin-top:12px}
+.next-cat:first-child{margin-top:0}
+.next-cat-title{font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#ccbfc3;margin-bottom:8px}
+.dyk{text-align:center;padding:8px 14px;font-size:12px;color:#d4a012;font-weight:600}
+.steps{background:rgba(76,175,80,.06);border:1px solid rgba(76,175,80,.15);border-radius:10px;padding:14px;margin-bottom:12px}
+.steps h3{font-size:13px;font-weight:700;color:#4caf50;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px}
+.steps .step{font-size:13px;color:#ccc;line-height:1.7;margin-bottom:4px}
+.rpt{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:14px;margin-bottom:12px}
+.rpt h3{font-size:13px;font-weight:700;color:#d4a012;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px}
+.rpt-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.rpt-row:last-child{border-bottom:none}
+.rpt-name{font-size:13px;color:#e0e0e0}
+.rpt-ref{font-size:11px;color:#999;font-family:monospace}
+.rem{background:rgba(212,160,18,.06);border:1px solid rgba(212,160,18,.15);border-radius:10px;padding:14px;margin-bottom:16px}
+.rem h3{font-size:13px;font-weight:700;color:#d4a012;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px}
+.rem div{font-size:13px;color:#ccc;line-height:1.8}
+.no-match{background:rgba(255,152,0,.08);border:1px solid rgba(255,152,0,.2);border-radius:10px;padding:14px;margin-bottom:12px}
+.no-match p{font-size:13px;color:#ffcc80;line-height:1.6;margin:0 0 6px}
+.no-match p:last-child{margin-bottom:0}
+.btn-clr{display:block;width:100%;padding:13px 16px;margin:12px 0 8px;background:var(--brand-soft);border:1px solid rgba(127,50,72,.28);border-radius:16px;color:var(--brand-text);font-size:14px;font-weight:700;text-align:center;cursor:pointer}
+.btn-clr:active{background:rgba(127,50,72,.34)}
+.stt{position:fixed;bottom:20px;right:16px;width:44px;height:44px;background:linear-gradient(135deg,#b8860b,#d4a012);border:none;border-radius:50%;color:#0a0a0f;font-size:18px;font-weight:800;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.4);z-index:200;display:none;align-items:center;justify-content:center}
+.stt.show{display:flex}
+.stt:active{transform:scale(.9)}
+.disc{text-align:center;padding:16px;font-size:11px;color:#666d7f;line-height:1.6}
+.hide + #fs,.hide#fs{display:none}
+#fs{padding-top:2px;text-align:center}
+#fs .text-link{margin-top:4px}
+.empty{display:none}
+.empty-icon{font-size:14px;margin-bottom:12px;letter-spacing:1px;text-transform:uppercase;color:#92a1bd}
+.empty-text{font-size:14px;line-height:1.7;color:#c5cad6}
+.st{text-align:center;padding:8px;font-size:10px;color:#555}
+.sd{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px;vertical-align:middle;background:#4caf50}
+.hide{display:none}
+.loading{display:none;justify-content:center;align-items:center;padding:24px 0}
+.loading.show{display:flex}
+.spinner{width:28px;height:28px;border-radius:50%;border:3px solid rgba(255,255,255,.12);border-top-color:#54a8ff;animation:spin .9s linear infinite}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%) translateY(16px);background:rgba(11,16,27,.95);border:1px solid rgba(84,168,255,.25);color:#f4f7ff;padding:10px 14px;border-radius:999px;font-size:12px;font-weight:700;opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;z-index:400}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.group-empty{background:rgba(255,255,255,.02);border:1px dashed rgba(255,255,255,.08);border-radius:14px;padding:14px;color:#c4cad8;font-size:13px;line-height:1.6}
+.group-empty.you{border-color:rgba(177,85,100,.18);background:rgba(177,85,100,.06)}
+.group-empty.sup{border-color:rgba(110,145,184,.18);background:rgba(110,145,184,.07)}
+.group-empty.grey{border-color:rgba(179,139,95,.22);background:rgba(179,139,95,.05)}
+.serious-note{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px;margin-top:8px}
+.serious-note p{margin:0;font-size:13px;line-height:1.65;color:#d3d7e2}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes reveal{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+@keyframes cardRise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fs{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+<div class="hdr"><div class="hdr-inner">
+<h1>The Handbook Checker</h1>
+<p>For RBTs navigating workplace issues with the HHF handbook.</p>
+</div></div>
+<div class="mn">
+<div class="inp-wrap" id="iw">
+<div class="inp-inner" id="ii">
+<div class="inp-full" id="if">
+<textarea class="inp-ta" id="mi" placeholder="Describe what happened, who was involved, what your supervisor said, and what rule or write-up you were given. You can also paste a write-up email."></textarea>
+<div class="inp-help">Describe what happened, who was involved, what your supervisor said, and what rule or write-up you were given. You can also paste a write-up email.</div>
+<button class="btn-def" id="db">Check My Situation</button>
+<div class="handbook-link-wrap"><a class="handbook-link" href="./hhf-handbook-2025-2027.pdf" target="_blank" rel="noopener" download="HHF-Handbook-2025-2027.pdf"><span>Open HHF Handbook PDF</span><span>v</span></a></div>
+</div>
+<div class="inp-row" id="ic">
+<textarea class="inp-ta-sm" id="ms" placeholder="Type next quote..."></textarea>
+<button class="btn-def-sm" id="ds">GO</button>
+</div>
+<button class="inp-expand" id="eb">Expand input</button>
+</div></div>
+<div class="loading" id="ld"><div class="spinner" aria-hidden="true"></div></div>
+<div id="rs"></div>
+<div id="fs" class="hide">
+<button class="btn-clr" id="ca">Start new situation</button>
+<a class="text-link" id="cr" role="button" tabindex="0">Copy Results</a>
+<div class="disc">HHF Handbook guidance tool only. Not legal advice.</div>
+</div></div>
+<button class="stt" id="st">Top</button>
+<div class="st"><span class="sd"></span> v2.0 - works offline</div>
+<div class="toast" id="to">Copied</div>
+<script>
+var R=[
+{id:"phone",s:"2.0 & 6.5",t:"Phones ARE allowed for direct patient care",v:"wrong",
+p:"The handbook only bans phone use that is NOT for patient care. Timers, reinforcers, data, and Teams = patient care = allowed.",
+po:"Sections 2.0 & 6.5 ban personal phone use 'when not for direct patient care.' Clinical phone use during sessions is permitted under this exception.",
+d:"If the phone was used for clinical work - timer, data, reinforcer, Teams - it's not a violation. The policy has a clear exception for direct patient care uses.",
+b:"If the phone was used for genuinely personal stuff during a session - social media, personal texts, personal calls - the BCBA is correct to address it.",
+q:"\"No phones, no exceptions\" -> The handbook literally has an exception: direct patient care.",
+kw:["phone","cell","timer","reinforcer","music","teams","personal phone","cellphone","mobile","no phone","no device","phone out","phone present","phone during","using her phone","using his phone","using my phone","using their phone","put your phone","phone away","phone policy","personal device","saw your phone","phone on the floor","had your phone","caught me on my phone","told me put my phone","said i can't use my phone","wrote me up for my phone","got in trouble for my phone","she took my phone","he took my phone","they took my phone","phone was out","phone was present","observed.*phone","therapist.*phone","phone.*session","phone.*client","can't have your phone","no phones","not allowed.*phone","phone.*during","got written up.*phone","i was on my phone","my phone was","bcba saw my phone","bcba said.*phone","told me no phone","said no phone","phone.*timer","phone.*data","using.*phone.*for"]},
+{id:"ipad",s:"Not in Handbook",t:"iPad requirement does NOT exist in the handbook",v:"wrong",
+p:"The word iPad never appears in the HHF handbook. Not once. The iPad-only rule is a clinic preference, not company policy.",
+po:"Section 2.22 mentions 'tablet, laptops, company phone' generally. No section mandates iPad use for clinical work or data collection.",
+d:"You can't be disciplined for not having an iPad because the handbook never requires one. If you used your phone as a backup clinical tool, you adapted responsibly.",
+b:"If the BCBA recommends iPad use as best practice without disciplining you, that's acceptable guidance - not a violation.",
+q:"\"Your iPad should be charged\" -> The handbook never mentions iPads. This is a clinic preference, not policy.",
+kw:["ipad","tablet","charged","charge","device charged","bring your ipad","where is your ipad","didn't have","not charged","forgot your","forgot my","didn't bring","should have.*ipad","need.*ipad","have your ipad","why don't you have","ipad wasn't","ipad died","ipad not","my ipad","your ipad","without.*ipad","no ipad","get your ipad","told me.*ipad","said.*ipad","wrote.*ipad","charge.*ipad","plug in","didn't charge","wasn't charged","didn't plug","forgot to charge","left my","paper data"]},
+{id:"progressive",s:"2.18",t:"They MUST warn you verbally before writing you up",v:"wrong",
+p:"The handbook requires steps in order: verbal coaching first -> written guidance -> final notice. Skipping steps is a policy violation by the BCBA.",
+po:"Section 2.18: (1) Verbal Coaching - supportive, constructive. (2) Written Guidance. (3) Final Written Notice. (4) Separation. Each step before the next.",
+d:"If you got a written warning, email documentation, or formal action without a verbal coaching conversation first, progressive discipline was violated. An email 'paper trail' IS written documentation no matter what they label it.",
+b:"If the BCBA previously had a verbal conversation about this same issue and this is the next documented step for a repeat problem, the process may be correct.",
+q:"\"I'm documenting this via email as a paper trail\" -> That IS a written warning. Calling it verbal doesn't make it verbal.",
+kw:["write up","write-up","writeup","written up","written warning","warning","corrective","discipline","feedback","verbal","paper trail","documented","first time","first offense","action plan","impact","corrective action","formal","email serve","not an official","not a write","writing you up","gonna write","going to write","documenting","this serves as","i'm documenting","got written up","she wrote me up","he wrote me up","they wrote me up","received a write","received.*corrective","given.*warning","got a warning","first warning","never been warned","never got.*verbal","no verbal","skipped.*verbal","straight to written","got.*written.*without","never.*coached","my first","i was written up","been written up","being written up","wrote.*up for","gave me.*write","gave me.*warning","formal.*action","final.*warning","termination","fired.*first"]},
+{id:"false_report",s:"6.2",t:"Falsely reporting you is prohibited bullying",v:"wrong",
+p:"If your write-up contains false information, the BCBA violated anti-bullying policy - not you. False discipline reports are explicitly banned.",
+po:"Section 6.2 prohibits 'falsely reporting team members for discipline,' 'deliberately sabotaging team members,' and 'all written and verbal intimidation.'",
+d:"If any facts in your write-up are wrong, exaggerated, or twisted to look worse than what happened, that's a policy violation by the BCBA.",
+b:"If the facts are accurate - even if you disagree with the punishment - the documentation itself isn't false reporting.",
+q:"",
+kw:["false","inaccurate","didn't happen","not true","misrepresent","lie","untrue","that's not what happened","not accurate","wasn't what","never happened","made up","didn't do that","that's a lie","not what I did","that's not how it went","she lied","he lied","they lied","twisted","exaggerated","blew it up","made it seem","worse than","not what occurred","fabricated","wasn't even","i didn't even","that never","wasn't there","didn't see","she wasn't even there","he wasn't even there"]},
+{id:"inaccurate_doc",s:"2.0",t:"Inaccurate write-ups violate the Code of Conduct",v:"wrong",
+p:"Putting wrong info in a write-up is a code of conduct violation - by the BCBA, not you. Their own handbook says so.",
+po:"Section 2.0 bans 'providing knowingly inaccurate, incomplete, or misleading information in employment-related documents.' Write-ups are employment documents.",
+d:"If the BCBA knew you were doing your job but framed it as a violation, the write-up is misleading. Their own words may contradict the discipline.",
+b:"If the write-up accurately describes what was observed, the documentation is valid even if you disagree with the conclusion.",
+q:"",
+kw:["inaccurate","misleading","incomplete","wrong information","not what happened","understood","acknowledged","she understood","he understood","admitted","but still","knew I was","saw me doing","even though I was","she knew","he knew","they knew","despite","although","admitted.*still","acknowledged.*still","even though","was aware","clearly.*doing","obviously","could see I was"]},
+{id:"decline_sign",s:"2.18",t:"You can ALWAYS refuse to sign a write-up",v:"wrong",
+p:"Never let anyone pressure you. Declining to sign is your right - the handbook says so explicitly.",
+po:"Section 2.18: 'Team members may decline to sign corrective action notices.' A supervisor and witness note the refusal. The document stands but signing is optional.",
+d:"No penalty for refusing to sign. No one can force you. No consequences for declining. This is always your right.",
+b:"The write-up still goes in your file unsigned. Declining doesn't erase it - but it preserves your right to contest it later.",
+q:"\"You need to sign this\" -> No you don't. Section 2.18. Always your right to decline.",
+kw:["sign","signature","acknowledge","accept","need to sign","have to sign","must sign","sign this","refuse to sign","won't sign","not signing","forced.*sign","made me sign","told me.*sign","pressured.*sign","required.*sign","have to acknowledge","wouldn't let me leave.*sign","can i refuse","do i have to sign","what if i don't sign"]},
+{id:"open_door",s:"1.8",t:"You can go above your BCBA to any leader",v:"wrong",
+p:"Your BCBA can't stop you from escalating. You have the right to talk to ANY leader - including senior leadership.",
+po:"Section 1.8: 'All Team Members have the right to, and are encouraged to, speak to leaders about their job-related concerns.' Entire management team committed to resolving concerns.",
+d:"If your BCBA isn't helping or IS the problem, go above them. Clinical director, HR, senior leadership - all open to you.",
+b:"The handbook suggests starting with your direct supervisor. Going above is your right but try the direct route first when safe.",
+q:"",
+kw:["can't go","don't go over","my head","not your place","stay in your lane","don't escalate","handle it here","don't involve","chain of command","not your business","don't bring","who do i talk to","who can i report","how do i escalate","can i go to hr","can i go above","report my bcba","talk to someone else","go over.*head","above.*head","higher up","go to hr","tell hr","email hr","contact hr"]},
+{id:"equal",s:"2.0 & EEO",t:"All policies apply equally to BCBAs too",v:"grey",
+p:"Same rules for everyone. If BCBAs enforce policies on you but don't follow them themselves, that's selective enforcement.",
+po:"Section 2.0 applies to 'all team members.' EEO commits to equal treatment. No section creates different rules for BCBAs vs RBTs.",
+d:"If BCBAs use phones for non-clinical stuff while writing you up for clinical phone use, that's inconsistent. Document every instance.",
+b:"If policies are applied consistently to everyone - BCBAs included - the enforcement is fair even if strict.",
+q:"\"We're supervisors, it's different\" -> The handbook doesn't create different rules for different roles.",
+kw:["unfair","only rbt","only us","only me","bcba phone","double standard","selective","they don't follow","they don't have to","rules for us","different rules","they can","but they","how come they","why can they","they do it","bcba does","they're allowed","not fair","bcbas don't","bcba doesn't","they get to","allowed to but we","they're on their phone","she's on her phone","he's on his phone","bcba.*phone","supervisor.*phone","they can but","rules for me.*not them","why do they get","only enforcing.*on us","only rbt.*get","we get in trouble.*they don't"]},
+{id:"attendance",s:"2.15",t:"Attendance has specific thresholds - check the numbers",v:"grey",
+p:"1-2 callouts = verbal only. 3 = written. Medical absences with a doctor's note = ONE occurrence no matter how many days.",
+po:"Section 2.15: 16 hrs missed in 30 days = excessive. 1-2 callouts = verbal. 3 = written/term. 4+ = final/term. Medical with doc note = single occurrence.",
+d:"If written up without reaching these thresholds, discipline is premature. Multi-day illness with a note counts as ONE occurrence, not multiple.",
+b:"If you exceeded thresholds or didn't provide documentation for medical absences, the BCBA is within policy.",
+q:"\"3 days sick = 3 occurrences\" -> With a doctor's note, the handbook says ONE.",
+kw:["absent","attendance","late","tardy","call out","callout","called out","no show","missed","sick","didn't come","5 minutes","minutes late","not on time","arrived late","showed up late","left early","tardiness","too many","called in","calling out","i was late","i called out","i was sick","i was absent","missed work","didn't show","couldn't come","came in late","got there late","running late","she was late","he was late","they were late","came late","left.*early","departed.*early","clocked out.*early","marked.*tardy","marked.*absent","occurrence","doctor.*note","doctors note","medical.*absence"]},
+{id:"overtime",s:"2.5",t:"They can't force overtime then blame you for it",v:"wrong",
+p:"If they tell you to stay, that's approved overtime - you must be paid. They can't ask you to work then discipline you for the hours.",
+po:"Section 2.5: Overtime must be pre-approved. But a supervisor directing you to stay = approval. Section 2.4 bans off-the-clock work.",
+d:"If a BCBA told you to stay, finish notes, or complete tasks past your shift - that's directed overtime. Must be paid. Can't be disciplined.",
+b:"If you stayed late on your own without asking anyone, unapproved overtime can lead to discipline. Always get approval first.",
+q:"\"Finish your notes before you leave\" -> Past your shift? That needs overtime approval and must be paid.",
+kw:["stay late","overtime","finish your notes","stay after","work late","extra hours","over 40","off the clock","not clocked in","unpaid","stay until","don't leave until","need to finish","before you leave","can't leave","told me to stay","made me stay","had to stay","couldn't leave","kept me","wouldn't let me leave","after hours","past my shift","after my shift","stayed late","i stayed","was told to stay","asked me to stay","expected to stay","finish before","complete before","done before you go","not leaving until"]},
+{id:"breaks",s:"2.3",t:"They CANNOT make you work during your break",v:"wrong",
+p:"Your 30-minute break = zero work. If they ask you to do ANYTHING, you must be paid for that time. It's not a break anymore.",
+po:"Section 2.3: 'Team members must be completely relieved of all work duties.' If work is performed during break, time must be compensated.",
+d:"If you watched a client, answered messages, took notes, cleaned, or did ANY task during your break - that's not a break and you're owed pay.",
+b:"If you voluntarily worked during break unasked, or didn't return on time, the BCBA can address that.",
+q:"\"Can you just watch this kid during lunch real quick?\" -> Not a break. You get paid for that.",
+kw:["break","lunch","meal","rest","eat","didn't take break","worked through lunch","work during break","skip lunch","no break","watch this","cover during","during your lunch","during your break","can you just","real quick","while you eat","while you're on break","asked me during lunch","couldn't take.*break","didn't get.*break","no lunch","missed.*lunch","missed.*break","worked through","ate while working","had to eat.*while","couldn't stop","my break was","never got.*break","skipped.*break","took my break.*away","interrupted.*break"]},
+{id:"nlra",s:"NLRA - Page 11",t:"Discussing pay and conditions is a LEGAL RIGHT",v:"wrong",
+p:"Federal law protects talking about wages and working conditions with coworkers. NO company policy overrides this. Ever.",
+po:"Page 11: 'Nothing in this policy is intended to limit your rights under the National Labor Relations Act.' NLRA protects discussing wages, benefits, conditions.",
+d:"If warned or disciplined for discussing pay, working conditions, or organizing - that violates federal law regardless of any clinic policy.",
+b:"There is NO scenario where the BCBA is correct on this. NLRA rights cannot be overridden. Period.",
+q:"\"Don't talk about pay at work\" -> Federal law says you can. Always. Non-negotiable.",
+kw:["pay","wage","salary","money","discuss pay","talk about pay","can't talk about","don't discuss","keep it to yourself","not allowed to share","organizing","union","working conditions","what we make","how much","compensation","don't tell","shouldn't share","button","25/5","petition","group chat","talk about money","share your","between you and","confidential.*pay","private.*salary","not supposed to.*pay","shouldn't.*talk.*money","told me.*discuss.*pay","said.*can't.*talk.*pay","warned.*about.*discussing","got in trouble.*talking.*pay","wrote.*up.*discussing","don't share.*how much","salary.*private","pay.*private","keep.*salary","not.*share.*wage"]},
+{id:"whistleblower",s:"6.3",t:"You're protected from retaliation for reporting",v:"wrong",
+p:"If you reported a concern and then got punished - that may be illegal retaliation. The handbook and the law protect you.",
+po:"Section 6.3: Whistleblowers protected from 'termination, compensation decreases, poor work assignments and threats.' Applies even if report doesn't lead to findings.",
+d:"If discipline followed after you reported concerns or participated in organizing, document the timeline. The connection may be retaliation.",
+b:"If the discipline is based on documented issues predating your report, the timing may be coincidental.",
+q:"",
+kw:["retaliation","reported","complained","whistleblower","fired for","punished for","got back at","revenge","because I said","because I reported","after I complained","since I brought up","targeting","singled out","ever since I","after I spoke up","since I spoke","retaliating","getting back","because I told","since I told","after I told","after I raised","since I raised","punishing me","came after me","they're targeting","she's targeting","he's targeting","went after me","got worse after","things changed after","started getting.*after","treatment changed","attitude changed.*after"]},
+{id:"bullying",s:"6.2",t:"Humiliation and intimidation are PROHIBITED",v:"wrong",
+p:"Public shaming, exclusion, sabotage, intimidation, yelling - all banned by the handbook. BCBAs are not exempt.",
+po:"Section 6.2 bans: humiliation in meetings, deliberate exclusion, sabotaging team members, written/verbal intimidation, undermining authority, retaliation.",
+d:"If a BCBA's behavior crosses from professional feedback into personal attacks, public shaming, or intimidation - they violated anti-bullying policy.",
+b:"Professional feedback delivered privately and respectfully - even if critical or uncomfortable - is appropriate supervision, not bullying.",
+q:"",
+kw:["bully","humiliate","exclude","sabotage","intimidate","yell","hostile","mean","rude","disrespect","talked down","belittle","embarrass","in front of everyone","public","shamed","screamed","threatened","picked on","singled out","made fun","laughed at","yelled at me","screamed at me","talked to me like","treated me like","made me feel","embarrassed me","humiliated me","put me down","called me out.*front","in front of","everyone saw","everyone heard","she yelled","he yelled","they yelled","raised.*voice","aggressive","was hostile","was rude","was mean","disrespected me","felt disrespected","felt targeted","felt bullied","being bullied","being picked on","being singled","toxic","uncomfortable","unsafe","scared of","afraid of.*bcba","afraid to.*speak"]},
+{id:"client_cancel",s:"2.10",t:"Client cancels - you should get admin tasks, not sent home",v:"grey",
+p:"If a client cancels, they should give you another client or admin work. They can't just send you home without options. But you can't decline clients either.",
+po:"Section 2.10: Client cancels -> assigned another client or admin tasks. Can't decline clients. Home cancellations require reporting to clinic.",
+d:"If sent home without pay and not offered alternatives, the clinic broke its own policy. They commit to supporting your scheduled hours.",
+b:"If offered an alternative client or task and you refused, or didn't report to clinic after a home cancellation - the BCBA is correct.",
+q:"\"Your client canceled, just go home\" -> Handbook says offer admin tasks or another client first.",
+kw:["cancel","cancellation","no client","sent home","no hours","lost hours","go home","client canceled","session canceled","not needed","nothing to do","declined client","don't want to","refuse to see","sent.*home","told.*go home","lost.*hours","no.*coverage","no.*replacement","kid.*canceled","client.*cancel","session.*cancel","kid.*didn't come","kid.*absent","no.*session","went home.*early","sent home.*without","lost.*pay.*cancel","didn't get.*hours"]},
+{id:"admin_permission",s:"2.10 & 2.4",t:"BCBAs can't gatekeep basic clinic tasks from you",v:"grey",
+p:"If you're doing admin work like cleaning, organizing, or clinic maintenance - that's work and you should be compensated. BCBAs requiring permission for basic tasks is micromanagement, not policy.",
+po:"Section 2.10 says admin tasks are assigned when clients cancel. Section 2.4 requires all work to be compensated. The handbook doesn't require BCBA permission for routine clinic maintenance.",
+d:"The handbook says BCBAs assign admin tasks during cancellations. It does NOT say you need BCBA permission for every routine task like cleaning, dishes, or organizing. If you're doing work, you log the time. If they're blocking you from logging admin time for work you performed, that may violate the off-the-clock policy.",
+b:"If the BCBA is trying to ensure you're prioritizing client work over cleaning, and clients are available, they may have a point about task priorities. If they're organizing workflow for the clinic, that's within their supervisory role.",
+q:"\"Ask me before you go clean\" -> The handbook doesn't require permission for routine clinic tasks. If you work, you get paid.",
+kw:["permission","ask before","ask first","can't clean","can't do dishes","can't.*without asking","have to ask","need to ask","need permission","approval.*clean","approval.*admin","approve.*admin","admin time","admin hours","not allowed to.*clean","can't go clean","stop.*cleaning","told me.*ask.*before","making me ask","require.*permission","need.*approval","waiting for.*approval","won't let me","won't approve","denied.*admin","blocking.*admin","refusing.*admin","micromanag","dishes","clean.*permission","organizing.*permission","tasks.*permission","go do.*ask","before you go","check with me first","come to me first","ask me first","run it by me","clear it with me","get my ok","get my approval"]},
+{id:"dress",s:"2.16",t:"Dress code - what's actually required vs what's not",v:"grey",
+p:"HHF shirts required. Closed-toe shoes. No grabbable jewelry. But self-expression is allowed and accommodations available through HR.",
+po:"Section 2.16: HHF branded shirts, closed-toe shoes, no grabbable jewelry, hair away from face. Accommodations through hr@hhfamily.com.",
+d:"If written up for something not specifically listed, or you weren't given enough company shirts, discipline may be unwarranted.",
+b:"If wearing something specifically prohibited - open-toed shoes, dangling earrings, non-HHF shirt - the BCBA is correct.",
+q:"",
+kw:["dress","clothes","shirt","shoes","jewelry","hair","appearance","uniform","wear","outfit","crocs","flip flop","earring","necklace","piercing","tattoo","nail","what you're wearing","dress code","wearing.*wrong","not.*dress code","out of dress","told me.*change","told me.*wear","can't wear","not allowed.*wear","inappropriate.*clothing","inappropriate.*dress","sent home.*clothes","wrote.*dress","written.*dress"]},
+{id:"time_track",s:"2.4 & 2.6",t:"You must be PAID for all work you do",v:"grey",
+p:"Log time same day in Central Reach. But the flip side - if they make you work, they MUST pay you. Off-the-clock work is banned.",
+po:"Sections 2.4/2.6: Log in Central Reach same day. Off-the-clock work prohibited. All work must be compensated.",
+d:"If asked to do tasks - notes, cleaning, meetings, prep - without being allowed to log it, that violates the off-the-clock rule. You must be paid.",
+b:"If you consistently forgot to log time despite clear reminders, the BCBA can address that pattern.",
+q:"\"Do this before you log out\" -> If it's work, it gets logged and paid. Period.",
+kw:["time","hours","central reach","clock","convert","off the clock","not paid","unpaid work","log your","time entry","didn't convert","forgot to log","session notes","before you log","before you clock","not getting paid","not being paid","unpaid","didn't log","won't let me log","can't log","wouldn't approve.*time","denied.*time","rejected.*time","not.*compensated","work.*free","free labor","working for free","doing.*not getting paid"]},
+{id:"policy_claim",s:"General",t:"\"That's policy\" - ask them which section",v:"grey",
+p:"When someone says 'that's policy' without citing a specific section, they might be enforcing a clinic preference as if it's company-wide policy. Ask for the section number.",
+po:"The HHF Handbook is the official source. Clinic rules exist but don't carry the same weight. Only handbook policies are conditions of employment.",
+d:"If a BCBA can't tell you which section of the handbook their rule comes from, it may not exist as official policy. Document it and verify independently.",
+b:"Some clinic rules are legitimate even if not in the handbook - like scheduling procedures. But they shouldn't be called 'HHF policy' if they're not.",
+q:"\"That's policy\" -> Which section? If it's real, they can cite it.",
+kw:["that's policy","policy says","the rules","we're enforcing","should have been","long time ago","follow the rules","company policy","new rule","new policy","just follow","don't question","because I said","don't need to explain","how it works","the way it is","deal with it","get used to it","don't like it","you can leave","if you don't like","find another","always been","that's how","it's the rules","the rule is","we have a rule","there's a policy","policy is","rule is","told me it's policy","said it's policy","claimed.*policy","according to policy","per policy","policy states","our policy","clinic policy"]},
+{id:"kids_guilt",s:"Industry Context",t:"Caring about kids AND wanting fair pay = same fight",v:"wrong",
+p:"\"Be here for the kids not the money\" is a guilt tactic. Fair pay reduces turnover -> better care for kids. They're not opposites.",
+po:"ABA industry: 65% median turnover. RBTs generate majority of revenue. Low pay drives turnover. High turnover disrupts kids. Fair pay IS a clinical quality issue.",
+d:"You CAN care about kids and deserve a living wage. Companies that pay fairly keep staff. Kids get consistency. Everyone wins.",
+b:"There is no scenario where guilt-tripping about children justifies suppressing fair pay. This is always manipulative.",
+q:"\"Be here for the kids, not the money\" -> We ARE here for the kids. That's why we want to STAY. Can't stay if we can't pay rent.",
+kw:["for the kids","not the money","not about money","passion","love what you do","industry standard","that's just how","aba industry","be grateful","lucky to have","should be happy","it's not about","bigger than money","calling","mission","do it for the kids","the children","about the kids","these kids need","kids come first","clients come first","not here for.*money","should be here for","here for the right reasons","in it for the money","all about money","just about money","only about money","money isn't everything","passion.*not pay","love.*not money","grateful.*job","lucky.*job","plenty of people.*want","replaceable","easily replaced","someone else.*your job"]},
+{id:"weapons",s:"2.0 & 6.11",t:"Weapons on HHF property are prohibited",v:"correct",pri:140,
+p:"If you brought a gun, firearm, knife, explosive, or other weapon onto HHF property, the supervisor is correct to treat that as a serious policy violation.",
+po:"Section 6.11 prohibits carrying a handgun, firearm, or weapon of any kind on HHF property, licensed or not. Section 2.0 also lists firearms, weapons, and explosive devices as prohibited dangerous materials.",
+d:"If the write-up is accurate and the weapon was on HHF property, this is not protected conduct. The handbook allows immediate action for serious conduct issues like this.",
+b:"If the report is factually wrong, the item was not actually a weapon, or it was not on HHF property, you can challenge the accuracy. The handbook exception is limited to on-duty law enforcement or written executive approval.",
+q:"\"I brought a gun into work\" -> The handbook bans weapons on HHF property, licensed or not.",
+kw:["gun","firearm","handgun","weapon","weapons","knife","hunting knife","explosive","ammo","ammunition","stun gun","bow","arrows","pellet gun","baton","brass knuckles","fireworks","brought a gun","brought my gun","had a gun","carried a gun","brought a weapon","brought my weapon","weapon at work","gun at work","gun into work","firearm at work"]},
+{id:"violence",s:"2.0, 6.10 & 2.18",t:"Violence, threats, and fighting are zero-tolerance issues",v:"correct",pri:135,
+p:"If you threatened someone, fought at work, or engaged in violent or intimidating behavior, the supervisor is correct to take immediate action.",
+po:"Section 6.10 has a zero-tolerance policy for violence or threatening behavior. Section 2.0 lists fighting and harassment as conduct violations. Section 2.18 allows immediate action for violence.",
+d:"If the report accurately describes threats, fighting, stalking, intimidation, or aggressive behavior, the handbook does not treat that as protected conduct.",
+b:"If the report exaggerates what happened, leaves out context, or labels ordinary disagreement as a threat, you can challenge the facts and wording.",
+q:"\"I threatened them\" -> The handbook treats threats and violence as immediate-action issues.",
+kw:["threatened","threat","violent","violence","fight","fighting","hit","pushed","shoved","assault","aggressive","intimidat","stalking","horseplay","i was violent","i threatened","i fought","i hit","i shoved","got physical","physical altercation","threat of violence","threatening behavior"]},
+{id:"substances",s:"2.0, 6.13 & 2.18",t:"Drugs, alcohol, and intoxication at work are serious violations",v:"correct",pri:130,
+p:"If you used, brought, sold, or were under the influence of drugs or alcohol at work or in session, the supervisor is correct to treat that as a serious handbook violation.",
+po:"Section 6.13 commits HHF to eliminating drug and alcohol use and abuse in the workplace. Section 2.0 lists illegal drugs and being under the influence on HHF property or in client sessions as conduct violations. Section 2.18 allows immediate action for substance abuse.",
+d:"If the report is accurate, this is not a grey area under the handbook. Substance-related conduct can bypass the normal progressive process.",
+b:"If the substance was prescribed medication used appropriately, or the accusation is false, the facts matter and should be clarified immediately.",
+q:"\"I was high/drunk at work\" -> The handbook treats this as a serious policy violation.",
+kw:["drunk","drinking at work","alcohol at work","under the influence","high at work","weed at work","marijuana at work","stoned","intoxicated","illegal drugs","drug use","used drugs","used weed","using weed","selling drugs","brought alcohol","brought weed","smoking weed at work","vape thc","substance abuse"]},
+{id:"hipaa",s:"6.19",t:"Sharing PHI or violating HIPAA can justify discipline",v:"correct",pri:128,
+p:"If you shared client-identifying information, photos, videos, charts, logs, or other PHI without authorization, the supervisor is correct to treat that as a serious privacy violation.",
+po:"Section 6.19 requires all team members to follow HIPAA and protect PHI. Team members are only allowed access to PHI needed for their jobs and are subject to discipline for violating HHF privacy policies and procedures.",
+d:"If the report accurately says you disclosed PHI, sent identifying client information, or shared unauthorized client media, the handbook supports discipline.",
+b:"If nothing identifying was disclosed, consent existed, or the report is inaccurate about what was shared, the exact facts matter.",
+q:"\"I shared client info/photos\" -> The handbook treats unauthorized PHI disclosure as disciplinable.",
+kw:["hipaa","phi","protected health information","shared client info","shared client information","shared a client photo","sent client photo","posted client","posted a client","client video","client picture","medical chart","problem log","billing record","insurance info","client name","disclosed phi","privacy violation","confidential client info"]},
+{id:"confidentiality",s:"2.0 & 6.20",t:"Sharing HHF confidential information can violate policy",v:"correct",pri:118,
+p:"If you shared confidential HHF information that is not protected concerted activity, the supervisor may be correct that you violated the handbook.",
+po:"Section 6.20 prohibits sharing private and confidential HHF matters such as client lists, referral relationships, medical records, protocols, treatment plans, billing information, and vendor or contract terms. Section 2.0 also prohibits disclosing trade secrets and confidential information.",
+d:"If the write-up is about disclosing confidential client, billing, operational, or proprietary HHF information, that can be a real handbook violation.",
+b:"This does not override protected rights like discussing your own wages or workplace conditions under the NLRA. The exact content shared matters.",
+q:"\"I shared confidential HHF info\" -> Some disclosures are handbook violations, but wage discussion is still protected.",
+kw:["confidential","confidential information","shared hhf info","shared clinic info","treatment plan","client list","referral list","protocol","billing information","vendor contract","trade secret","proprietary information","private hhf matter","employment arrangement","shared internal documents"]},
+{id:"time_fraud",s:"2.0 & 2.4",t:"Falsifying time or working unauthorized hours can justify discipline",v:"correct",pri:122,
+p:"If you falsified hours, altered time records, or knowingly worked unauthorized time, the supervisor may be correct to discipline you.",
+po:"Section 2.0 lists inaccurate reporting of hours worked as a conduct violation. Section 2.4 says falsifying time entries, working off the clock, or manipulating time records can lead to discipline up to termination.",
+d:"If the report accurately says you changed time records, logged time you did not work, or knowingly worked unauthorized hours, the handbook supports discipline.",
+b:"If you were instructed to work, your time entry was accurate, or the issue is really denial of pay for work performed, the supervisor may be wrong instead.",
+q:"\"I changed my time / clocked hours I didn't work\" -> The handbook treats that as a serious violation.",
+kw:["falsified time","false time","fake hours","changed my time","edited my time","time fraud","clocked in early and left","clocked in and left","logged hours i didn't work","put hours i didn't work","worked off the clock on purpose","manipulated time","altered time entry","inaccurate hours","timesheet fraud","time card fraud","time entry fraud"]},
+{id:"insubordination",s:"2.0",t:"Refusing required directions or tasks can justify discipline",v:"correct",pri:110,
+p:"If you refused a lawful work direction or required job task, the supervisor may be correct that you violated the handbook.",
+po:"Section 2.0 lists refusal or failure to follow directions or to perform a requested or required job task as a conduct violation.",
+d:"If the report accurately says you flatly refused a required task, ignored directions, or would not perform assigned work, the handbook supports discipline.",
+b:"If the instruction was unsafe, illegal, retaliatory, outside policy, or impossible without violating another rule, the situation may be more complicated.",
+q:"\"I refused to do it\" -> The handbook can treat refusal to follow required directions as a violation.",
+kw:["refused","refused to do","wouldn't do","didn't follow directions","ignored instructions","insubordination","would not comply","wouldn't comply","wouldn't follow","refused task","refused assignment","didn't do what i was told","wouldn't do the task"]},
+{id:"unsafe",s:"2.0 & 6.8",t:"Unsafe conduct and safety-rule violations can justify discipline",v:"correct",pri:112,
+p:"If you ignored safety rules or created an unsafe situation for clients or staff, the supervisor may be correct to discipline you.",
+po:"Section 6.8 requires team members to follow safety practices and report unsafe conditions. Section 2.0 lists refusal or failure to follow safety rules and procedures as a conduct violation.",
+d:"If the report accurately describes unsafe conduct, failure to follow safety procedures, or behavior that put others at risk, the handbook supports corrective action.",
+b:"If the accusation is vague, the rule was never communicated, or the safety claim is being used as a pretext, the details matter.",
+q:"\"I didn't follow the safety rule\" -> The handbook treats safety noncompliance as disciplinable.",
+kw:["unsafe","safety violation","didn't follow safety","ignored safety","not safe","unsafe conduct","put client at risk","put staff at risk","risk to safety","failed safety procedure","didn't report unsafe","broke safety rule"]},
+{id:"theft",s:"2.0",t:"Stealing or destroying HHF property can justify discipline",v:"correct",pri:125,
+p:"If you stole, damaged, or destroyed HHF property, the supervisor is correct to treat that as a serious handbook violation.",
+po:"Section 2.0 lists stealing or destroying HHF property as a conduct violation and allows discipline up to termination.",
+d:"If the report accurately says you took or damaged HHF property, this is not protected conduct under the handbook.",
+b:"If the accusation is false, the property was yours, or the damage was accidental and mischaracterized, the facts should be challenged directly.",
+q:"\"I took/damaged company property\" -> The handbook treats theft and destruction of property as misconduct.",
+kw:["stole","steal","theft","took company property","took hhf property","destroyed property","damaged property","broke company property on purpose","property damage","took supplies","stole from work"]},
+{id:"obscene_lang",s:"2.0 & 6.2",t:"Obscene, harassing, or abusive language can justify discipline",v:"correct",pri:108,
+p:"If you used obscene, abusive, or harassing language at work, the supervisor may be correct to discipline you.",
+po:"Section 2.0 lists obscene or harassing language as a conduct violation. Section 6.2 also prohibits offensive written or verbal abuse and other harassing conduct.",
+d:"If the report accurately describes abusive, degrading, or harassing language, the handbook supports corrective action.",
+b:"If the accusation is vague or strips out context, tone, or who started the exchange, the exact wording matters.",
+q:"\"I cursed them out / used abusive language\" -> The handbook can treat that as a conduct violation.",
+kw:["cursed out","swore at","obscene language","abusive language","harassing language","called them names","berated","verbal abuse","offensive language","told them fuck","told them bitch","used profanity at work","graphic comment"]},
+{id:"smoking",s:"6.12",t:"Smoking, vaping, and tobacco products on HHF property can justify discipline",v:"correct",pri:102,
+p:"If you smoked, vaped, or carried tobacco or vaping devices on HHF property in violation of policy, the supervisor may be correct to discipline you.",
+po:"Section 6.12 prohibits smoking and vaping on HHF property, including adjoining property within direct line of sight, and says smoking/vaping devices and tobacco products must be stored in a locked, secure location outside the clinic.",
+d:"If the report accurately says you were smoking, vaping, or carrying prohibited tobacco/vape items on HHF property, the handbook supports corrective action.",
+b:"If you were off HHF property and out of sight of the clinic, or the accusation is inaccurate about where the device was, the facts matter.",
+q:"\"I vaped at work / had my vape in clinic\" -> The handbook restricts vaping and tobacco products on HHF property.",
+kw:["smoked at work","smoking at work","vaped at work","vaping at work","smoke break on property","vape in clinic","had my vape","had cigarettes in clinic","chewing tobacco at work","snuff at work","lighter in clinic","matches in clinic","tobacco on hhf property"]},
+{id:"photo_video",s:"2.21 & 6.19",t:"Unauthorized photos, videos, or posts can violate policy",v:"correct",pri:116,
+p:"If you took, posted, or shared unauthorized photos or videos from the clinic or of clients, the supervisor may be correct to discipline you.",
+po:"Section 2.21 requires prior consent for individuals appearing in photos or videos and says client photos or videos, or anything revealing PHI, need prior approval to ensure HIPAA compliance.",
+d:"If the report accurately says you took or posted unauthorized clinic or client media, the handbook supports discipline.",
+b:"If consent and required approvals were in place, or the media did not identify anyone, the exact facts matter.",
+q:"\"I posted clinic/client photos\" -> Consent and HIPAA compliance matter under the handbook.",
+kw:["posted a video","posted a photo","posted clinic video","posted clinic photo","took a video at work","took a photo at work","recorded in clinic","filmed in clinic","shared a clinic video","shared a clinic photo","posted on social media","posted on instagram","posted on tiktok","client photo","client video"]},
+{id:"client_family_phone",s:"6.5",t:"Private texting or calling client families from your personal phone can violate policy",v:"correct",pri:111,
+p:"If you used your personal phone to text or call a client's family privately, the supervisor may be correct to discipline you.",
+po:"Section 6.5 says employees are prohibited from sharing personal phone numbers or engaging in private communication via text messages or phone calls using a personal phone with client families.",
+d:"If the report accurately says you texted or called a client's family from your personal phone, the handbook supports corrective action.",
+b:"If the communication was not with a client family, the number was not personal, or the accusation misstates what happened, the details matter.",
+q:"\"I texted the parent from my personal phone\" -> The handbook prohibits private communication with client families using a personal phone.",
+kw:["texted the parent","texted parent","called the parent","called parent","client family","client's family","used my personal phone with parent","gave parent my number","shared my phone number","private communication with family","texted a client's mom","texted a client's dad","texted a client parent","called a client parent","used my personal phone with a client parent","texted the client's parent","called the client's parent"]},
+{id:"driving_device",s:"2.20",t:"Texting or using devices while driving for work can justify discipline",v:"correct",pri:114,
+p:"If you were texting, checking messages, or using a device while driving for work, the supervisor may be correct to discipline you.",
+po:"Section 2.20 says team members must refrain from reading or sending text messages, accessing records on a digital device, or checking team messages while driving, and should use hands-free operations or safely pull over.",
+d:"If the report accurately says you used a device while driving during work, the handbook supports corrective action.",
+b:"If you were safely pulled over, using hands-free appropriately, or not driving for work at the time, the exact facts matter.",
+q:"\"I checked messages while driving\" -> The handbook tells team members not to text or access records while driving.",
+kw:["texting while driving","texted while driving","checked messages while driving","checked team messages while driving","used my phone while driving","looked at my phone while driving","accessed records while driving","digital device while driving","driving for work","in-home driving","work driving","called while driving"]},
+{id:"child_abuse",s:"2.28",t:"Abuse or neglect of a child is a zero-tolerance violation",v:"correct",pri:145,
+p:"If you physically, sexually, or mentally abused or neglected a child, the supervisor is correct to treat that as a severe violation and the conduct may also be unlawful.",
+po:"Section 2.28 says HHF maintains zero tolerance against child abuse and neglect, and it is against the law and against HHF policy for employees to physically, sexually, or mentally abuse or neglect any child.",
+d:"If the report accurately describes abuse, neglect, maltreatment, or coercive sexual conduct involving a child, this is not protected conduct and may require immediate reporting.",
+b:"If the accusation is false or mischaracterizes appropriate clinical handling, the factual details and any witness evidence are critical.",
+q:"\"I abused / neglected a child\" -> The handbook treats that as zero-tolerance conduct.",
+kw:["abused a child","child abuse","neglected a child","child neglect","hurt a child","hit a child","maltreatment","physically abused","mentally abused","sexually abused","molested","neglect of a child","ignored the child on purpose"]},
+{id:"social_media",s:"2.0, 6.4 & 2.21",t:"Malicious or unauthorized social media content can violate policy",v:"correct",pri:113,
+p:"If you posted malicious, threatening, obscene, intimidating, or unauthorized work-related content on social media, the supervisor may be correct to discipline you.",
+po:"Section 6.4 prohibits statements, photos, video, or audio that could reasonably be viewed as malicious, obscene, threatening, or intimidating toward clients, team members, or others affiliated with HHF. Section 2.0 also lists failure to comply with social media and electronic use policies as a conduct violation.",
+d:"If the report accurately says you posted harassing, threatening, degrading, or unauthorized clinic-related content, the handbook supports corrective action.",
+b:"Protected concerted activity still matters. A post about wages or conditions can be protected if it does not cross into threats, harassment, PHI disclosure, or other prohibited conduct.",
+q:"\"I posted about work on social media\" -> The content and tone determine whether it is protected or disciplinable.",
+kw:["social media post","posted on facebook","posted on instagram","posted on tiktok","posted about work","tagged coworkers","used company email for social media","malicious post","threatening post","intimidating post","obscene post","hostile post","degrading post"]},
+{id:"equipment",s:"2.22",t:"Misusing company equipment can justify discipline",v:"correct",pri:101,
+p:"If you misused HHF devices or used company equipment in a way that violates policy, the supervisor may be correct to discipline you.",
+po:"Section 2.22 says HHF computers and devices are company equipment subject to review, should not be used to violate company policies, and team members must not thwart cybersecurity systems or procedures.",
+d:"If the report accurately says you misused HHF equipment, bypassed security expectations, or used a company device for prohibited conduct, the handbook supports corrective action.",
+b:"If the accusation is just normal work use, or the rule was never actually violated, the specific device activity matters.",
+q:"\"I used the HHF iPad/laptop/company phone in a prohibited way\" -> Company equipment use is reviewable and still subject to policy.",
+kw:["company equipment","hhf ipad","hhf laptop","company phone","used the work ipad","used the work laptop","misused device","bypassed security","shared password","cybersecurity","company device","used company equipment improperly"]},
+{id:"injury_reporting",s:"6.8 & 6.9",t:"Failing to report injuries or unsafe incidents can justify discipline",v:"correct",pri:99,
+p:"If you failed to report a workplace injury, unsafe condition, or incident that policy required you to report, the supervisor may be correct to discipline you.",
+po:"Sections 6.8 and 6.9 require team members to report unsafe conditions, workplace accidents, injuries, or illnesses promptly, and work-related injuries or illnesses must be reported within 24 hours.",
+d:"If the report accurately says you did not report an injury, unsafe condition, or incident when required, the handbook supports corrective action.",
+b:"If you did report it, were not the person responsible to report, or were denied a chance to complete the form, the facts should be clarified.",
+q:"\"I didn't report the injury/unsafe condition\" -> The handbook expects prompt reporting.",
+kw:["didn't report the injury","failed to report injury","didn't report the accident","didn't report unsafe condition","unsafe condition not reported","never filed injury report","reported it too late","didn't tell supervisor about injury","failed to complete injury form"]},
+{id:"cancel_no_report",s:"2.10",t:"You must report to the clinic after certain client cancellations",v:"correct",pri:109,
+p:"If your home or community client canceled and you failed to report to the clinic, the supervisor may be correct to discipline you.",
+po:"Section 2.10 says that after a home or community cancellation, team members must report to the clinic. Failure to report can result in PTO use or being marked as an unapproved absence leading to further discipline.",
+d:"If the report accurately says you did not report to the clinic after a qualifying cancellation, the handbook supports corrective action.",
+b:"If you were told not to report, were never informed of the expectation, or the cancellation facts are different, the details matter.",
+q:"\"My client canceled and I just went home\" -> The handbook says some cancellations still require reporting to the clinic.",
+kw:["didn't report to clinic","did not report to clinic","client canceled and i went home","went home after cancellation","home cancellation","community cancellation","didn't go to the clinic","failed to report after cancellation","client canceled so i left","was supposed to report to clinic"]},
+{id:"cybersecurity",s:"2.22",t:"Sharing passwords or bypassing cybersecurity rules can justify discipline",v:"correct",pri:103,
+p:"If you shared passwords, bypassed security controls, or ignored device-security rules, the supervisor may be correct to discipline you.",
+po:"Section 2.22 says cybersecurity is every team member's responsibility, passwords should not be shared, and team members must not take actions to thwart cybersecurity systems or procedures.",
+d:"If the report accurately says you shared credentials, bypassed security, or ignored required security procedures, the handbook supports corrective action.",
+b:"If no credentials were shared and the device use was authorized, the exact security facts matter.",
+q:"\"I shared my password / bypassed security\" -> The handbook treats cybersecurity compliance as part of device use.",
+kw:["shared password","gave my password","used someone else's password","logged in for someone else","bypassed security","thwarted cybersecurity","ignored security procedure","shared login","shared credentials","password sharing","used coworker login"]},
+{id:"false_wrongdoing_report",s:"6.3",t:"Intentionally false wrongdoing reports can justify discipline",v:"correct",pri:106,
+p:"If you knowingly filed a false report of wrongdoing, the supervisor may be correct to discipline you.",
+po:"Section 6.3 protects whistleblowers, but it also says intentionally filing a false report of wrongdoing may lead to discipline, including termination.",
+d:"If the report accurately says you knowingly made a false complaint or dishonest wrongdoing report, the handbook supports corrective action.",
+b:"If you made a good-faith report based on what you believed at the time, whistleblower protections may still apply even if the report was not substantiated.",
+q:"\"I made a report I knew wasn't true\" -> The handbook protects good-faith reporting, not intentional false reports.",
+kw:["false report","knowingly false report","made a false complaint","lied in a complaint","dishonest report","fake report","report i knew wasn't true","intentionally false report","made up a complaint","made a report i knew was false","complaint i knew was false","report that was false"]},
+{id:"visitor_security",s:"6.0 & 6.8",t:"Unauthorized visitors and security concerns must be reported",v:"correct",pri:92,
+p:"If you knowingly allowed or ignored an unauthorized visitor or failed to report a related safety concern, the supervisor may be correct to discipline you.",
+po:"The handbook expects unauthorized visitors and safety concerns to be reported to leadership, and safety reporting is part of every team member's responsibility.",
+d:"If the report accurately says you let an unauthorized person remain or failed to report a visitor/security issue, the handbook supports corrective action.",
+b:"If you reported it promptly or did not know the person was unauthorized, the details matter.",
+q:"\"I let an unauthorized person stay / didn't report them\" -> The handbook expects security concerns to be reported.",
+kw:["unauthorized visitor","didn't report visitor","let them stay in clinic","unknown person in clinic","visitor not reported","didn't tell bcba about visitor","didn't report unauthorized person","security issue not reported"]},
+{id:"personal_phone_misuse",s:"2.0 & 6.5",t:"Personal phone use not tied to patient care can justify discipline",v:"correct",pri:112,
+p:"If you were using your personal phone for non-clinical reasons while on duty or with a client, the supervisor may be correct to discipline you.",
+po:"Section 6.5 and Section 2.0 prohibit personal cellphone usage during work hours when it is not for direct patient care, and personal phone use while with a client is strictly prohibited.",
+d:"If the report accurately says you were texting, scrolling, shopping, using social media, or otherwise using your phone for personal reasons during work, the handbook supports corrective action.",
+b:"If the phone was being used for direct patient care, data, timing, Teams, or another legitimate clinical purpose, the discipline may still be wrong.",
+q:"\"I was on my phone for personal stuff in session\" -> The handbook does not protect personal phone use on duty.",
+kw:["personal phone use","using my phone for personal reasons","social media at work","instagram at work","facebook at work","tiktok at work","shopping on my phone","texting my friend","personal call","facetime at work","scrolling on my phone","on my phone for personal stuff"]},
+{id:"unauthorized_overtime",s:"2.0 & 2.5",t:"Working unauthorized overtime can justify discipline",v:"correct",pri:97,
+p:"If you stayed late or worked overtime without approval on your own, the supervisor may be correct to discipline you.",
+po:"Section 2.5 says overtime must be approved in advance, and Section 2.0 lists working unauthorized overtime as a conduct violation.",
+d:"If the report accurately says you chose to work extra hours without getting approval first, the handbook supports corrective action.",
+b:"If a supervisor directed or expected you to stay, the issue may be unpaid directed work rather than unauthorized overtime.",
+q:"\"I stayed late without asking\" -> The handbook requires advance approval for overtime.",
+kw:["unauthorized overtime","worked overtime without approval","stayed late without approval","worked extra hours without approval","i stayed late on my own","overtime not approved","worked beyond my shift without approval"]},
+{id:"dress_code_clear",s:"2.16",t:"Clear dress code violations can justify discipline",v:"correct",pri:90,
+p:"If you wore something the handbook specifically prohibits, the supervisor may be correct to discipline you.",
+po:"Section 2.16 requires HHF branded shirts, closed-toe shoes, and no grabbable jewelry, with related appearance and safety expectations.",
+d:"If the report accurately says you wore open-toed shoes, prohibited jewelry, or a non-HHF shirt when required, the handbook supports corrective action.",
+b:"If the issue involves something not clearly listed in the handbook, accommodations, or inconsistent enforcement, the situation may still be arguable.",
+q:"\"I wore Crocs / open-toed shoes / no HHF shirt\" -> Some dress code issues are specifically covered by the handbook.",
+kw:["open-toed shoes","open toed shoes","crocs","flip flops","no hhf shirt","not wearing hhf shirt","dangling earrings","grabbable jewelry","necklace at work","dress code violation"]},
+{id:"hygiene_clear",s:"2.17",t:"Serious hygiene or health-safety noncompliance can justify discipline",v:"correct",pri:88,
+p:"If you ignored clear hygiene or health-safety standards that put others at risk, the supervisor may be correct to discipline you.",
+po:"The handbook says hygiene and appearance standards exist to protect health and safety, and persistent non-compliance can result in immediate termination when it poses a risk to team members and clients.",
+d:"If the report accurately says you entered the clinic in a condition that violated explicit hygiene or health-safety rules, the handbook supports corrective action.",
+b:"If the accusation is exaggerated, one-off, or not tied to an actual handbook standard, the exact facts matter.",
+q:"\"I came in with a strong smoke/marijuana odor or contagious condition\" -> The handbook treats some hygiene and health risks seriously.",
+kw:["strong smoke odor","smelled like weed","marijuana smell","cigarette smoke smell","came in sick","contagious","pink eye","ringworm","lice","health safety issue","hygiene violation"]}
+];
+
+var RPT=[{n:"Any Supervisor or Leader",r:"Section 1.8"},{n:"People Operations (HR)",r:"hr@hhfamily.com"},{n:"Anonymous Complaint Line",r:"520-521-2222"},{n:"Anonymous Suggestion Box",r:"SharePoint"}];
+var DYK=["iPads are never mentioned in the HHF Handbook","Discussing pay with coworkers is a federal right","A documented email IS a written warning - no matter what they call it","You can always decline to sign - Section 2.18","All policies apply equally to BCBAs - Section 2.0","Medical absences with a note = ONE occurrence","Off-the-clock work is banned - if you work, you get paid","The ABA industry has 65% turnover - you're not the problem","The handbook has an exception for phone use during patient care","Progressive discipline means verbal FIRST - always"];
+
+var rc=0,ah=[],activeAnalysisText="";
+
+function sanitizedText(text){
+  var t=(text||"").replace(/\r/g,"").trim();
+  t=t.replace(/^(from|sent|subject|to|cc):.*$/gim,"");
+  t=t.replace(/^on .+ wrote:.*$/gim,"");
+  t=t.replace(/^>.*$/gim,"");
+  t=t.replace(/^hi\b.*$/gim,"");
+  t=t.replace(/^hello\b.*$/gim,"");
+  t=t.replace(/^thanks[,]?.*$/gim,"");
+  t=t.replace(/^thank you[,]?.*$/gim,"");
+  t=t.replace(/^best[,]?.*$/gim,"");
+  t=t.replace(/^sincerely[,]?.*$/gim,"");
+  t=t.replace(/^regards[,]?.*$/gim,"");
+  t=t.replace(/^\s*[-*]\s+/gm,"");
+  t=t.replace(/[-_]{3,}.*/g,"");
+  t=t.replace(/\n{3,}/g,"\n\n").trim();
+  return t;
+}
+
+function shortInputSummary(text){
+  var t=sanitizedText(text).replace(/\s+/g," ").trim();
+  if(!t)return "";
+  if(t.length<180)return t;
+  var first=t.split(/[.!?]\s+/)[0].trim();
+  if(first&&first.length<=160)return first+".";
+  return t.slice(0,157).trim()+"...";
+}
+
+function formatSectionRef(s){
+  var raw=String(s||"").replace(/\s+/g," ").trim();
+  if(!raw)return "HHF Handbook";
+  if(/^not in handbook$/i.test(raw))return "Not in HHF Handbook";
+  if(/^general$/i.test(raw)||/^industry context$/i.test(raw))return raw;
+  raw=raw.replace(/&/g,",").replace(/\band\b/gi,",");
+  var parts=raw.split(",").map(function(part){return part.trim()}).filter(Boolean);
+  return parts.map(function(part){
+    return /^§/.test(part)||/^HHF Handbook/i.test(part)?part:"HHF Handbook §"+part;
+  }).join(" | ");
+}
+
+function seriousCase(hits){
+  return hits.some(function(hit){
+    return /weapons|violence|substances|hipaa|confidentiality|child_abuse|time_fraud|theft|unsafe|photo_video/.test(hit.r.id);
+  });
+}
+
+function issueCount(hits){
+  var seen={};
+  hits.forEach(function(hit){seen[hit.r.id]=true});
+  return Object.keys(seen).length;
+}
+
+function confidenceLabel(hit){
+  if(hit.cf==="HIGH")return "High confidence";
+  if(hit.cf==="MED")return "Likely";
+  return "Needs more facts";
+}
+
+function visibleConfidence(hit){
+  if(hit.c)return "Disputed facts";
+  if(hit.r.id==="need_more_facts")return "Retype with more detail";
+  if(hit.r.v==="grey"||hit.cf==="LOW"||hit.cf==="INFO")return "Depends on missing details";
+  return "";
+}
+
+function userLabel(text){
+  if(/bcba/i.test(text))return "your BCBA";
+  if(/clinical director/i.test(text))return "your clinical director";
+  if(/hr|people operations/i.test(text))return "HR";
+  if(/leadership|manager/i.test(text))return "leadership";
+  return "your supervisor";
+}
+
+function showToast(msg){
+  var el=document.getElementById('to');
+  if(!el)return;
+  el.textContent=msg||"Copied";
+  el.classList.add('show');
+  clearTimeout(showToast._t);
+  showToast._t=setTimeout(function(){el.classList.remove('show')},1800);
+}
+
+function showLoading(on){
+  var ld=document.getElementById('ld');
+  if(!ld)return;
+  ld.classList.toggle('show',!!on);
+}
+
+function updateInputMode(hasResults){
+  document.getElementById('iw').classList.toggle('hide',!!hasResults);
+}
+
+function autoResizeInput(){
+  var ta=document.getElementById('mi');
+  if(!ta)return;
+  ta.style.height='180px';
+  var next=Math.min(Math.max(ta.scrollHeight,180),420);
+  ta.style.height=next+'px';
+}
+
+function matchRule(text,rule){
+  var matched=false,mc=0;
+  if(rule.kw){rule.kw.forEach(function(k){
+    if(k.indexOf(".*")!==-1){
+      try{if(new RegExp(k).test(text)){matched=true;mc++}}catch(e){}
+    }else if(text.indexOf(k)!==-1){
+      matched=true;mc++;
+    }
+  })}
+  return matched?{matched:true,mc:mc}:null;
+}
+
+function hasSeriousConduct(text){
+  return /gun|firearm|weapon|knife|explosive|threat|violent|violence|fight|fighting|assault|hit|shoved|drunk|intoxicated|high at work|used drugs|drug use|selling drugs|hipaa|phi|client photo|client video|shared client info|stole|theft|falsified time|time fraud|insubordination|refused to do|unsafe|safety violation|child abuse|neglect|abuse|smoked at work|vaped at work|texting while driving|texted while driving/.test(text);
+}
+
+function hasDispute(text){
+  return /false|lied|fabricated|not true|didn't happen|never happened|accused me|they said i|they claim|claim(ed)? i|wasn't me|not mine|misunderstood|misrepresented/.test(text);
+}
+
+function hasAdmission(text){
+  return /\bi\b.*\b(brought|had|used|texted|called|posted|shared|stole|refused|ignored|went home|didn't report|stayed late|worked overtime|wore|vaped|smoked|hit|threatened|fought|drove|checked)\b/.test(text);
+}
+
+function hasDirectAdmission(text){
+  return hasAdmission(text)&&!hasAccusationContext(text);
+}
+
+function hasApprovedInternalComm(text){
+  return /(teams|team app|company teams|microsoft teams|work app|approved channel|company phone|work phone|internal message|internal messaging|coworker|coworkers|supervisor|bcba|leadership|clinic chat|staff chat)/.test(text);
+}
+
+function hasExplicitPhi(text){
+  return /(client name|full name|dob|date of birth|diagnosis|medical chart|problem log|billing record|insurance info|client photo|client video|posted client|sent client photo|identifying information)/.test(text);
+}
+
+function hasAccusationOnly(text){
+  return /(said it was|told me it was|called it|claimed it was|wrote that it was).*(hipaa|phi|privacy violation)/.test(text);
+}
+
+function hasAccusationContext(text){
+  return /(they said|my supervisor said|my bcba said|the write-?up says|the email says|i was accused|they accused me|they claimed|they wrote that|they alleged|the report says|it says i)/.test(text);
+}
+
+function hasDisputeContext(text){
+  return /(that is false|that wasn't true|that didn't happen|they lied|misrepresented|twisted|fabricated|not what happened|not accurate)/.test(text);
+}
+
+function extractIssueSegments(text){
+  var base=sanitizedText(text.toLowerCase());
+  var primary=base.split(/\n+|[.!?]+/).map(function(part){return part.trim()}).filter(Boolean);
+  var out=[];
+  primary.forEach(function(part){
+    part.split(/\bbut\b|\bhowever\b|\balso\b|\bthen\b|\bwhile\b|\bafter that\b|;/g).forEach(function(chunk){
+      var c=chunk.trim();
+      if(c.length>=12)out.push(c);
+    });
+  });
+  if(!out.length&&base)out=[base];
+  var seen={};
+  return out.filter(function(seg){
+    if(seen[seg])return false;
+    seen[seg]=true;
+    return true;
+  }).slice(0,10);
+}
+
+function issueFamily(id){
+  if(/phone|hipaa|confidentiality|photo_video|client_family_phone|social_media|cybersecurity|equipment/.test(id))return "communication";
+  if(/progressive|false_report|inaccurate_doc|policy_claim|open_door/.test(id))return "process";
+  if(/attendance|client_cancel|cancel_no_report|time_track|time_fraud|overtime|unauthorized_overtime/.test(id))return "time";
+  if(/bullying|whistleblower|nlra|breaks|kids_guilt|equal/.test(id))return "rights";
+  if(/weapons|violence|substances|unsafe|theft|child_abuse|obscene_lang|smoking|injury_reporting|visitor_security|insubordination/.test(id))return "serious";
+  if(/dress|hygiene/.test(id))return "appearance";
+  return "general";
+}
+
+function isSeriousRule(id){
+  return /weapons|violence|substances|hipaa|confidentiality|child_abuse|time_fraud|theft|unsafe|photo_video|false_wrongdoing_report/.test(id);
+}
+
+function scoreHit(text,rule,mc,contra,ctx){
+  ctx=ctx||{};
+  var score=mc*10+(rule.pri||0);
+  if(rule.v==="correct")score+=8;
+  if(rule.v==="wrong")score+=4;
+  if(contra)score+=10;
+  if(rule.v==="correct"&&ctx.admission&&!ctx.dispute)score+=12;
+  if(rule.v==="wrong"&&ctx.admission&&hasSeriousConduct(text)&&!ctx.dispute)score-=35;
+  if(rule.v==="correct"&&ctx.accusation&&!ctx.admission)score-=20;
+  if(rule.v==="correct"&&ctx.dispute&&!ctx.admission)score-=18;
+  if(isSeriousRule(rule.id)&&ctx.accusation&&ctx.dispute&&!ctx.admission)score-=120;
+  if(rule.id==="progressive"&&hasSeriousConduct(text))score-=70;
+  if(rule.id==="inaccurate_doc"&&hasSeriousConduct(text)&&!/false|lied|fabricated|not true|didn't happen/.test(text))score-=40;
+  if(rule.id==="equal"&&hasSeriousConduct(text))score-=20;
+  if(rule.id==="phone"&&/personal|social media|instagram|tiktok|facebook|texting|texted|personal call|facetime|shopping/.test(text))score-=45;
+  if(rule.id==="phone"&&/client family|parent|mom|dad|guardian/.test(text)&&/text|call|phone/.test(text))score-=30;
+  if(rule.id==="phone"&&ctx.internalComm&&!/parent|client family|mom|dad|guardian/.test(text))score+=28;
+  if(rule.id==="client_cancel"&&/didn't report to clinic|did not report to clinic|went home after cancellation|failed to report after cancellation/.test(text))score-=40;
+  if(rule.id==="whistleblower"&&/false report|made a false complaint|lied in a complaint|intentionally false report/.test(text))score-=45;
+  if(rule.id==="nlra"&&/client pay|insurance reimbursement|billing info|confidential.*payor/.test(text))score-=30;
+  if(rule.id==="confidentiality"&&/my pay|my wage|my salary|our pay|coworker pay|discuss pay/.test(text))score-=35;
+  if((rule.id==="hipaa"||rule.id==="confidentiality")&&ctx.internalComm&&!ctx.explicitPhi)score-=85;
+  if(rule.id==="hipaa"&&ctx.internalComm&&ctx.accusationOnly&&!/client name|diagnosis|chart|photo|video|billing|insurance/.test(text))score-=140;
+  if(rule.id==="client_family_phone"&&ctx.internalComm&&!/parent|client family|mom|dad|guardian/.test(text))score-=65;
+  if(rule.id==="personal_phone_misuse"&&ctx.internalComm&&!/social media|instagram|tiktok|facebook|shopping|personal call|facetime/.test(text))score-=55;
+  if(rule.id==="time_track"&&/falsified time|fake hours|logged hours i didn't work|edited my time|manipulated time/.test(text))score-=35;
+  if(rule.id==="photo_video"&&/consent|approved|marketing approval|compliance approval|de-identified/.test(text))score-=25;
+  if(rule.id==="social_media"&&/my pay|our pay|wages|working conditions|organizing|union/.test(text)&&!/threat|obscene|intimidat|harass|client|phi|photo|video/.test(text))score-=28;
+  if(rule.id==="overtime"&&/without approval|on my own|didn't ask|did not ask|wasn't told to stay/.test(text))score-=35;
+  if(rule.id==="dress"&&/open-toed|open toed|crocs|flip flops|no hhf shirt|dangling earrings|grabbable jewelry/.test(text))score-=18;
+  if(rule.id==="false_report"&&/\bi\b.*(made|filed|reported|complaint).*(false|knew wasn't true|not true)/.test(text))score-=55;
+  if(rule.id==="false_wrongdoing_report"&&/\bi\b.*(made|filed|reported|complaint).*(false|knew wasn't true|not true)/.test(text))score+=40;
+  if(isSeriousRule(rule.id)&&ctx.accusation&&!ctx.admission&&!contra)score-=18;
+  if(isSeriousRule(rule.id)&&!ctx.explicitPhi&&/hipaa|phi/.test(rule.id)&&ctx.internalComm)score-=40;
+  return score;
+}
+
+function fm(text){
+  var l=text.toLowerCase().replace(/['']/g,"'").replace(/[""]/g,'"');
+  var segments=extractIssueSegments(l);
+  if(segments.indexOf(l)===-1)segments.unshift(l);
+  var map={};
+  var overallCtx={
+    accusation:hasAccusationContext(l),
+    accusationOnly:hasAccusationOnly(l),
+    dispute:hasDispute(l)||hasDisputeContext(l),
+    admission:hasDirectAdmission(l),
+    internalComm:hasApprovedInternalComm(l),
+    explicitPhi:hasExplicitPhi(l)||(hasDirectAdmission(l)&&/shared client info|shared client information|confidential client info|confidential client information|privacy violation/.test(l))
+  };
+  segments.forEach(function(seg,segIndex){
+    var ctx={
+      accusation:hasAccusationContext(seg)||overallCtx.accusation,
+      accusationOnly:hasAccusationOnly(seg)||overallCtx.accusationOnly,
+      dispute:hasDispute(seg)||hasDisputeContext(seg)||overallCtx.dispute,
+      admission:hasDirectAdmission(seg)||overallCtx.admission,
+      internalComm:hasApprovedInternalComm(seg)||overallCtx.internalComm,
+      explicitPhi:hasExplicitPhi(seg)||(hasDirectAdmission(seg)&&/shared client info|shared client information|confidential client info|confidential client information|privacy violation/.test(seg))||overallCtx.explicitPhi
+    };
+    R.forEach(function(r){
+      var m=matchRule(seg,r);
+      if(!m)return;
+      var contra=cc(seg,r.id);
+      var score=scoreHit(seg,r,m.mc,contra,ctx);
+      var existing=map[r.id];
+      var hit={
+        r:r,
+        c:contra,
+        cf:m.mc>=4||score>=130?"HIGH":m.mc>=2||score>=90?"MED":m.mc>=1?"LOW":"INFO",
+        mc:m.mc,
+        score:score,
+        family:issueFamily(r.id),
+        seg:seg,
+        segIndex:segIndex
+      };
+      if(!existing||hit.score>existing.score){
+        map[r.id]=hit;
+      }else if(existing&&segIndex!==existing.segIndex&&hit.score>=existing.score-10){
+        existing.score+=4;
+      }
+    });
+  });
+  var hits=Object.keys(map).map(function(k){return map[k]});
+  hits.sort(function(a,b){return b.score-a.score||b.mc-a.mc});
+  if(hits.length){
+    var topCorrect=hits.filter(function(h){return h.r.v==="correct"}).sort(function(a,b){return b.score-a.score})[0];
+    var topWrong=hits.filter(function(h){return h.r.v==="wrong"}).sort(function(a,b){return b.score-a.score})[0];
+    var topGrey=hits.filter(function(h){return h.r.v==="grey"}).sort(function(a,b){return b.score-a.score})[0];
+    if(topCorrect&&topCorrect.score>=120){
+      hits=hits.filter(function(h){
+        if(h.r.v==="correct"||h.c||h.score>=topCorrect.score-35)return true;
+        if(topWrong&&h.r.id===topWrong.r.id&&topWrong.score>=40)return true;
+        if(topGrey&&h.r.id===topGrey.r.id&&topGrey.score>=50)return true;
+        return false;
+      });
+    }
+    if(hits[0]&&hits[0].score>=60){
+      hits=hits.filter(function(h){return h.score>=15||h.c});
+    }
+    hits=hits.filter(function(h){return h.score>=25||(h.c&&h.score>=35)});
+    hits=hits.filter(function(h){
+      if(!isSeriousRule(h.r.id))return true;
+      if(h.c)return true;
+      if(/hipaa|confidentiality/.test(h.r.id))return h.score>=85||h.seg&&hasExplicitPhi(h.seg);
+      return h.score>=75;
+    });
+    hits.sort(function(a,b){return b.score-a.score||b.mc-a.mc});
+    if(hits.length>3){
+      var kept=[],seenFamilies={};
+      hits.forEach(function(hit){
+        if(kept.length>=8)return;
+        var fam=hit.family||"general";
+        if(!seenFamilies[fam]||hit.score>=hits[0].score-30||kept.length<3){
+          kept.push(hit);
+          seenFamilies[fam]=(seenFamilies[fam]||0)+1;
+        }
+      });
+      hits=kept;
+    }
+  }
+  if(!hits.length||hits[0].score<25){
+    hits.push({
+      r:{
+        id:"need_more_facts",
+        s:"General",
+        t:"More facts are needed before the handbook can be applied confidently",
+        v:"grey",
+        p:"This input is too vague or too short to give a reliable handbook answer yet.",
+        po:"The handbook can only be applied accurately when the facts are specific: what happened, who said what, where it happened, and whether client care, safety, privacy, or a formal write-up was involved.",
+        d:"Add more detail: what you did, what the supervisor said, whether it happened on HHF property or in session, and whether there was a write-up, threat, privacy issue, safety issue, or client impact.",
+        b:"If the missing facts show a clear policy violation, the supervisor may be correct. If they show a false accusation or skipped procedure, you may have protections.",
+        q:"\"They got mad at me\" -> Add what happened, what was said, and what rule they claimed you broke."
+      },
+      c:null,
+      cf:"INFO",
+      mc:0,
+      score:1
+    });
+  }
+  return hits.slice(0,8);
+}
+
+function cc(t,id){
+  if(id==="phone"){
+    if(/timer|data|teams|reinforcer|understood|doing.*(her|his|their|my) job|use of timer|clinical|was using|was doing|taking data/.test(t)&&/warning|corrective|no tolerance|verbal warning|discipline|write.?up|written|wrote/.test(t))
+      return"The write-up acknowledges clinical/work phone use but still disciplines - the BCBA's own words prove the exception applies.";
+  }
+  if(id==="progressive"){
+    if(/verbal warning|not an official|not a write|paper trail|this email serves|not an official write|this is not/.test(t)&&/action plan|impact|summary|paper trail|email|documented|moving forward|corrective/.test(t))
+      return"Claims to be 'verbal' but has formal documentation (summary, impact, action plan). That's written - the step was skipped.";
+  }
+  if(id==="inaccurate_doc"){
+    if(/understood|acknowledged|she understood|he understood|doing.*(her|his|their|my) job|use of timer|was doing|was using|taking data/.test(t)&&/warning|corrective|violation|no tolerance|write.?up|written|wrote/.test(t))
+      return"The BCBA acknowledged job performance but still disciplined - their own words contradict the basis for the write-up.";
+  }
+  if(id==="admin_permission"){
+    if(/permission|ask before|ask first|approval/.test(t)&&/clean|dishes|admin|organize|maintenance|sweep|mop|wipe|tidy/.test(t))
+      return"The handbook doesn't require BCBA permission for routine clinic tasks. This is micromanagement, not policy.";
+  }
+  if(id==="weapons"){
+    if(/not true|didn't happen|false|lied|fabricated|wasn't mine|never brought|no gun|no weapon/.test(t))
+      return"If the report is inaccurate about the weapon or whether it was on HHF property, the facts should be challenged immediately.";
+  }
+  if(id==="hipaa"){
+    if(/no name|not identifiable|consent|permission|authorized|de-identified/.test(t))
+      return"If the information was truly de-identified or authorized, the write-up may be overstating the privacy issue.";
+    if(hasApprovedInternalComm(t)&&!hasExplicitPhi(t))
+      return"If this was internal work communication through an approved channel like Teams and no identifying client information was actually shared, this may not be a real HIPAA issue.";
+  }
+  if(id==="time_fraud"){
+    if(/told me to work|made me work|directed to stay|approved overtime|accurate time/.test(t))
+      return"If you accurately recorded directed work time, this may be a pay-compliance issue rather than time fraud.";
+  }
+  if(id==="social_media"){
+    if(/wages|pay|working conditions|union|organizing/.test(t)&&!/threat|obscene|intimidat|harass|client|phi/.test(t))
+      return"If the post was about wages or working conditions and did not include threats, harassment, or confidential information, protected concerted activity may still apply.";
+  }
+  if(id==="client_family_phone"){
+    if(/clinical|direct patient care|teams|company phone|approved channel/.test(t))
+      return"If the communication was through an approved work channel rather than a personal phone, the write-up may be overstating the issue.";
+  }
+  if(id==="cancel_no_report"){
+    if(/told me to go home|was told not to report|they sent me home|supervisor said go home/.test(t))
+      return"If leadership told you not to report to the clinic, the write-up may be misstating your obligations under the cancellation policy.";
+  }
+  if(id==="cybersecurity"){
+    if(/never shared|didn't share|authorized|permission|approved/.test(t))
+      return"If the access was authorized and no credentials were improperly shared, the write-up may be overstating a cybersecurity issue.";
+  }
+  if(id==="false_wrongdoing_report"){
+    if(/good faith|i believed|thought it was true|was trying to report|suspected/.test(t))
+      return"If you reported in good faith based on what you believed, whistleblower protections may still matter even if the report was not substantiated.";
+  }
+  if(id==="personal_phone_misuse"){
+    if(/timer|data|teams|reinforcer|clinical|direct patient care/.test(t))
+      return"If the phone was actually being used for direct patient care, the supervisor may be treating clinical phone use as personal use.";
+  }
+  if(id==="unauthorized_overtime"){
+    if(/told me to stay|made me stay|directed me to stay|expected me to stay|finish before you leave/.test(t))
+      return"If leadership directed the extra work, this may be directed overtime rather than unauthorized overtime.";
+  }
+  return null;
+}
+
+function summaryText(hits){
+  var onlyThin=hits.every(function(h){return h.r.id==="need_more_facts"});
+  var correct=hits.filter(function(h){return h.r.v==="correct"&&h.r.id!=="need_more_facts"}).length;
+  var wrong=hits.filter(function(h){return h.r.v==="wrong"}).length;
+  var grey=hits.filter(function(h){return h.r.v==="grey"}).length;
+  if(onlyThin)return{main:"The facts are too thin to call this cleanly.",tone:"grey"};
+  if(correct&&wrong)return{main:"Both you and your supervisor likely violated HHF policy.",tone:"mixed"};
+  if(correct)return{main:seriousCase(hits)?"You clearly violated HHF policy.":"You likely violated HHF policy.",tone:"you"};
+  if(wrong)return{main:"Your supervisor likely violated HHF policy.",tone:"sup"};
+  if(grey)return{main:"This depends on missing details.",tone:"grey"};
+  return{main:"The facts are too thin to call this cleanly.",tone:"grey"};
+}
+
+function nextStepsForHits(hits){
+  var out={lead:"",groups:[]};
+  var stepsNow=[],stepsDoc=[],stepsArgue=[],stepsContact=[];
+  var ids={};
+  hits.forEach(function(hit){ids[hit.r.id]=true});
+  if(ids.need_more_facts){
+    stepsNow.push("Retype this calmly with more detail.");
+    stepsDoc.push("Include what happened, who was involved, what your supervisor said, what rule or write-up was mentioned, and whether a client, safety issue, or private information was involved.");
+  }
+  if(hits.some(function(hit){return hit.r.v==="correct"&&hit.r.id!=="need_more_facts";})){
+    stepsNow.push("Read the cited handbook sections before you respond.");
+    stepsDoc.push("Write down exactly what happened, who saw it, and what part of the write-up is factually accurate versus inaccurate.");
+  }
+  if(hits.some(function(hit){return hit.r.v==="wrong";})){
+    stepsDoc.push("Save the write-up, email, text, or meeting notes and preserve the date, time, exact wording, and who was present.");
+  }
+  if(ids.hipaa||ids.confidentiality||ids.photo_video){
+    stepsNow.push("Stop any further sharing of private or confidential information immediately.");
+  }
+  if(ids.weapons||ids.violence||ids.substances||ids.child_abuse){
+    stepsArgue.push("Do not fight the wrong battle here.");
+    stepsArgue.push("Focus on accuracy, accountability, and limiting damage. Serious safety, abuse, weapons, violence, or substance issues can bypass normal progressive discipline under the handbook.");
+  }
+  if(ids.progressive||ids.false_report||ids.inaccurate_doc){
+    stepsArgue.push("If your supervisor's write-up skipped steps or misstated facts, quote the exact handbook mismatch when you respond.");
+  }
+  if(ids.client_cancel||ids.cancel_no_report){
+    stepsDoc.push("For cancellation cases, note whether you were expected to report to the clinic, offered alternate work, or directly told to go home.");
+  }
+  if(ids.phone||ids.personal_phone_misuse||ids.client_family_phone){
+    stepsArgue.push("Separate clinical phone use, personal phone use, and parent communication. The handbook treats those differently.");
+  }
+  if(ids.time_track||ids.time_fraud||ids.unauthorized_overtime){
+    stepsArgue.push("Separate accurate recording of directed work from fake time, off-the-clock work, and unauthorized overtime.");
+  }
+  if(hits.some(function(hit){return hit.r.v==="wrong";})){
+    stepsContact.push("Document first, then escalate through the proper HHF channel if needed.");
+  }
+  if(!stepsNow.length&&!stepsDoc.length&&!stepsArgue.length&&!stepsContact.length){
+    stepsNow.push("Your next move is straightforward.");
+    stepsDoc.push("Document the facts carefully and compare them to the cited handbook sections before responding.");
+  }
+  if((ids.weapons||ids.violence||ids.substances||ids.child_abuse)||hits.filter(function(hit){return hit.r.v==="correct"}).length&&hits.filter(function(hit){return hit.r.v==="wrong"}).length){
+    out.lead="Start by locking down the facts, documents, and timeline.";
+  }
+  if(stepsNow.length)out.groups.push({title:"What to do now",steps:stepsNow.slice(0,3)});
+  if(stepsDoc.length)out.groups.push({title:"What to document",steps:stepsDoc.slice(0,3)});
+  if(stepsArgue.length)out.groups.push({title:"What not to miss",steps:stepsArgue.slice(0,3)});
+  if(stepsContact.length)out.groups.push({title:"Who to bring this to",steps:stepsContact.slice(0,2)});
+  return out;
+}
+
+function renderHitCard(hit,bi,i,open){
+  var r=hit.r;
+  var vc=r.v==="wrong"?"v-wrong":r.v==="correct"?"v-correct":"v-grey";
+  var bc=r.v==="wrong"?"wrong":r.v==="correct"?"correct":"grey";
+  var vl=r.v==="wrong"?"SUPERVISOR ISSUE":r.v==="correct"?"YOU VIOLATED POLICY":"GREY AREA";
+  var cl=visibleConfidence(hit);
+  var ci=bi+'c'+i;
+  var h='<div class="crd'+(hit.c?' contra':'')+'" id="'+ci+'" style="animation-delay:'+(220+(i*110))+'ms">';
+  h+='<div class="crd-v '+vc+'">';
+  h+='<span class="v-badge '+bc+'">'+vl+'</span>';
+  h+='<div class="v-text">'+r.p+'</div>';
+  h+='<div class="v-section">'+formatSectionRef(r.s)+(r.t?' - '+r.t:'')+'</div>';
+  if(cl)h+='<div class="v-conf">'+cl+'</div>';
+  h+='</div>';
+  h+='<div class="crd-body">';
+  if(hit.c)h+='<div class="blk blk-contra"><div class="blk-label">What may change this</div><p>'+hit.c+'</p></div>';
+  h+='<div class="blk blk-main"><div class="blk-label">Why this matched</div><p>'+r.d+'</p></div>';
+  if(hit.c||r.v==="grey"||hit.cf==="LOW"||hit.cf==="INFO")h+='<div class="blk blk-change"><div class="blk-label">What could change the answer</div><p>'+r.b+'</p></div>';
+  h+='</div></div>';
+  return h;
+}
+
+function renderGroup(title,note,cls,list,bi,startIndex,order){
+  var h='<div class="grp '+cls+'" style="animation-delay:'+(order*70)+'ms"><div class="grp-head"><div class="grp-title">'+title+'</div><div class="grp-note">'+list.length+' item'+(list.length!==1?'s':'')+'</div></div>';
+  if(!list.length){
+    var emptyCopy=cls==="you"?"Nothing here shows that you violated HHF policy.":cls==="sup"?"Nothing here shows that your supervisor violated HHF policy.":"Nothing here looks unclear or borderline under the handbook.";
+    h+='<div class="group-empty '+cls+'">'+emptyCopy+'</div>';
+  }else{
+    list.forEach(function(hit,offset){h+=renderHitCard(hit,bi,startIndex+offset,offset===0)});
+  }
+  h+='</div>';
+  return h;
+}
+
+function rb(hits,qt){
+  rc++;
+  var nc=hits.filter(function(h){return h.c}).length;
+  var bi='rb'+rc;
+  var correctHits=hits.filter(function(h){return h.r.v==="correct"&&h.r.id!=="need_more_facts"});
+  var wrongHits=hits.filter(function(h){return h.r.v==="wrong"});
+  var greyHits=hits.filter(function(h){return h.r.v==="grey"||h.r.id==="need_more_facts"});
+  var summary=summaryText(hits);
+  var nextSteps=nextStepsForHits(hits);
+  var h='<div class="res-block" id="'+bi+'">';
+  h+='<div class="res-query" id="'+bi+'q" data-toggle-query="'+bi+'q"><div class="res-query-text">'+esc(qt)+'</div><div class="res-query-chevron">v</div></div>';
+  h+='<button type="button" class="btn-edit" data-edit-description="1">Edit my description</button>';
+  h+='<div class="summ summ-'+summary.tone+'"><div class="summ-top"><div class="summ-main">'+summary.main+'</div></div></div>';
+
+  h+=renderGroup('Where You Violated HHF Policy','Handbook sections that support discipline against you.','you',correctHits,bi,0,1);
+  h+=renderGroup('What Your Supervisor Likely Violated','Clear procedure problems, policy misuse, or handbook conflicts on their side.','sup',wrongHits,bi,correctHits.length,2);
+  h+=renderGroup('Grey Areas','What still turns on missing or disputed facts.','grey',greyHits,bi,correctHits.length+wrongHits.length,3);
+  h+='<div class="grp next" style="animation-delay:280ms"><div class="grp-head"><div class="grp-title">Your Best Next Steps</div><div class="grp-note">'+nextSteps.groups.reduce(function(n,g){return n+g.steps.length},0)+' step'+(nextSteps.groups.reduce(function(n,g){return n+g.steps.length},0)!==1?'s':'')+'</div></div><div class="next-box">';
+  if(nextSteps.lead)h+='<div class="next-lead">'+esc(nextSteps.lead)+'</div>';
+  nextSteps.groups.forEach(function(group){
+    h+='<div class="next-cat"><div class="next-cat-title">'+esc(group.title)+'</div>';
+    group.steps.forEach(function(step,idx){h+='<div class="next-step">'+(idx+1)+'. '+esc(step)+'</div>'});
+    h+='</div>';
+  });
+  h+='</div></div>';
+
+  if(greyHits.some(function(hit){return hit.r.id==="need_more_facts"})){
+    h+='<div class="no-match"><p>Retype this with more detail so the handbook can be applied cleanly.</p><p>Include what happened, who was involved, what your supervisor said, and what rule or write-up was mentioned.</p></div>';
+  }
+  if(seriousCase(hits)){
+    h+='<div class="serious-note"><p>Protect yourself by being fully accurate. Do not leave out facts, exaggerate, or reshape what happened.</p></div>';
+  }
+  h+='</div>';
+  return{html:h,hits:hits,text:qt};
+}
+
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+function go(text){
+  var clean=sanitizedText(text);
+  if(!clean.trim())return;
+  activeAnalysisText=clean;
+  document.getElementById('rs').innerHTML='';
+  document.getElementById('fs').classList.add('hide');
+  showLoading(true);
+  var bs=document.querySelectorAll('.btn-def,.btn-def-sm');
+  bs.forEach(function(b){b.classList.add('flash');setTimeout(function(){b.classList.remove('flash')},400)});
+  setTimeout(function(){
+    var hits=fm(clean);
+    var res=rb(hits,clean);
+    ah=[{t:clean,h:hits,b:res.html}];
+    rc=1;
+    var stack=document.getElementById('rs');
+    stack.innerHTML=res.html;
+    document.getElementById('fs').classList.remove('hide');
+    updateInputMode(true);
+    showLoading(false);
+    if(navigator.vibrate)navigator.vibrate(35);
+    if(window.matchMedia('(max-width: 768px)').matches){
+      var el=document.getElementById('rb1');
+      if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
+    }
+  },140);
+}
+
+function tg(id){var e=document.getElementById(id);if(e)e.classList.toggle('open')}
+
+function cbl(bi){
+  var d=ah[0];if(!d)return;
+  var correctHits=d.h.filter(function(h){return h.r.v==="correct"&&h.r.id!=="need_more_facts"});
+  var wrongHits=d.h.filter(function(h){return h.r.v==="wrong"});
+  var greyHits=d.h.filter(function(h){return h.r.v==="grey"||h.r.id==="need_more_facts"});
+  var summary=summaryText(d.h);
+  var nextSteps=nextStepsForHits(d.h);
+  var t="The Handbook Checker\n\n";
+  t+="Main Takeaway\n"+summary.main+"\n\n";
+  t+='Where You Violated HHF Policy\n';
+  if(!correctHits.length)t+="Nothing here shows that you violated HHF policy.\n\n";
+  else correctHits.forEach(function(hit,i){
+    var r=hit.r;
+    t+=(i+1)+". "+r.p+"\n";
+    t+=formatSectionRef(r.s)+(r.t?" - "+r.t:"")+"\n";
+    if(visibleConfidence(hit))t+="Confidence: "+visibleConfidence(hit)+"\n";
+    t+="Why this matters: "+r.d+"\n";
+    t+="What could change the answer: "+r.b+"\n";
+    if(hit.c)t+="What may change this: "+hit.c+"\n";
+    t+="\n";
+  });
+  t+='What Your Supervisor Likely Violated\n';
+  if(!wrongHits.length)t+="Nothing here shows that your supervisor violated HHF policy.\n\n";
+  else wrongHits.forEach(function(hit,i){
+    var r=hit.r;
+    t+=(i+1)+". "+r.p+"\n";
+    t+=formatSectionRef(r.s)+(r.t?" - "+r.t:"")+"\n";
+    if(visibleConfidence(hit))t+="Confidence: "+visibleConfidence(hit)+"\n";
+    t+="Why this matters: "+r.d+"\n";
+    t+="What could change the answer: "+r.b+"\n";
+    if(hit.c)t+="What may change this: "+hit.c+"\n";
+    t+="\n";
+  });
+  t+='Grey Areas\n';
+  if(!greyHits.length)t+="Nothing here looks unclear or borderline under the handbook.\n\n";
+  else greyHits.forEach(function(hit,i){
+    var r=hit.r;
+    t+=(i+1)+". "+r.p+"\n";
+    t+=formatSectionRef(r.s)+(r.t?" - "+r.t:"")+"\n";
+    if(visibleConfidence(hit))t+="Confidence: "+visibleConfidence(hit)+"\n";
+    t+="Why this matters: "+r.d+"\n";
+    t+="What could change the answer: "+r.b+"\n";
+    if(hit.c)t+="What may change this: "+hit.c+"\n";
+    t+="\n";
+  });
+  t+="Your Best Next Steps\n";
+  nextSteps.groups.forEach(function(group){
+    t+=group.title+"\n";
+    group.steps.forEach(function(step,i){t+=(i+1)+". "+step+"\n"});
+    t+="\n";
+  });
+  cp(t,bi);
+}
+
+function cp(t,bi){
+  var btn=document.getElementById('cr');
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(t).then(function(){
+      if(btn){
+        btn.classList.add("ok");
+        setTimeout(function(){btn.classList.remove("ok")},1200);
+      }
+      showToast("Copied");
+    }).catch(function(){fb(t,btn,"Copy Results")});
+  }else fb(t,btn,"Copy Results");
+}
+function cpel(t,el,o){
+  if(!el)return;
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(t).then(function(){showToast("Copied")}).catch(function(){fbel(t,el,o)});
+  }else fbel(t,el,o);
+}
+function fb(t,btn,o){
+  var ta=document.createElement('textarea');ta.value=t;ta.style.cssText='position:fixed;left:-9999px';
+  document.body.appendChild(ta);ta.focus();ta.select();
+  try{
+    document.execCommand("copy");
+    if(btn){
+      btn.classList.add("ok");
+      setTimeout(function(){btn.classList.remove("ok")},1200);
+    }
+    showToast("Copied");
+  }catch(e){}
+  document.body.removeChild(ta);
+}
+function fbel(t,el,o){
+  var ta=document.createElement('textarea');ta.value=t;ta.style.cssText='position:fixed;left:-9999px';
+  document.body.appendChild(ta);ta.focus();ta.select();
+  try{document.execCommand("copy");showToast("Copied")}catch(e){}
+  document.body.removeChild(ta);
+}
+
+function clr(){
+  document.getElementById('rs').innerHTML='';
+  document.getElementById('fs').classList.add('hide');
+  updateInputMode(false);
+  showLoading(false);
+  document.getElementById('mi').value='';
+  autoResizeInput();
+  ah=[];rc=0;activeAnalysisText="";
+}
+
+document.addEventListener('DOMContentLoaded',function(){
+  document.getElementById('db').addEventListener('click',function(){go(document.getElementById('mi').value)});
+  document.getElementById('ds').addEventListener('click',function(){go(document.getElementById('ms').value)});
+  document.getElementById('mi').addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();go(this.value)}});
+  document.getElementById('mi').addEventListener('input',autoResizeInput);
+  document.getElementById('ms').addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();go(this.value)}});
+  document.getElementById('eb').addEventListener('click',function(){
+    document.getElementById('mi').focus();
+  });
+  document.getElementById('cr').addEventListener('click',function(){cbl('rb1')});
+  document.getElementById('cr').addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();cbl('rb1')}});
+  document.getElementById('ca').addEventListener('click',clr);
+  var stb=document.getElementById('st');
+  stb.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})});
+  window.addEventListener('scroll',function(){if(window.scrollY>400)stb.classList.add('show');else stb.classList.remove('show')});
+  document.addEventListener('click',function(e){
+    var edit=e.target.closest('[data-edit-description]');
+    if(edit){
+      updateInputMode(false);
+      document.getElementById('fs').classList.add('hide');
+      document.getElementById('mi').value=activeAnalysisText;
+      autoResizeInput();
+      document.getElementById('mi').focus();
+      document.getElementById('iw').scrollIntoView({behavior:'smooth',block:'start'});
+      return
+    }
+    var query=e.target.closest('[data-toggle-query]');
+    if(query){
+      query.classList.toggle('open');
+      return
+    }
+  });
+  autoResizeInput();
+});
+</script>
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load',function(){
+    navigator.serviceWorker.register('./sw.js').catch(function(err){
+      console.warn('Service worker registration failed.', err);
+    });
+  });
+}
+</script>
+</body>
+</html>
