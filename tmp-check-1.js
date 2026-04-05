@@ -1,243 +1,4 @@
-ï»¿<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="RBT Defense">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#0a0a0f">
-<meta name="description" content="Offline-friendly RBT Handbook Checker for reviewing workplace situations against the HHF handbook on iPhone, Android, and desktop.">
-<link rel="manifest" href="./manifest.webmanifest">
-<link rel="icon" href="./icon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="./icon.svg">
-<title>RBT Handbook Checker</title>
-<style>
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
-html{overflow-y:scroll;overscroll-behavior:none;-webkit-overflow-scrolling:touch}
-body{min-height:100vh;min-height:100dvh;background:#0a0a0f;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#e0e0e0;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%}
-.hdr{background:linear-gradient(90deg,#b8860b,#d4a012,#f5c842,#d4a012,#b8860b);padding:16px 20px;text-align:center;position:relative}
-.hdr::after{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(45deg,transparent,transparent 8px,rgba(0,0,0,.04) 8px,rgba(0,0,0,.04) 16px)}
-.hdr-inner{position:relative;z-index:1}
-.hdr-badge{font-size:11px;font-weight:800;letter-spacing:3px;color:#1a1a2e;text-transform:uppercase;margin-bottom:3px}
-.hdr h1{font-size:20px;font-weight:800;color:#0a0a0f;line-height:1.2;margin-bottom:2px}
-.hdr p{font-size:11px;color:#2a2a3e;font-weight:600}
-.mn{padding:0 14px 120px;max-width:600px;margin:0 auto}
-.inp-wrap{position:sticky;top:0;z-index:100;background:#0a0a0f;padding:12px 0;transition:all .3s}
-.inp-inner{background:rgba(255,255,255,.04);border:1px solid rgba(212,160,18,.2);border-radius:12px;padding:10px;transition:all .3s}
-.inp-ta{width:100%;min-height:90px;max-height:180px;background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#e0e0e0;padding:12px;font-size:16px;line-height:1.4;resize:none;outline:none;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;transition:all .3s;-webkit-appearance:none}
-.inp-ta:focus{border-color:rgba(212,160,18,.5)}
-.inp-ta::placeholder{color:#555;font-size:14px}
-.compact .inp-ta{min-height:40px;max-height:40px;padding:8px 12px;font-size:14px}
-.compact .btn-def{padding:10px;font-size:13px}
-.inp-row{display:none;gap:8px;align-items:center}
-.compact .inp-full{display:none}
-.compact .inp-row{display:flex}
-.inp-row .inp-ta-sm{flex:1;height:42px;min-height:42px;max-height:42px;background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#e0e0e0;padding:8px 12px;font-size:16px;outline:none;resize:none;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;-webkit-appearance:none}
-.inp-row .inp-ta-sm:focus{border-color:rgba(212,160,18,.5)}
-.inp-row .inp-ta-sm::placeholder{color:#555;font-size:13px}
-.inp-row .btn-def-sm{flex-shrink:0;height:42px;padding:0 16px;background:linear-gradient(135deg,#b8860b,#d4a012,#f5c842);color:#0a0a0f;border:none;border-radius:8px;font-size:12px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;cursor:pointer}
-.inp-row .btn-def-sm:active{transform:scale(.95)}
-.btn-def{width:100%;padding:14px;margin-top:10px;background:linear-gradient(135deg,#2d8cff,#54a8ff);color:#f8fbff;border:none;border-radius:12px;font-size:16px;font-weight:800;letter-spacing:.3px;cursor:pointer;transition:transform .1s,box-shadow .2s;box-shadow:0 10px 24px rgba(45,140,255,.22)}
-.btn-def:active{transform:scale(.97)}
-.btn-def.flash{animation:bf .4s ease}
-@keyframes bf{0%{filter:brightness(1)}50%{filter:brightness(1.4)}100%{filter:brightness(1)}}
-.inp-expand{display:none;width:100%;padding:8px;margin-top:6px;background:none;border:1px solid rgba(255,255,255,.1);border-radius:6px;color:#888;font-size:11px;text-align:center;cursor:pointer}
-.compact .inp-expand{display:block}
-.inp-note{font-size:12px;color:#8c93a8;line-height:1.5;margin-bottom:8px}
-.inp-help{font-size:13px;color:#d4d7e1;line-height:1.55;margin-top:10px}
-.inp-actions{display:flex;gap:10px;align-items:center;margin-top:12px}
-.top-actions{display:none;margin:0 0 14px}
-.compact + .top-actions,.top-actions.show{display:block}
-.btn-edit{width:100%;padding:12px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:12px;color:#dce6ff;font-size:14px;font-weight:700;cursor:pointer}
-.btn-edit:active{transform:scale(.98)}
-.qt-wrap{padding:12px 0}
-.qt-label{font-size:10px;font-weight:700;color:#888;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
-.qt-cat{margin-bottom:10px}
-.qt-cat-title{font-size:11px;font-weight:700;color:#d4a012;margin-bottom:6px;padding-left:2px}
-.qt-row{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
-.qt-row::-webkit-scrollbar{display:none}
-.qt-btn{flex-shrink:0;padding:8px 14px;background:rgba(212,160,18,.1);border:1px solid rgba(212,160,18,.25);border-radius:20px;color:#d4a012;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;-webkit-appearance:none;appearance:none}
-.qt-btn:active{background:rgba(212,160,18,.3);transform:scale(.95)}
-.bnr{background:rgba(255,184,77,.09);border:1px solid rgba(255,184,77,.14);border-radius:12px;padding:12px 14px;margin:12px 0;font-size:13px;color:#d6d8de;line-height:1.6;text-align:center}
-.sig-line{font-size:12px;color:#9ea4b7;line-height:1.5;margin:8px 0 0}
-.res-block{margin-bottom:20px;animation:fs .4s ease}
-.res-time{font-size:11px;color:#73798c;text-align:right;margin-bottom:8px}
-.res-query{font-size:12px;color:#b9bfce;background:rgba(255,255,255,.03);border-radius:10px;padding:10px 12px;margin-bottom:12px;font-style:italic;border-left:3px solid #2d8cff;word-break:break-word}
-.summ{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px 14px 12px;margin-bottom:12px}
-.summ-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
-.summ-label{font-size:11px;color:#8ea9d8;font-weight:700;letter-spacing:1px;text-transform:uppercase}
-.summ-main{font-size:17px;font-weight:800;color:#f5f5f5;line-height:1.35;margin-top:4px}
-.summ-sub{font-size:12px;color:#b6bccd;line-height:1.55;margin-top:6px}
-.summ-used{font-size:11px;color:#9298ab;margin-top:8px}
-.btn-cpy{padding:10px 14px;background:rgba(45,140,255,.12);color:#dce9ff;border:1px solid rgba(84,168,255,.28);border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
-.btn-cpy:active{transform:scale(.95)}
-.btn-cpy.ok{background:rgba(76,175,80,.2);color:#4caf50;border-color:rgba(76,175,80,.3)}
-.crd{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:14px;margin-bottom:10px;overflow:hidden}
-.crd.contra{border-color:rgba(255,152,0,.4)}
-.crd-v{padding:14px 14px 4px;position:relative;width:100%;text-align:left;border:none;font:inherit;background:none}
-.v-wrong{background:rgba(64,137,255,.13);border-left:5px solid #54a8ff}
-.v-correct{background:rgba(244,67,54,.16);border-left:5px solid #ff6b6b}
-.v-grey{background:rgba(255,152,0,.18);border-left:5px solid #ff9800}
-.v-badge{display:inline-block;padding:3px 10px;border-radius:4px;font-size:11px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px}
-.v-badge.wrong{background:rgba(64,137,255,.25);color:#89beff}
-.v-badge.correct{background:rgba(244,67,54,.3);color:#ff8d8d}
-.v-badge.grey{background:rgba(255,152,0,.3);color:#ffa726}
-.v-text{font-size:16px;font-weight:700;color:#f5f5f5;line-height:1.3;padding-right:28px}
-.v-section{font-size:12px;color:#ffd280;font-weight:700;margin-top:6px}
-.v-conf{font-size:11px;color:#9ea4b7;margin-top:4px}
-.crd-body{padding:6px 14px 14px;display:block}
-.blk{border-radius:6px;padding:10px 12px;margin-bottom:8px}
-.blk:last-child{margin-bottom:0}
-.blk-label{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
-.blk p{font-size:13px;margin:0;line-height:1.5}
-.blk-policy{background:rgba(0,0,0,.25);border-left:3px solid #d4a012}
-.blk-policy .blk-label{color:#d4a012}
-.blk-policy p{color:#ccc}
-.blk-contra{background:rgba(255,152,0,.1);border:1px solid rgba(255,152,0,.3)}
-.blk-contra .blk-label{color:#ff9800}
-.blk-contra p{color:#ffcc80}
-.blk-def{background:rgba(76,175,80,.08);border-left:3px solid #4caf50}
-.blk-def .blk-label{color:#4caf50}
-.blk-def p{color:#a5d6a7}
-.blk-bcba{background:rgba(244,67,54,.08);border-left:3px solid #ef5350}
-.blk-bcba .blk-label{color:#ef5350}
-.blk-bcba p{color:#ef9a9a}
-.blk-quote{background:rgba(255,255,255,.03);border-left:3px solid #888}
-.blk-quote .blk-label{color:#888}
-.blk-quote p{color:#aaa;font-style:italic}
-.btn-cc{display:block;width:100%;padding:8px;margin-top:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#c4c9d6;font-size:12px;font-weight:600;text-align:center;cursor:pointer}
-.btn-cc:active{background:rgba(255,255,255,.1)}
-.grp{margin-bottom:16px;opacity:0;transform:translateY(4px);animation:reveal .28s ease forwards}
-.grp-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px;padding:8px 2px 0}
-.grp-title{font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase}
-.grp-note{font-size:11px;color:#959cb0}
-.grp.you .grp-title{color:#ff8d8d}
-.grp.sup .grp-title{color:#89beff}
-.grp.grey .grp-title{color:#ffa726}
-.grp.next .grp-title{color:#9ccc65}
-.next-box{background:rgba(156,204,101,.08);border:1px solid rgba(156,204,101,.18);border-radius:14px;padding:14px;margin-bottom:12px}
-.next-lead{font-size:13px;color:#eef7d7;font-weight:700;line-height:1.5;margin-bottom:10px}
-.next-step{font-size:13px;color:#d6e9b5;line-height:1.65;margin-bottom:6px}
-.next-step:last-child{margin-bottom:0}
-.next-cat{margin-top:12px}
-.next-cat:first-child{margin-top:0}
-.next-cat-title{font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#b8d985;margin-bottom:8px}
-.dyk{text-align:center;padding:8px 14px;font-size:12px;color:#d4a012;font-weight:600}
-.steps{background:rgba(76,175,80,.06);border:1px solid rgba(76,175,80,.15);border-radius:10px;padding:14px;margin-bottom:12px}
-.steps h3{font-size:13px;font-weight:700;color:#4caf50;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px}
-.steps .step{font-size:13px;color:#ccc;line-height:1.7;margin-bottom:4px}
-.rpt{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:14px;margin-bottom:12px}
-.rpt h3{font-size:13px;font-weight:700;color:#d4a012;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px}
-.rpt-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)}
-.rpt-row:last-child{border-bottom:none}
-.rpt-name{font-size:13px;color:#e0e0e0}
-.rpt-ref{font-size:11px;color:#999;font-family:monospace}
-.rem{background:rgba(212,160,18,.06);border:1px solid rgba(212,160,18,.15);border-radius:10px;padding:14px;margin-bottom:16px}
-.rem h3{font-size:13px;font-weight:700;color:#d4a012;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px}
-.rem div{font-size:13px;color:#ccc;line-height:1.8}
-.no-match{background:rgba(255,152,0,.08);border:1px solid rgba(255,152,0,.2);border-radius:10px;padding:14px;text-align:center;margin-bottom:12px}
-.no-match p{font-size:13px;color:#ffcc80;line-height:1.6}
-.btn-clr{display:block;width:100%;padding:12px;margin:12px 0;background:rgba(244,67,54,.08);border:1px solid rgba(244,67,54,.2);border-radius:8px;color:#ef5350;font-size:13px;font-weight:700;text-align:center;cursor:pointer}
-.btn-clr:active{background:rgba(244,67,54,.15)}
-.stt{position:fixed;bottom:20px;right:16px;width:44px;height:44px;background:linear-gradient(135deg,#b8860b,#d4a012);border:none;border-radius:50%;color:#0a0a0f;font-size:18px;font-weight:800;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.4);z-index:200;display:none;align-items:center;justify-content:center}
-.stt.show{display:flex}
-.stt:active{transform:scale(.9)}
-.disc{text-align:center;padding:16px;font-size:11px;color:#666d7f;line-height:1.6}
-.empty{text-align:center;padding:30px 20px;color:#555}
-.empty-icon{font-size:14px;margin-bottom:12px;letter-spacing:1px;text-transform:uppercase;color:#92a1bd}
-.empty-text{font-size:14px;line-height:1.7;color:#c5cad6}
-.st{text-align:center;padding:8px;font-size:10px;color:#555}
-.sd{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px;vertical-align:middle;background:#4caf50}
-.hide{display:none}
-.loading{display:none;justify-content:center;align-items:center;padding:24px 0}
-.loading.show{display:flex}
-.spinner{width:28px;height:28px;border-radius:50%;border:3px solid rgba(255,255,255,.12);border-top-color:#54a8ff;animation:spin .9s linear infinite}
-.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%) translateY(16px);background:rgba(11,16,27,.95);border:1px solid rgba(84,168,255,.25);color:#f4f7ff;padding:10px 14px;border-radius:999px;font-size:12px;font-weight:700;opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;z-index:400}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.group-empty{background:rgba(255,255,255,.02);border:1px dashed rgba(255,255,255,.1);border-radius:14px;padding:14px;color:#c4cad8;font-size:13px;line-height:1.6}
-.group-empty.you{border-color:rgba(244,67,54,.2);background:rgba(244,67,54,.06)}
-.group-empty.sup{border-color:rgba(84,168,255,.22);background:rgba(84,168,255,.07)}
-.group-empty.grey{border-color:rgba(255,152,0,.24);background:rgba(255,152,0,.08)}
-.serious-note{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px;margin-top:8px}
-.serious-note p{margin:0;font-size:13px;line-height:1.65;color:#d3d7e2}
-@keyframes spin{to{transform:rotate(360deg)}}
-@keyframes reveal{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
-@keyframes fs{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-</style>
-</head>
-<body>
-<div class="hdr"><div class="hdr-inner">
-<div class="hdr-badge">HHF Handbook Tool</div>
-<h1>RBT Handbook Checker</h1>
-<p>Check your situation against the HHF handbook.</p>
-</div></div>
-<div class="mn">
-<div class="inp-wrap" id="iw">
-<div class="inp-inner" id="ii">
-<div class="inp-full" id="if">
-<div class="inp-note">Keep this focused. Do not paste unrelated private information about yourself, clients, or coworkers.</div>
-<textarea class="inp-ta" id="mi" placeholder="Describe what happened, who was involved, what your supervisor said, and what rule or write-up you were given. You can also paste a write-up email."></textarea>
-<div class="inp-help">Describe what happened, who was involved, what your supervisor said, and what rule or write-up you were given. You can also paste a write-up email.</div>
-<button class="btn-def" id="db">Check My Situation</button>
-</div>
-<div class="inp-row" id="ic">
-<textarea class="inp-ta-sm" id="ms" placeholder="Type next quote..."></textarea>
-<button class="btn-def-sm" id="ds">GO</button>
-</div>
-<button class="inp-expand" id="eb">Expand input</button>
-</div></div>
-<div class="top-actions" id="ta"><button type="button" class="btn-edit" id="ed">Edit my description</button></div>
-<div id="qt">
-<div class="bnr">Paste a write-up email or describe what happened in your own words. This tool checks both what you did and what your supervisor did against the HHF handbook.</div>
-<div class="qt-wrap">
-<div class="qt-label">Quick tap - common situations</div>
-<div class="qt-cat"><div class="qt-cat-title">Phone & iPad</div><div class="qt-row">
-<button type="button" class="qt-btn" data-q="my BCBA told me no phones on the floor no exceptions even as a timer">No phones allowed</button>
-<button type="button" class="qt-btn" data-q="I used my phone as a timer during session and got written up">Phone as timer</button>
-<button type="button" class="qt-btn" data-q="my BCBA said my iPad needs to be charged and that's on me">iPad not charged</button>
-<button type="button" class="qt-btn" data-q="I got in trouble for not having my iPad so I used my phone for data">Used phone for data</button>
-</div></div>
-<div class="qt-cat"><div class="qt-cat-title">Write-ups</div><div class="qt-row">
-<button type="button" class="qt-btn" data-q="my BCBA is writing me up and I don't think it's fair">Unfair write-up</button>
-<button type="button" class="qt-btn" data-q="she said it's a verbal warning but sent me an email documenting it">Verbal warning email</button>
-<button type="button" class="qt-btn" data-q="they told me I have to sign this write-up or face consequences">Must sign write-up</button>
-<button type="button" class="qt-btn" data-q="I got a final warning but I never got a verbal or written warning first">Skipped steps</button>
-</div></div>
-<div class="qt-cat"><div class="qt-cat-title">Attendance & Hours</div><div class="qt-row">
-<button type="button" class="qt-btn" data-q="I was 5 minutes late and they're writing me up for tardiness">Late 5 min</button>
-<button type="button" class="qt-btn" data-q="my BCBA told me I need to stay late and finish my notes">Stay late</button>
-<button type="button" class="qt-btn" data-q="they said I called out too many times and I'm getting written up">Too many callouts</button>
-<button type="button" class="qt-btn" data-q="I was told to go home because my client canceled and I lost hours">Client canceled</button>
-</div></div>
-<div class="qt-cat"><div class="qt-cat-title">Pay, Breaks & Rights</div><div class="qt-row">
-<button type="button" class="qt-btn" data-q="my BCBA told me I'm not allowed to discuss my pay with coworkers">Can't discuss pay</button>
-<button type="button" class="qt-btn" data-q="they made me watch a kid during my lunch break">Work during break</button>
-<button type="button" class="qt-btn" data-q="they told me I should be here for the kids not the money">Here for the kids</button>
-<button type="button" class="qt-btn" data-q="I have to ask my BCBA for permission before I can go clean or do admin tasks">Permission to clean</button>
-</div></div>
-<div class="qt-cat"><div class="qt-cat-title">Meeting & General</div><div class="qt-row">
-<button type="button" class="qt-btn" data-q="BCBA said that's policy and we're enforcing it now but can't tell me what section">That's policy</button>
-<button type="button" class="qt-btn" data-q="they said if I don't like it here I can leave">Don't like it, leave</button>
-<button type="button" class="qt-btn" data-q="my BCBA yelled at me in front of everyone and embarrassed me">Yelled at me</button>
-<button type="button" class="qt-btn" data-q="I think I got written up because I reported a concern last week">Retaliation</button>
-</div></div>
-</div>
-<div class="empty"><div class="empty-icon">Ready to check</div>
-<div class="empty-text">You can paste a write-up, describe your experience, or explain what your supervisor said. The analysis stays focused on handbook-relevant facts.</div>
-</div></div>
-<div class="loading" id="ld"><div class="spinner" aria-hidden="true"></div></div>
-<div id="rs"></div>
-<div id="fs" class="hide">
-<button class="btn-cpy" id="cr">Copy Results</button>
-<button class="btn-clr" id="ca">Clear all results</button>
-<div class="disc">HHF Handbook guidance tool only. Not legal advice.</div>
-</div></div>
-<button class="stt" id="st">Top</button>
-<div class="st"><span class="sd"></span> v2.0 - works offline</div>
-<div class="toast" id="to">Copied</div>
-<script>
+
 var R=[
 {id:"phone",s:"2.0 & 6.5",t:"Phones ARE allowed for direct patient care",v:"wrong",
 p:"The handbook only bans phone use that is NOT for patient care. Timers, reinforcers, data, and Teams = patient care = allowed.",
@@ -469,7 +230,7 @@ po:"Section 6.5 says employees are prohibited from sharing personal phone number
 d:"If the report accurately says you texted or called a client's family from your personal phone, the handbook supports corrective action.",
 b:"If the communication was not with a client family, the number was not personal, or the accusation misstates what happened, the details matter.",
 q:"\"I texted the parent from my personal phone\" -> The handbook prohibits private communication with client families using a personal phone.",
-kw:["texted the parent","texted parent","called the parent","called parent","client family","client's family","used my personal phone with parent","gave parent my number","shared my phone number","private communication with family","texted a client's mom","texted a client's dad","texted a client parent","called a client parent","used my personal phone with a client parent","texted the client's parent","called the client's parent"]},
+kw:["texted the parent","texted parent","called the parent","called parent","client family","client's family","used my personal phone with parent","gave parent my number","shared my phone number","private communication with family","texted a client's mom","texted a client's dad"]},
 {id:"driving_device",s:"2.20",t:"Texting or using devices while driving for work can justify discipline",v:"correct",pri:114,
 p:"If you were texting, checking messages, or using a device while driving for work, the supervisor may be correct to discipline you.",
 po:"Section 2.20 says team members must refrain from reading or sending text messages, accessing records on a digital device, or checking team messages while driving, and should use hands-free operations or safely pull over.",
@@ -525,7 +286,7 @@ po:"Section 6.3 protects whistleblowers, but it also says intentionally filing a
 d:"If the report accurately says you knowingly made a false complaint or dishonest wrongdoing report, the handbook supports corrective action.",
 b:"If you made a good-faith report based on what you believed at the time, whistleblower protections may still apply even if the report was not substantiated.",
 q:"\"I made a report I knew wasn't true\" -> The handbook protects good-faith reporting, not intentional false reports.",
-kw:["false report","knowingly false report","made a false complaint","lied in a complaint","dishonest report","fake report","report i knew wasn't true","intentionally false report","made up a complaint","made a report i knew was false","complaint i knew was false","report that was false"]},
+kw:["false report","knowingly false report","made a false complaint","lied in a complaint","dishonest report","fake report","report i knew wasn't true","intentionally false report","made up a complaint"]},
 {id:"visitor_security",s:"6.0 & 6.8",t:"Unauthorized visitors and security concerns must be reported",v:"correct",pri:92,
 p:"If you knowingly allowed or ignored an unauthorized visitor or failed to report a related safety concern, the supervisor may be correct to discipline you.",
 po:"The handbook expects unauthorized visitors and safety concerns to be reported to leadership, and safety reporting is part of every team member's responsibility.",
@@ -600,7 +361,7 @@ function formatSectionRef(s){
   raw=raw.replace(/&/g,",").replace(/\band\b/gi,",");
   var parts=raw.split(",").map(function(part){return part.trim()}).filter(Boolean);
   return parts.map(function(part){
-    return /^Â§/.test(part)||/^HHF Handbook/i.test(part)?part:"HHF Handbook Â§"+part;
+    return /^§/.test(part)||/^HHF Handbook/i.test(part)?part:"HHF Handbook §"+part;
   }).join(" | ");
 }
 
@@ -703,8 +464,6 @@ function scoreHit(text,rule,mc,contra){
   if(rule.id==="social_media"&&/my pay|our pay|wages|working conditions|organizing|union/.test(text)&&!/threat|obscene|intimidat|harass|client|phi|photo|video/.test(text))score-=28;
   if(rule.id==="overtime"&&/without approval|on my own|didn't ask|did not ask|wasn't told to stay/.test(text))score-=35;
   if(rule.id==="dress"&&/open-toed|open toed|crocs|flip flops|no hhf shirt|dangling earrings|grabbable jewelry/.test(text))score-=18;
-  if(rule.id==="false_report"&&/\bi\b.*(made|filed|reported|complaint).*(false|knew wasn't true|not true)/.test(text))score-=55;
-  if(rule.id==="false_wrongdoing_report"&&/\bi\b.*(made|filed|reported|complaint).*(false|knew wasn't true|not true)/.test(text))score+=40;
   return score;
 }
 
@@ -727,16 +486,13 @@ function fm(text){
     if(topCorrect&&topCorrect.score>=120){
       hits=hits.filter(function(h){
         if(h.r.v==="correct"||h.c||h.score>=topCorrect.score-35)return true;
-        if(topWrong&&h.r.id===topWrong.r.id&&topWrong.score>=40)return true;
-        if(topGrey&&h.r.id===topGrey.r.id&&topGrey.score>=50)return true;
+        if(topWrong&&h.r.id===topWrong.r.id&&topWrong.score>=70)return true;
+        if(topGrey&&h.r.id===topGrey.r.id&&topGrey.score>=70)return true;
         return false;
       });
     }
-    if(hits[0]&&hits[0].score>=60){
-      hits=hits.filter(function(h){return h.score>=15||h.c});
-    }
   }
-  if(!hits.length||hits[0].score<25){
+  if(!hits.length||hits[0].score<35){
     hits.push({
       r:{
         id:"need_more_facts",
@@ -819,11 +575,9 @@ function cc(t,id){
 }
 
 function summaryText(hits){
-  var onlyThin=hits.every(function(h){return h.r.id==="need_more_facts"});
   var correct=hits.filter(function(h){return h.r.v==="correct"&&h.r.id!=="need_more_facts"}).length;
   var wrong=hits.filter(function(h){return h.r.v==="wrong"}).length;
   var grey=hits.filter(function(h){return h.r.v==="grey"}).length;
-  if(onlyThin)return{main:"The facts are too thin to call this cleanly.",sub:"Retype your description with what happened, who was involved, what your supervisor said, and what rule or write-up was involved."};
   if(correct&&wrong)return{main:"Both you and your supervisor likely violated HHF policy.",sub:"Do not confuse your conduct issue with your supervisor's process issue. Read both sections separately."};
   if(correct)return{main:seriousCase(hits)?"You clearly violated HHF policy.":"You likely violated HHF policy.",sub:"Start with where you violated policy, then check whether any facts or process problems still matter."};
   if(wrong)return{main:"Your supervisor likely violated HHF policy.",sub:"Compare the write-up or workplace conduct to the cited handbook sections before you respond."};
@@ -1143,15 +897,4 @@ document.addEventListener('DOMContentLoaded',function(){
   });
   autoResizeInput();
 });
-</script>
-<script>
-if('serviceWorker' in navigator){
-  window.addEventListener('load',function(){
-    navigator.serviceWorker.register('./sw.js').catch(function(err){
-      console.warn('Service worker registration failed.', err);
-    });
-  });
-}
-</script>
-</body>
-</html>
+
