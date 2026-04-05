@@ -1,5 +1,5 @@
 // ==========================================
-// data.js - Arbiter v4.3 FULL (Siloed Logic)
+// data.js - Arbiter v4.4 FULL (Global Silo + Breakroom Rights)
 // ==========================================
 
 var R = [
@@ -13,7 +13,7 @@ var R = [
     b: "Regular attendance is essential for clinical consistency for our clients.",
     strategy: "If you have reached this limit, focus on the 'Partnership Plan' required by the handbook to address your barriers.",
     kw: ["16 hours", "missed shift", "call out", "absent", "too many days", "attendance"],
-    anti_kw: ["doctor", "note", "consecutive", "partnership", "emergency", "phone", "timer", "scrub", "clean", "dishes"]
+    anti_kw: ["doctor", "note", "consecutive", "partnership", "emergency", "phone", "timer", "scrub", "clean", "dishes", "breakroom"]
   },
   {
     id: "att_medical", s: "2.15", pg: 17, t: "Protected Medical Absence", v: "wrong", pri: 950,
@@ -23,15 +23,6 @@ var R = [
     strategy: "Provide your medical documentation and cite Section 2.15: 'Because these were consecutive days for a single illness and I provided a note, this should be recorded as one occurrence.'",
     kw: ["doctor", "note", "consecutive", "sick for 3 days", "medical", "hospital"],
     anti_kw: ["no note", "forgot my note", "phone", "timer", "scrub", "clean", "dishes"]
-  },
-  {
-    id: "att_procedural", s: "2.15", pg: 17, t: "Missing Partnership Plan", v: "grey", pri: 700,
-    p: "Discipline for attendance requires a 'Partnership Plan' first.",
-    d: "Section 2.15 mandates that leadership must 'partner with the team member' to create a plan to overcome barriers before moving to formal discipline.",
-    b: "If they went straight to a write-up without a coaching meeting about your barriers, they skipped a step.",
-    strategy: "Ask: 'I noticed we haven't created the Partnership Plan mentioned in Section 2.15 yet. Can we sit down to discuss my barriers so I can improve my attendance?'",
-    kw: ["partnership", "barriers", "straight to write up", "no coaching"],
-    anti_kw: ["phone", "timer", "scrub", "clean", "dishes"]
   },
 
   // ---------------------------------------------------------
@@ -44,7 +35,7 @@ var R = [
     b: "A supervisor stopping you from unapproved chores is an operational correction.",
     strategy: "Accept the correction: 'I understand. Are there any approved admin tasks available for me to work on now?'",
     kw: ["cleaning", "kitchen", "sweep", "dishes", "unassigned", "chores"],
-    anti_kw: ["watched me", "didn't stop me", "saw me", "phone", "timer", "absent", "late", "scrub"]
+    anti_kw: ["watched me", "didn't stop me", "saw me", "phone", "timer", "absent", "late", "scrub", "breakroom"]
   },
   {
     id: "permitted_work", s: "2.4", pg: 12, t: "Compensated Time (FLSA)", v: "wrong", pri: 960,
@@ -53,20 +44,29 @@ var R = [
     b: "Silence from a supervisor while you work constitutes legal permission.",
     strategy: "Escalate: 'Since the work was performed while a supervisor was present and did not intervene, Section 2.4 and FLSA require this time to be compensated.'",
     kw: ["watched me", "saw me", "witnessed", "permitted"],
-    anti_kw: ["stopped me", "told me to stop", "phone", "timer", "device", "scrub", "sneaker", "color", "late", "absent"]
+    anti_kw: ["stopped me", "told me to stop", "phone", "timer", "device", "scrub", "sneaker", "color", "late", "absent", "breakroom"]
   },
 
   // ---------------------------------------------------------
   // CATEGORY 3: DEVICES & PHONES (6.5)
   // ---------------------------------------------------------
   {
+    id: "breakroom_rights", s: "2.3", pg: 12, t: "Breakroom Privacy", v: "wrong", pri: 980, 
+    p: "Supervisors cannot restrict personal device use during UNPAID breaks.",
+    d: "Section 2.3 mandates that you be 'completely relieved of all duties' during unpaid breaks. Because you are off the clock and in a non-clinical area, the Section 6.5 'Phone Ban' does not apply.",
+    b: "If a supervisor controls your activities during an unpaid break, the company may be legally required to pay you for that time.",
+    strategy: "Politely clarify: 'Under Section 2.3, I am currently on my unpaid break and relieved of all duties. I will put my phone away as soon as I clock back in and return to the clinical floor.'",
+    kw: ["breakroom", "unpaid break", "scrolling on my break", "on my lunch", "off the clock"],
+    anti_kw: ["during session", "with my client", "at the table", "timer", "data"]
+  },
+  {
     id: "device_personal", s: "6.5", pg: 43, t: "Personal Device Misuse", v: "correct", pri: 800,
-    p: "Personal device use during sessions is strictly prohibited.",
+    p: "Personal device use DURING SESSIONS is strictly prohibited.",
     d: "Section 6.5 states cell phone use while with a client is 'strictly prohibited.' This is a safety and quality of care violation.",
     b: "Even a 'quick text' is considered a safety risk in a clinical setting.",
     strategy: "Acknowledge the safety risk and commit to leaving the device in your bag or a designated area per Section 6.5.",
     kw: ["texting", "social media", "instagram", "tiktok", "facebook", "scrolling", "personal phone"],
-    anti_kw: ["timer", "data", "clinical", "emergency", "clean", "dishes"]
+    anti_kw: ["timer", "data", "clinical", "emergency", "clean", "dishes", "breakroom", "unpaid break", "on my break"]
   },
   {
     id: "device_clinical", s: "6.5", pg: 43, t: "Clinical Device Exception", v: "wrong", pri: 970,
@@ -75,7 +75,7 @@ var R = [
     b: "Supervisors sometimes issue blanket 'no phone' bans that ignore this specific clinical exception.",
     strategy: "Clarify the use: 'I was using my device as a clinical timer/data tool as permitted by the Direct Patient Care exception in Section 6.5.'",
     kw: ["timer", "data", "clock", "clinical use", "reinforcer", "youtube for client", "ipad"],
-    anti_kw: ["texting", "social media", "cleaning", "dishes"]
+    anti_kw: ["texting", "social media", "cleaning", "dishes", "breakroom"]
   },
 
   // ---------------------------------------------------------
@@ -101,7 +101,7 @@ var R = [
     b: "HHF allows 'reasonable self-expression' as long as it is safe.",
     strategy: "Ask: 'Could you show me where in Section 2.16 it restricts this color? I want to ensure my apparel is in line with the written policy.'",
     kw: ["color", "brand", "sneakers", "figs", "hoka", "scrubs color"],
-    anti_kw: ["ripped", "open-toe", "hoodie", "lanyard", "phone", "timer", "clean"]
+    anti_kw: ["ripped", "open-toe", "hoodie", "lanyard", "phone", "timer", "clean", "breakroom"]
   },
   {
     id: "dress_violation", s: "2.16", pg: 19, t: "Actual Safety Violation", v: "correct", pri: 800,
@@ -110,7 +110,7 @@ var R = [
     b: "These items pose a risk during physical interventions or client behaviors.",
     strategy: "Correct the attire immediately to ensure safety compliance per Section 2.16.",
     kw: ["ripped", "open-toe", "hoodie", "drawstring", "dangling", "jewelry", "crocs"],
-    anti_kw: ["color", "brand", "phone", "timer", "clean"]
+    anti_kw: ["color", "brand", "phone", "timer", "clean", "breakroom"]
   },
 
   // ---------------------------------------------------------
@@ -123,7 +123,7 @@ var R = [
     b: "Being sent home unpaid as a FT employee without the offer of admin work may violate this priority status.",
     strategy: "Remind them of your status: 'As a FT employee, Section 2.10 notes I should be prioritized for admin or fill-in work. Are there any tasks available?'",
     kw: ["sent home unpaid", "no admin offered", "cancel", "full time"],
-    anti_kw: ["refused a client", "part time", "phone", "timer", "scrub"]
+    anti_kw: ["refused a client", "part time", "phone", "timer", "scrub", "breakroom"]
   },
 
   // ---------------------------------------------------------
@@ -136,7 +136,7 @@ var R = [
     b: "The coaching step is designed to be supportive, not punitive.",
     strategy: "Ask for procedural clarity: 'Since this is a first-time minor issue, can we follow the Verbal Coaching step outlined in Section 2.18?'",
     kw: ["first time", "no warning", "straight to write up", "procedural"],
-    anti_kw: ["sleep", "theft", "abuse", "hit", "drunk", "phone", "timer"]
+    anti_kw: ["sleep", "theft", "abuse", "hit", "drunk", "phone", "timer", "breakroom"]
   },
 
   // ---------------------------------------------------------
@@ -149,13 +149,13 @@ var R = [
     b: "Supervisors are held to the same Code of Conduct as RBTs.",
     strategy: "Do not engage in an argument. Document the dates/times and escalate via the Section 1.8 Open Door Policy or call the Anonymous Complaint Line at 520-521-2222.",
     kw: ["bully", "harass", "retaliation", "humiliate", "target", "mean"],
-    anti_kw: ["phone", "timer", "late", "absent", "scrub"]
+    anti_kw: ["phone", "timer", "late", "absent", "scrub", "breakroom"]
   }
 ];
 
 const THEMES = {
   SUPERVISOR_WRONG: { 
-    words: ["timer", "data", "clinical", "approved", "note", "doctor", "watched me", "didn't stop me", "sent home unpaid", "first time", "no coaching", "working lunch", "color", "brand"], 
+    words: ["timer", "data", "clinical", "approved", "note", "doctor", "watched me", "didn't stop me", "sent home unpaid", "first time", "no coaching", "working lunch", "color", "brand", "breakroom", "unpaid break"], 
     weight: 150 
   },
   THERAPIST_WRONG: { 
