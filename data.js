@@ -2,10 +2,10 @@ var R = [
   {
     id: "phone", s: "2.0 & 6.5", pg: 22, t: "Clinical Phone Use Exception", v: "wrong", pri: 50,
     p: "Clinical phone use is protected as an exception to the device ban.",
-    d: "Section 6.5 explicitly allows devices when used for 'direct patient care.' This includes timers, data collection apps, and clinical communication via Teams.",
+    d: "Section 6.5 explicitly allows devices when used for 'direct patient care.' This includes timers, data collection apps, client reinforcers (like YouTube/Music rewards), and clinical communication via Teams.",
     b: "If personal apps were open or if the device wasn't being used for a specific client task, the supervisor may enforce the standard ban.",
-    strategy: "Highlight that your device use falls under the 'Direct Patient Care' exception in Section 6.5. Focus on the specific clinical function (timer/data) you were performing at that exact moment.",
-    kw: ["phone", "cell", "device", "mobile", "timer", "data", "teams", "clock"]
+    strategy: "Highlight that your device use falls under the 'Direct Patient Care' exception in Section 6.5. Focus on the specific clinical function (timer/reinforcer/data) you were performing at that exact moment.",
+    kw: ["phone", "cell", "device", "mobile", "timer", "data", "teams", "clock", "music", "youtube", "reward"]
   },
   {
     id: "personal_phone", s: "6.5", pg: 22, t: "Personal Phone Misuse", v: "correct", pri: 40,
@@ -34,7 +34,7 @@ var R = [
 ];
 
 const THEMES = {
-  SUPERVISOR_WRONG: { words: ["timer", "data", "teams", "note", "doctor", "clinical", "approved", "verbal", "first time"], weight: 125 },
+  SUPERVISOR_WRONG: { words: ["timer", "data", "teams", "note", "doctor", "clinical", "approved", "verbal", "first time", "reinforcer"], weight: 125 },
   THERAPIST_WRONG: { words: ["instagram", "tiktok", "facebook", "scrolling", "social media", "personal", "spotify", "music", "vape"], weight: 125 }
 };
 
@@ -44,7 +44,7 @@ const CLARIFICATIONS = [
     triggers: ["phone", "device", "music"],
     q: "How exactly was the device being used?",
     opts: [
-      { label: "Clinical (Timer, Data, or Teams)", append: " I was using the device for clinical patient care." },
+      { label: "Clinical (Timer, Data, Teams, or Client Reinforcer)", append: " I was using the device for clinical patient care." },
       { label: "Personal (Social Media, Texts, or Music)", append: " I was using the device for personal entertainment." }
     ]
   },
