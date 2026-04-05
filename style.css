@@ -34,7 +34,6 @@ body {
 
 .privacy-shield { text-align: center; font-size: 11px; color: #777; margin-top: 12px; }
 
-/* PDF Button Styling */
 .pdf-btn-wrap { display: flex; justify-content: center; margin-top: 25px; }
 .btn-pdf { 
     display: inline-block;
@@ -52,7 +51,52 @@ body {
 .btn-pdf:active { background: rgba(255,255,255,0.1); }
 
 .res-block { margin-top: 20px; animation: fade 0.4s ease; }
-.res-query { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; color: #bbb; font-size: 14px; margin-bottom: 20px; border-left: 3px solid var(--brand); }
+
+/* --- NEW: Expandable Description & Edit Button Styles --- */
+.res-query-wrap { margin-bottom: 25px; }
+.res-query { 
+    background: rgba(255,255,255,0.05); 
+    padding: 15px; 
+    border-radius: 12px; 
+    color: #bbb; 
+    font-size: 14px; 
+    border-left: 3px solid var(--brand);
+    position: relative;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+.res-query.collapsed { 
+    max-height: 80px; 
+    mask-image: linear-gradient(to bottom, black 50%, transparent 100%); 
+    -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%); 
+}
+
+.expand-btn {
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 8px 0;
+    cursor: pointer;
+    text-transform: uppercase;
+    display: inline-block;
+}
+
+.inline-edit-btn {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid #444;
+    color: #888;
+    font-size: 11px;
+    padding: 5px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 8px;
+    display: inline-block;
+    transition: all 0.2s;
+}
+.inline-edit-btn:active { background: var(--brand-soft); color: #fff; border-color: var(--brand); }
+/* -------------------------------------------------------- */
 
 .crd { background: rgba(255,255,255,0.02); border-radius: 16px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.08); overflow: hidden; }
 .crd-v { padding: 20px; border-left: 6px solid #444; }
@@ -73,7 +117,6 @@ body {
 .strategy-box { background: rgba(84,168,255,0.05); border: 1px solid rgba(84,168,255,0.15); border-radius: 12px; padding: 15px; margin-top: 5px; }
 .strategy-box p { color: var(--accent) !important; font-weight: 400; }
 
-/* Clarification UI */
 .followup-wrap { text-align: center; padding: 25px; background: rgba(255,255,255,0.03); border-radius: 16px; border: 1px solid var(--brand); }
 .followup-q { font-weight: 500; color: #fff; margin-bottom: 20px; font-size: 16px; }
 .followup-opts { display: flex; flex-direction: column; gap: 12px; align-items: center; }
