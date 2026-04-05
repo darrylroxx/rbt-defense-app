@@ -840,14 +840,19 @@ function matchRule(text,rule){
   var matched=false,mc=0;
   if(rule.kw){rule.kw.forEach(function(k){
     if(k.indexOf(".*")!==-1){
-      try{if(new RegExp(k).test(text)){matched=true;mc++}}catch(e){}
-    }else if(text.indexOf(k)!==-1){
-      matched=true;mc++;
+      try{if(new RegExp(k, "i").test(text)){matched=true;mc++}}catch(e){}
+    }else{
+      // Use word boundaries so "phone" doesn't match "earphones" or "headphones"
+      try{
+        var escaped = k.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+        if(new RegExp("\\b" + escaped + "\\b", "i").test(text)){matched=true;mc++}
+      }catch(e){
+        if(text.indexOf(k)!==-1){matched=true;mc++;}
+      }
     }
   })}
   return matched?{matched:true,mc:mc}:null;
 }
-
 function fm(text){
   var l=text.toLowerCase().replace(/['']/g,"'").replace(/[""]/g,'"');
   var segments=extractIssueSegments(l);
