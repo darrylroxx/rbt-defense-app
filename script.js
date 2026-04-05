@@ -4,22 +4,23 @@ function sanitizedText(text) { return (text || "").toLowerCase().trim(); }
 function calculateWeights(text, rule) {
   let score = 0;
   
-  // 1. Keyword Strength with Negation Handling
+  // 1. Keyword Strength + Negation Check
   rule.kw.forEach(k => {
     let regex = new RegExp("\\b" + k + "\\b", "i");
     if (regex.test(text)) {
       let words = text.split(/\s+/);
       let idx = words.findIndex(w => w.includes(k));
       let context = words.slice(Math.max(0, idx - 3), idx).join(" ");
+      // Check if "not", "no", "never" is within 3 words
       if (/\b(not|never|didn't|wasn't|no)\b/.test(context)) {
-        score -= 60; // Flip score if "not" is present
+        score -= 70; // High penalty for negative claim
       } else {
         score += 35;
       }
     }
   });
 
-  // 2. Thematic Weighting
+  // 2. Thematic Weighting (Supervisor vs Therapist)
   THEMES.SUPERVISOR_WRONG.words.forEach(w => {
     if (text.includes(w)) {
       if (rule.v === "wrong") score += THEMES.SUPERVISOR_WRONG.weight;
@@ -42,8 +43,9 @@ function findMatches(text) {
   let results = [];
   R.forEach(r => {
     let weight = calculateWeights(text, r);
-    if (weight > 25) {
+    if (weight > 30) {
       let ruleCopy = JSON.parse(JSON.stringify(r));
+      // AUTO-FLIP: If a note is mentioned, Attendance becomes a Supervisor Issue
       if (r.id === "attendance" && text.includes("note")) ruleCopy.v = "wrong";
       results.push({ r: ruleCopy, score: weight });
     }
@@ -52,7 +54,7 @@ function findMatches(text) {
   return results.slice(0, 3);
 }
 
-// ======================== UI & INTERACTION ========================
+// ======================== UI RENDER ========================
 function go(text, skipId = null) {
   const clean = sanitizedText(text);
   if (!clean) return;
@@ -62,6 +64,7 @@ function go(text, skipId = null) {
   document.getElementById('iw').classList.add('hide');
 
   setTimeout(() => {
+    // 1. Check for interactive clarification
     if (!skipId) {
       let clarification = CLARIFICATIONS.find(c => c.triggers.some(t => clean.includes(t)));
       if (clarification && !clarification.opts.some(o => clean.includes(o.append.toLowerCase()))) {
@@ -70,17 +73,18 @@ function go(text, skipId = null) {
       }
     }
 
+    // 2. Run the math
     let matches = findMatches(clean);
     let html = `<div class="res-block"><div class="res-query">${text}</div>`;
     
     if (matches.length === 0) {
-      html += `<div class="crd v-grey" style="padding:20px; color:#aaa; text-align:center;">No clear handbook matches. Try adding more detail.</div>`;
+      html += `<div class="crd v-grey" style="padding:20px; color:#aaa; text-align:center;">I need more detail to match this to a specific handbook rule.</div>`;
     } else {
       matches.forEach(m => {
         const r = m.r;
         const typeCls = r.v === "wrong" ? "v-wrong" : r.v === "correct" ? "v-correct" : "v-grey";
         const badgeCls = r.v === "wrong" ? "wrong" : r.v === "correct" ? "correct" : "grey";
-        const badgeLabel = r.v === "wrong" ? "SUPERVISOR ISSUE" : r.v === "correct" ? "YOU VIOLATED POLICY" : "GREY AREA";
+        const badgeLabel = r.v === "wrong" ? "SUPERVISOR ISSUE" : r.v === "correct" ? "POLICY VIOLATION" : "GREY AREA";
 
         html += `
           <div class="crd">
@@ -89,8 +93,12 @@ function go(text, skipId = null) {
               <div class="v-text">${r.p}</div>
               <div class="v-section">Section ${r.s} (Page ${r.pg}) - ${r.t}</div>
             </div>
-            <div class="blk"><div class="blk-label">Handbook Analysis</div><p>${r.d}</p></div>
-            <div class="blk" style="background:rgba(255,255,255,0.02);"><div class="blk-label">When this might not apply</div><p>${r.b}</p></div>
+            <div class="blk"><div class="blk-label">Analysis</div><p>${r.d}</p></div>
+            <div class="blk" style="background:rgba(84,168,255,0.08);">
+              <div class="blk-label" style="color:#54a8ff;">Word-for-Word Meeting Script</div>
+              <div class="script-box"><p class="script-text">"${r.script}"</p></div>
+            </div>
+            <div class="blk" style="background:rgba(255,255,255,0.02);"><div class="blk-label">Context Check</div><p>${r.b}</p></div>
           </div>`;
       });
     }
@@ -99,7 +107,7 @@ function go(text, skipId = null) {
     document.getElementById('rs').innerHTML = html;
     document.getElementById('ld').classList.remove('show');
     document.getElementById('fs').classList.remove('hide');
-  }, 400);
+  }, 450);
 }
 
 function renderQuestion(c, text) {
@@ -123,7 +131,7 @@ window.answer = function(t, a, id) {
   go(combined, id);
 };
 
-// DEVICE DETECTION (iOS Banner)
+// iOS Banner
 function detectiOS() {
     const isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
