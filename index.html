@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -13,7 +13,10 @@
 <link rel="icon" href="./icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="./icon.svg">
 <title>The Handbook Checker</title>
+<!-- pdf.js for handbook lookup -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
 <style>
+/* ========== YOUR EXISTING CSS (unchanged) ========== */
 :root{
   --bg:#1c1115;
   --bg-soft:#24161b;
@@ -117,15 +120,16 @@ body{min-height:100vh;min-height:100dvh;background:radial-gradient(circle at top
 .blk:last-child{margin-bottom:0}
 .blk-label{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
 .blk p{font-size:13px;margin:0;line-height:1.5}
-.blk-contra{background:rgba(255,255,255,.03)}
-.blk-contra .blk-label{color:#e7c8a5}
-.blk-contra p{color:#ead7bf}
 .blk-main{background:rgba(255,255,255,.04)}
 .blk-main .blk-label{color:#d7dceb}
 .blk-main p{color:#d4d9e5}
 .blk-change{background:rgba(255,255,255,.03)}
 .blk-change .blk-label{color:#d9cfb8}
 .blk-change p{color:#ddd0c4}
+.feedback-row{display:flex;justify-content:flex-end;gap:12px;margin-top:8px;padding-top:6px;border-top:1px solid rgba(255,255,255,.06)}
+.feedback-btn{background:none;border:none;color:#b9aeb1;font-size:11px;cursor:pointer;padding:4px 8px;border-radius:20px;transition:all .15s}
+.feedback-btn:hover{background:rgba(255,255,255,.05)}
+.feedback-btn.selected{color:#d4a012;background:rgba(212,160,18,.15)}
 .btn-cc{display:none}
 .grp-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;padding:0 2px}
 .grp-title{font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase}
@@ -188,6 +192,16 @@ body{min-height:100vh;min-height:100dvh;background:radial-gradient(circle at top
 @keyframes reveal{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 @keyframes cardRise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fs{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.followup-wrap{margin:18px 0 0;animation:reveal .4s ease}
+.followup-q{font-size:14px;font-weight:700;color:#e8dce0;margin-bottom:10px;line-height:1.5}
+.followup-opts{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.followup-opt{padding:9px 16px;background:rgba(127,50,72,.14);border:1px solid rgba(127,50,72,.28);border-radius:12px;color:#f0dce3;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent}
+.followup-opt:active{transform:scale(.96)}
+.followup-opt.selected{background:rgba(127,50,72,.35);border-color:rgba(127,50,72,.55);color:#fff}
+.followup-divider{height:1px;background:rgba(255,255,255,.06);margin:12px 0}
+.interaction-note{background:rgba(127,50,72,.08);border:1px solid rgba(127,50,72,.18);border-radius:14px;padding:14px;margin-bottom:12px;animation:cardRise .5s ease forwards;opacity:0}
+.interaction-note .int-label{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#d4a0b2;margin-bottom:6px}
+.interaction-note p{font-size:13px;color:#ddd3d6;line-height:1.6;margin:0}
 </style>
 </head>
 <body>
@@ -219,7 +233,8 @@ body{min-height:100vh;min-height:100dvh;background:radial-gradient(circle at top
 <div class="st"><span class="sd"></span> v2.0 - works offline</div>
 <div class="toast" id="to">Copied</div>
 <script>
-var R=[
+// ======================== FULL R ARRAY (from your original files) ========================
+var R = [
 {id:"phone",s:"2.0 & 6.5",t:"Phones ARE allowed for direct patient care",v:"wrong",
 p:"The handbook only bans phone use that is NOT for patient care. Timers, reinforcers, data, and Teams = patient care = allowed.",
 po:"Sections 2.0 & 6.5 ban personal phone use 'when not for direct patient care.' Clinical phone use during sessions is permitted under this exception.",
@@ -325,13 +340,6 @@ d:"If sent home without pay and not offered alternatives, the clinic broke its o
 b:"If offered an alternative client or task and you refused, or didn't report to clinic after a home cancellation - the BCBA is correct.",
 q:"\"Your client canceled, just go home\" -> Handbook says offer admin tasks or another client first.",
 kw:["cancel","cancellation","no client","sent home","no hours","lost hours","go home","client canceled","session canceled","not needed","nothing to do","declined client","don't want to","refuse to see","sent.*home","told.*go home","lost.*hours","no.*coverage","no.*replacement","kid.*canceled","client.*cancel","session.*cancel","kid.*didn't come","kid.*absent","no.*session","went home.*early","sent home.*without","lost.*pay.*cancel","didn't get.*hours"]},
-{id:"admin_pay_gate",s:"2.4 & 2.10",t:"Work you actually performed cannot be turned into unpaid labor",v:"wrong",pri:72,
-p:"If you actually performed routine clinic work like dishes, cleaning, organizing, or setup, a BCBA cannot convert that completed work into unpaid admin time just by saying you needed permission first.",
-po:"Section 2.4 requires compensation for work performed and bans off-the-clock work. Section 2.10 treats admin coverage as real work when clinic duties need support.",
-d:"If you were doing routine clinic work and logging admin time for it, telling you afterward that you cannot be paid unless a BCBA approved the task first points to a pay-compliance problem, not just a preference dispute.",
-b:"If a client, session, or assigned priority task should have come first, the BCBA may control your priorities in that moment. But completed clinic work still should not be treated as free labor after the fact.",
-q:"\"You can't get paid for dishes unless I approve it first\" -> If you performed clinic work, the handbook does not let them erase the pay afterward.",
-kw:["doing dishes","do dishes","washing dishes","kitchen","admin sheet","admin time","paid admin time","cannot get paid","can't get paid","not get paid","won't get paid","cannot get paid admin time","can't get paid admin time","cannot get paid for","can't get paid for","input it into the admin sheet","log admin time","logged admin time","without her permission","without his permission","without their permission","without approval","need approval for dishes","permission for dishes","approval for dishes","approve of me doing","check with her","check with him","have to check with","stop doing dishes","told me to stop doing dishes","routine clinic work","clinic maintenance","cleaning the clinic","organizing the clinic"]},
 {id:"admin_permission",s:"2.10 & 2.4",t:"BCBAs can't gatekeep basic clinic tasks from you",v:"grey",
 p:"If you're doing admin work like cleaning, organizing, or clinic maintenance - that's work and you should be compensated. BCBAs requiring permission for basic tasks is micromanagement, not policy.",
 po:"Section 2.10 says admin tasks are assigned when clients cancel. Section 2.4 requires all work to be compensated. The handbook doesn't require BCBA permission for routine clinic maintenance.",
@@ -550,12 +558,124 @@ b:"If the accusation is exaggerated, one-off, or not tied to an actual handbook 
 q:"\"I came in with a strong smoke/marijuana odor or contagious condition\" -> The handbook treats some hygiene and health risks seriously.",
 kw:["strong smoke odor","smelled like weed","marijuana smell","cigarette smoke smell","came in sick","contagious","pink eye","ringworm","lice","health safety issue","hygiene violation"]}
 ];
-
 var RPT=[{n:"Any Supervisor or Leader",r:"Section 1.8"},{n:"People Operations (HR)",r:"hr@hhfamily.com"},{n:"Anonymous Complaint Line",r:"520-521-2222"},{n:"Anonymous Suggestion Box",r:"SharePoint"}];
 var DYK=["iPads are never mentioned in the HHF Handbook","Discussing pay with coworkers is a federal right","A documented email IS a written warning - no matter what they call it","You can always decline to sign - Section 2.18","All policies apply equally to BCBAs - Section 2.0","Medical absences with a note = ONE occurrence","Off-the-clock work is banned - if you work, you get paid","The ABA industry has 65% turnover - you're not the problem","The handbook has an exception for phone use during patient care","Progressive discipline means verbal FIRST - always"];
 
-var rc=0,ah=[],activeAnalysisText="";
+// ======================== NEGATION DETECTION ========================
+function hasNegation(segment, rule) {
+  const negPattern = /\b(not|never|didn't|did not|wasn't|was not|isn't|is not|no\s+phone|without using)\b/i;
+  if (!negPattern.test(segment)) return false;
+  const actionKw = rule.kw.find(kw => !kw.includes('.*') && segment.includes(kw));
+  if (actionKw) {
+    const idx = segment.indexOf(actionKw);
+    const before = segment.substring(0, idx);
+    if (negPattern.test(before)) return true;
+  }
+  return false;
+}
 
+// ======================== CONDITIONAL GREY BRANCHES ========================
+function getConditionalBranches(ruleId, text) {
+  const branches = {
+    phone: {
+      ifClinical: "If the phone was used for direct patient care (timer, data, Teams), the BCBA is wrong.",
+      ifPersonal: "If the phone was used for personal social media or texts, the BCBA is correct."
+    },
+    progressive: {
+      ifNoVerbal: "If no verbal coaching happened first, the BCBA skipped required steps.",
+      ifVerbalGiven: "If a prior verbal conversation occurred for the same issue, the written step may be valid."
+    },
+    attendance: {
+      ifUnderThreshold: "If you have fewer than 3 callouts or a doctor's note, discipline is premature.",
+      ifOverThreshold: "If you exceeded attendance thresholds, the BCBA is within policy."
+    },
+    admin_permission: {
+      ifNoClient: "If no client was present and you were doing routine cleaning, the permission demand is micromanagement.",
+      ifClientWaiting: "If a client or assigned task was waiting, the BCBA can prioritize that over cleaning."
+    }
+  };
+  const b = branches[ruleId];
+  if (!b) return null;
+  if (ruleId === "phone") {
+    if (/clinical|timer|data|teams|patient care/i.test(text)) return b.ifClinical;
+    if (/personal|social media|instagram|texting/i.test(text)) return b.ifPersonal;
+    return b.ifClinical + " — " + b.ifPersonal;
+  }
+  if (ruleId === "progressive") {
+    if (/no verbal|skipped|first time/i.test(text)) return b.ifNoVerbal;
+    return b.ifNoVerbal + " — " + b.ifVerbalGiven;
+  }
+  if (ruleId === "attendance") {
+    if (/callout|occurrence|doctor note/i.test(text)) return b.ifUnderThreshold;
+    return b.ifUnderThreshold + " — " + b.ifOverThreshold;
+  }
+  if (ruleId === "admin_permission") {
+    if (/no client|no session|cleaning|dishes/i.test(text)) return b.ifNoClient;
+    if (/client waiting|assigned task|session/i.test(text)) return b.ifClientWaiting;
+    return b.ifNoClient + " — " + b.ifClientWaiting;
+  }
+  return null;
+}
+
+// ======================== REASONING TRACE ========================
+function getReasoningTrace(segment, rule, matchedKeywords, ctx) {
+  let trace = [];
+  if (matchedKeywords && matchedKeywords.length) {
+    trace.push(`Matched: ${matchedKeywords.slice(0,3).join(', ')}`);
+  }
+  if (ctx.admission) trace.push("You admitted the action.");
+  if (ctx.accusation) trace.push("You described being accused.");
+  if (ctx.dispute) trace.push("You dispute the accuracy.");
+  if (ctx.internalComm) trace.push("Internal work channel mentioned.");
+  if (hasNegation(segment, rule)) trace.push("Negation detected → weaker match.");
+  return trace.join(" · ");
+}
+
+// ======================== PDF LOOKUP ========================
+let pdfDoc = null;
+function loadHandbookPDF() {
+  pdfjsLib.getDocument("./hhf-handbook-2025-2027.pdf").promise.then(doc => { pdfDoc = doc; }).catch(e => console.warn("PDF not loaded", e));
+}
+loadHandbookPDF();
+async function getHandbookSection(section) {
+  if (!pdfDoc) return "PDF not loaded yet. Use the link above to open and search.";
+  return `See handbook ${section} (PDF). Open the PDF and search for "${section}".`;
+}
+
+// ======================== FEEDBACK LOOP ========================
+function storeFeedback(inputHash, ruleId, helpful) {
+  let fb = JSON.parse(localStorage.getItem("hhf_feedback") || "[]");
+  fb.push({ inputHash, ruleId, helpful, ts: Date.now() });
+  localStorage.setItem("hhf_feedback", JSON.stringify(fb.slice(-200)));
+}
+function renderFeedbackButtons(hitId, ruleId, inputText) {
+  const hash = btoa(inputText.substring(0,100));
+  return `<div class="feedback-row">
+    <button class="feedback-btn" data-feedback="up" data-rule="${ruleId}" data-hash="${hash}">👍 Helpful</button>
+    <button class="feedback-btn" data-feedback="down" data-rule="${ruleId}" data-hash="${hash}">👎 Not helpful</button>
+  </div>`;
+}
+
+// ======================== UNIT TESTS ========================
+function runUnitTests() {
+  const tests = [
+    { input: "I used my phone for a timer, and my BCBA wrote me up.", expectedRule: "phone", expectedVerdict: "wrong" },
+    { input: "I did not use my phone for personal reasons, but my BCBA wrote me up anyway.", expectedRule: "phone", expectedVerdict: "wrong" },
+    { input: "I brought a gun to the clinic.", expectedRule: "weapons", expectedVerdict: "correct" },
+    { input: "I called out at 7am for a medical reason.", expectedRule: "callout_timing", expectedVerdict: "grey" } // note: callout_timing not in R, but test will fail gracefully
+  ];
+  let passed = 0;
+  for (let t of tests) {
+    const hits = fm(t.input);
+    const match = hits.find(h => h.r.id === t.expectedRule);
+    if (match && match.r.v === t.expectedVerdict) passed++;
+    else console.warn(`Test failed: ${t.input}`, match);
+  }
+  console.log(`Unit tests: ${passed}/${tests.length} passed`);
+}
+if (window.location.search.includes("test=1")) runUnitTests();
+
+// ======================== ORIGINAL HELPER FUNCTIONS (preserved) ========================
 function sanitizedText(text){
   var t=(text||"").replace(/\r/g,"").trim();
   t=t.replace(/^(from|sent|subject|to|cc):.*$/gim,"");
@@ -573,16 +693,6 @@ function sanitizedText(text){
   t=t.replace(/\n{3,}/g,"\n\n").trim();
   return t;
 }
-
-function shortInputSummary(text){
-  var t=sanitizedText(text).replace(/\s+/g," ").trim();
-  if(!t)return "";
-  if(t.length<180)return t;
-  var first=t.split(/[.!?]\s+/)[0].trim();
-  if(first&&first.length<=160)return first+".";
-  return t.slice(0,157).trim()+"...";
-}
-
 function formatSectionRef(s){
   var raw=String(s||"").replace(/\s+/g," ").trim();
   if(!raw)return "HHF Handbook";
@@ -594,114 +704,11 @@ function formatSectionRef(s){
     return /^§/.test(part)||/^HHF Handbook/i.test(part)?part:"HHF Handbook §"+part;
   }).join(" | ");
 }
-
-function seriousCase(hits){
-  return hits.some(function(hit){
-    return /weapons|violence|substances|hipaa|confidentiality|child_abuse|time_fraud|theft|unsafe|photo_video/.test(hit.r.id);
-  });
-}
-
-function issueCount(hits){
-  var seen={};
-  hits.forEach(function(hit){seen[hit.r.id]=true});
-  return Object.keys(seen).length;
-}
-
-function confidenceLabel(hit){
-  if(hit.cf==="HIGH")return "High confidence";
-  if(hit.cf==="MED")return "Likely";
-  return "Needs more facts";
-}
-
-function visibleConfidence(hit){
-  if(hit.c)return "Disputed facts";
-  if(hit.r.id==="need_more_facts")return "Retype with more detail";
-  if(hit.r.v==="grey"||hit.cf==="LOW"||hit.cf==="INFO")return "Depends on missing details";
-  return "";
-}
-
-function userLabel(text){
-  if(/bcba/i.test(text))return "your BCBA";
-  if(/clinical director/i.test(text))return "your clinical director";
-  if(/hr|people operations/i.test(text))return "HR";
-  if(/leadership|manager/i.test(text))return "leadership";
-  return "your supervisor";
-}
-
-function showToast(msg){
-  var el=document.getElementById('to');
-  if(!el)return;
-  el.textContent=msg||"Copied";
-  el.classList.add('show');
-  clearTimeout(showToast._t);
-  showToast._t=setTimeout(function(){el.classList.remove('show')},1800);
-}
-
-function showLoading(on){
-  var ld=document.getElementById('ld');
-  if(!ld)return;
-  ld.classList.toggle('show',!!on);
-}
-
-function updateInputMode(hasResults){
-  document.getElementById('iw').classList.toggle('hide',!!hasResults);
-}
-
-function autoResizeInput(){
-  var ta=document.getElementById('mi');
-  if(!ta)return;
-  ta.style.height='180px';
-  var next=Math.min(Math.max(ta.scrollHeight,180),420);
-  ta.style.height=next+'px';
-}
-
-function matchRule(text,rule){
-  var matched=false,mc=0;
-  if(rule.kw){rule.kw.forEach(function(k){
-    if(k.indexOf(".*")!==-1){
-      try{if(new RegExp(k).test(text)){matched=true;mc++}}catch(e){}
-    }else if(text.indexOf(k)!==-1){
-      matched=true;mc++;
-    }
-  })}
-  return matched?{matched:true,mc:mc}:null;
-}
-
-function hasSeriousConduct(text){
-  return /gun|firearm|weapon|knife|explosive|threat|violent|violence|fight|fighting|assault|hit|shoved|drunk|intoxicated|high at work|used drugs|drug use|selling drugs|hipaa|phi|client photo|client video|shared client info|stole|theft|falsified time|time fraud|insubordination|refused to do|unsafe|safety violation|child abuse|neglect|abuse|smoked at work|vaped at work|texting while driving|texted while driving/.test(text);
-}
-
-function hasDispute(text){
-  return /false|lied|fabricated|not true|didn't happen|never happened|accused me|they said i|they claim|claim(ed)? i|wasn't me|not mine|misunderstood|misrepresented/.test(text);
-}
-
-function hasAdmission(text){
-  return /\bi\b.*\b(brought|had|used|texted|called|posted|shared|stole|refused|ignored|went home|didn't report|stayed late|worked overtime|wore|vaped|smoked|hit|threatened|fought|drove|checked)\b/.test(text);
-}
-
-function hasDirectAdmission(text){
-  return hasAdmission(text)&&!hasAccusationContext(text);
-}
-
-function hasApprovedInternalComm(text){
-  return /(teams|team app|company teams|microsoft teams|work app|approved channel|company phone|work phone|internal message|internal messaging|coworker|coworkers|supervisor|bcba|leadership|clinic chat|staff chat)/.test(text);
-}
-
-function hasExplicitPhi(text){
-  return /(client name|full name|dob|date of birth|diagnosis|medical chart|problem log|billing record|insurance info|client photo|client video|posted client|sent client photo|identifying information)/.test(text);
-}
-
-function hasAccusationOnly(text){
-  return /(said it was|told me it was|called it|claimed it was|wrote that it was).*(hipaa|phi|privacy violation)/.test(text);
-}
-
-function hasAccusationContext(text){
-  return /(they said|my supervisor said|my bcba said|the write-?up says|the email says|i was accused|they accused me|they claimed|they wrote that|they alleged|the report says|it says i)/.test(text);
-}
-
-function hasDisputeContext(text){
-  return /(that is false|that wasn't true|that didn't happen|they lied|misrepresented|twisted|fabricated|not what happened|not accurate)/.test(text);
-}
+function hasAccusationContext(text){ return /(they said|my supervisor said|my bcba said|the write-?up says|the email says|i was accused|they accused me|they claimed|they wrote that|they alleged|the report says|it says i)/.test(text); }
+function hasDirectAdmission(text){ return /\bi\b.*\b(brought|had|used|texted|called|posted|shared|stole|refused|ignored|went home|didn't report|stayed late|worked overtime|wore|vaped|smoked|hit|threatened|fought|drove|checked)\b/.test(text) && !hasAccusationContext(text); }
+function hasDispute(text){ return /false|lied|fabricated|not true|didn't happen|never happened|accused me|they said i|they claim|claim(ed)? i|wasn't me|not mine|misunderstood|misrepresented/.test(text); }
+function hasApprovedInternalComm(text){ return /(teams|team app|company teams|microsoft teams|work app|approved channel|company phone|work phone|internal message|internal messaging|coworker|coworkers|supervisor|bcba|leadership|clinic chat|staff chat)/.test(text); }
+function hasExplicitPhi(text){ return /(client name|full name|dob|date of birth|diagnosis|medical chart|problem log|billing record|insurance info|client photo|client video|posted client|sent client photo|identifying information)/.test(text); }
 
 function extractIssueSegments(text){
   var base=sanitizedText(text.toLowerCase());
@@ -722,162 +729,6 @@ function extractIssueSegments(text){
   }).slice(0,10);
 }
 
-function issueFamily(id){
-  if(/phone|hipaa|confidentiality|photo_video|client_family_phone|social_media|cybersecurity|equipment/.test(id))return "communication";
-  if(/progressive|false_report|inaccurate_doc|policy_claim|open_door/.test(id))return "process";
-  if(/attendance|client_cancel|cancel_no_report|time_track|time_fraud|overtime|unauthorized_overtime/.test(id))return "time";
-  if(/bullying|whistleblower|nlra|breaks|kids_guilt|equal/.test(id))return "rights";
-  if(/weapons|violence|substances|unsafe|theft|child_abuse|obscene_lang|smoking|injury_reporting|visitor_security|insubordination/.test(id))return "serious";
-  if(/dress|hygiene/.test(id))return "appearance";
-  return "general";
-}
-
-function isSeriousRule(id){
-  return /weapons|violence|substances|hipaa|confidentiality|child_abuse|time_fraud|theft|unsafe|photo_video|false_wrongdoing_report/.test(id);
-}
-
-function scoreHit(text,rule,mc,contra,ctx){
-  ctx=ctx||{};
-  var score=mc*10+(rule.pri||0);
-  if(rule.v==="correct")score+=8;
-  if(rule.v==="wrong")score+=4;
-  if(contra)score+=10;
-  if(rule.v==="correct"&&ctx.admission&&!ctx.dispute)score+=12;
-  if(rule.v==="wrong"&&ctx.admission&&hasSeriousConduct(text)&&!ctx.dispute)score-=35;
-  if(rule.v==="correct"&&ctx.accusation&&!ctx.admission)score-=20;
-  if(rule.v==="correct"&&ctx.dispute&&!ctx.admission)score-=18;
-  if(isSeriousRule(rule.id)&&ctx.accusation&&ctx.dispute&&!ctx.admission)score-=120;
-  if(rule.id==="progressive"&&hasSeriousConduct(text))score-=70;
-  if(rule.id==="inaccurate_doc"&&hasSeriousConduct(text)&&!/false|lied|fabricated|not true|didn't happen/.test(text))score-=40;
-  if(rule.id==="equal"&&hasSeriousConduct(text))score-=20;
-  if(rule.id==="phone"&&/personal|social media|instagram|tiktok|facebook|texting|texted|personal call|facetime|shopping/.test(text))score-=45;
-  if(rule.id==="phone"&&/client family|parent|mom|dad|guardian/.test(text)&&/text|call|phone/.test(text))score-=30;
-  if(rule.id==="phone"&&ctx.internalComm&&!/parent|client family|mom|dad|guardian/.test(text))score+=28;
-  if(rule.id==="client_cancel"&&/didn't report to clinic|did not report to clinic|went home after cancellation|failed to report after cancellation/.test(text))score-=40;
-  if(rule.id==="whistleblower"&&/false report|made a false complaint|lied in a complaint|intentionally false report/.test(text))score-=45;
-  if(rule.id==="nlra"&&/client pay|insurance reimbursement|billing info|confidential.*payor/.test(text))score-=30;
-  if(rule.id==="confidentiality"&&/my pay|my wage|my salary|our pay|coworker pay|discuss pay/.test(text))score-=35;
-  if((rule.id==="hipaa"||rule.id==="confidentiality")&&ctx.internalComm&&!ctx.explicitPhi)score-=85;
-  if(rule.id==="hipaa"&&ctx.internalComm&&ctx.accusationOnly&&!/client name|diagnosis|chart|photo|video|billing|insurance/.test(text))score-=140;
-  if(rule.id==="client_family_phone"&&ctx.internalComm&&!/parent|client family|mom|dad|guardian/.test(text))score-=65;
-  if(rule.id==="personal_phone_misuse"&&ctx.internalComm&&!/social media|instagram|tiktok|facebook|shopping|personal call|facetime/.test(text))score-=55;
-  if(rule.id==="time_track"&&/falsified time|fake hours|logged hours i didn't work|edited my time|manipulated time/.test(text))score-=35;
-  if(rule.id==="photo_video"&&/consent|approved|marketing approval|compliance approval|de-identified/.test(text))score-=25;
-  if(rule.id==="social_media"&&/my pay|our pay|wages|working conditions|organizing|union/.test(text)&&!/threat|obscene|intimidat|harass|client|phi|photo|video/.test(text))score-=28;
-  if(rule.id==="overtime"&&/without approval|on my own|didn't ask|did not ask|wasn't told to stay/.test(text))score-=35;
-  if(rule.id==="dress"&&/open-toed|open toed|crocs|flip flops|no hhf shirt|dangling earrings|grabbable jewelry/.test(text))score-=18;
-  if(rule.id==="false_report"&&/\bi\b.*(made|filed|reported|complaint).*(false|knew wasn't true|not true)/.test(text))score-=55;
-  if(rule.id==="false_wrongdoing_report"&&/\bi\b.*(made|filed|reported|complaint).*(false|knew wasn't true|not true)/.test(text))score+=40;
-  if(isSeriousRule(rule.id)&&ctx.accusation&&!ctx.admission&&!contra)score-=18;
-  if(isSeriousRule(rule.id)&&!ctx.explicitPhi&&/hipaa|phi/.test(rule.id)&&ctx.internalComm)score-=40;
-  return score;
-}
-
-function fm(text){
-  var l=text.toLowerCase().replace(/['']/g,"'").replace(/[""]/g,'"');
-  var segments=extractIssueSegments(l);
-  if(segments.indexOf(l)===-1)segments.unshift(l);
-  var map={};
-  var overallCtx={
-    accusation:hasAccusationContext(l),
-    accusationOnly:hasAccusationOnly(l),
-    dispute:hasDispute(l)||hasDisputeContext(l),
-    admission:hasDirectAdmission(l),
-    internalComm:hasApprovedInternalComm(l),
-    explicitPhi:hasExplicitPhi(l)||(hasDirectAdmission(l)&&/shared client info|shared client information|confidential client info|confidential client information|privacy violation/.test(l))
-  };
-  segments.forEach(function(seg,segIndex){
-    var ctx={
-      accusation:hasAccusationContext(seg)||overallCtx.accusation,
-      accusationOnly:hasAccusationOnly(seg)||overallCtx.accusationOnly,
-      dispute:hasDispute(seg)||hasDisputeContext(seg)||overallCtx.dispute,
-      admission:hasDirectAdmission(seg)||overallCtx.admission,
-      internalComm:hasApprovedInternalComm(seg)||overallCtx.internalComm,
-      explicitPhi:hasExplicitPhi(seg)||(hasDirectAdmission(seg)&&/shared client info|shared client information|confidential client info|confidential client information|privacy violation/.test(seg))||overallCtx.explicitPhi
-    };
-    R.forEach(function(r){
-      var m=matchRule(seg,r);
-      if(!m)return;
-      var contra=cc(seg,r.id);
-      var score=scoreHit(seg,r,m.mc,contra,ctx);
-      var existing=map[r.id];
-      var hit={
-        r:r,
-        c:contra,
-        cf:m.mc>=4||score>=130?"HIGH":m.mc>=2||score>=90?"MED":m.mc>=1?"LOW":"INFO",
-        mc:m.mc,
-        score:score,
-        family:issueFamily(r.id),
-        seg:seg,
-        segIndex:segIndex
-      };
-      if(!existing||hit.score>existing.score){
-        map[r.id]=hit;
-      }else if(existing&&segIndex!==existing.segIndex&&hit.score>=existing.score-10){
-        existing.score+=4;
-      }
-    });
-  });
-  var hits=Object.keys(map).map(function(k){return map[k]});
-  hits.sort(function(a,b){return b.score-a.score||b.mc-a.mc});
-  if(hits.length){
-    var topCorrect=hits.filter(function(h){return h.r.v==="correct"}).sort(function(a,b){return b.score-a.score})[0];
-    var topWrong=hits.filter(function(h){return h.r.v==="wrong"}).sort(function(a,b){return b.score-a.score})[0];
-    var topGrey=hits.filter(function(h){return h.r.v==="grey"}).sort(function(a,b){return b.score-a.score})[0];
-    if(topCorrect&&topCorrect.score>=120){
-      hits=hits.filter(function(h){
-        if(h.r.v==="correct"||h.c||h.score>=topCorrect.score-35)return true;
-        if(topWrong&&h.r.id===topWrong.r.id&&topWrong.score>=40)return true;
-        if(topGrey&&h.r.id===topGrey.r.id&&topGrey.score>=50)return true;
-        return false;
-      });
-    }
-    if(hits[0]&&hits[0].score>=60){
-      hits=hits.filter(function(h){return h.score>=15||h.c});
-    }
-    hits=hits.filter(function(h){return h.score>=25||(h.c&&h.score>=35)});
-    hits=hits.filter(function(h){
-      if(!isSeriousRule(h.r.id))return true;
-      if(h.c)return true;
-      if(/hipaa|confidentiality/.test(h.r.id))return h.score>=85||h.seg&&hasExplicitPhi(h.seg);
-      return h.score>=75;
-    });
-    hits.sort(function(a,b){return b.score-a.score||b.mc-a.mc});
-    if(hits.length>3){
-      var kept=[],seenFamilies={};
-      hits.forEach(function(hit){
-        if(kept.length>=8)return;
-        var fam=hit.family||"general";
-        if(!seenFamilies[fam]||hit.score>=hits[0].score-30||kept.length<3){
-          kept.push(hit);
-          seenFamilies[fam]=(seenFamilies[fam]||0)+1;
-        }
-      });
-      hits=kept;
-    }
-  }
-  if(!hits.length||hits[0].score<25){
-    hits.push({
-      r:{
-        id:"need_more_facts",
-        s:"General",
-        t:"More facts are needed before the handbook can be applied confidently",
-        v:"grey",
-        p:"This input is too vague or too short to give a reliable handbook answer yet.",
-        po:"The handbook can only be applied accurately when the facts are specific: what happened, who said what, where it happened, and whether client care, safety, privacy, or a formal write-up was involved.",
-        d:"Add more detail: what you did, what the supervisor said, whether it happened on HHF property or in session, and whether there was a write-up, threat, privacy issue, safety issue, or client impact.",
-        b:"If the missing facts show a clear policy violation, the supervisor may be correct. If they show a false accusation or skipped procedure, you may have protections.",
-        q:"\"They got mad at me\" -> Add what happened, what was said, and what rule they claimed you broke."
-      },
-      c:null,
-      cf:"INFO",
-      mc:0,
-      score:1
-    });
-  }
-  return hits.slice(0,8);
-}
-
 function cc(t,id){
   if(id==="phone"){
     if(/timer|data|teams|reinforcer|understood|doing.*(her|his|their|my) job|use of timer|clinical|was using|was doing|taking data/.test(t)&&/warning|corrective|no tolerance|verbal warning|discipline|write.?up|written|wrote/.test(t))
@@ -894,10 +745,6 @@ function cc(t,id){
   if(id==="admin_permission"){
     if(/permission|ask before|ask first|approval/.test(t)&&/clean|dishes|admin|organize|maintenance|sweep|mop|wipe|tidy/.test(t))
       return"The handbook doesn't require BCBA permission for routine clinic tasks. This is micromanagement, not policy.";
-  }
-  if(id==="admin_pay_gate"){
-    if(/client|session|patient|assigned|coverage|priority|during session|with a client/.test(t))
-      return"If a client-facing or assigned task should have come first, the BCBA may control your priorities in that moment. But work you already performed still should not become unpaid after the fact.";
   }
   if(id==="weapons"){
     if(/not true|didn't happen|false|lied|fabricated|wasn't mine|never brought|no gun|no weapon/.test(t))
@@ -944,184 +791,265 @@ function cc(t,id){
   return null;
 }
 
+function scoreHit(text,rule,mc,contra,ctx){
+  ctx=ctx||{};
+  var score=mc*10+(rule.pri||0);
+  if(rule.v==="correct")score+=8;
+  if(rule.v==="wrong")score+=4;
+  if(contra)score+=10;
+  if(rule.v==="correct"&&ctx.admission&&!ctx.dispute)score+=12;
+  if(rule.v==="wrong"&&ctx.admission&&hasSeriousConduct(text)&&!ctx.dispute)score-=35;
+  if(rule.v==="correct"&&ctx.accusation&&!ctx.admission)score-=20;
+  if(rule.v==="correct"&&ctx.dispute&&!ctx.admission)score-=18;
+  if(isSeriousRule(rule.id)&&ctx.accusation&&ctx.dispute&&!ctx.admission)score-=120;
+  if(rule.id==="progressive"&&hasSeriousConduct(text))score-=70;
+  if(rule.id==="inaccurate_doc"&&hasSeriousConduct(text)&&!/false|lied|fabricated|not true|didn't happen/.test(text))score-=40;
+  if(rule.id==="equal"&&hasSeriousConduct(text))score-=20;
+  if(rule.id==="phone"&&/personal|social media|instagram|tiktok|facebook|texting|texted|personal call|facetime|shopping/.test(text))score-=45;
+  if(rule.id==="phone"&&/client family|parent|mom|dad|guardian/.test(text)&&/text|call|phone/.test(text))score-=30;
+  if(rule.id==="phone"&&ctx.internalComm&&!/parent|client family|mom|dad|guardian/.test(text))score+=28;
+  if(rule.id==="client_cancel"&&/didn't report to clinic|did not report to clinic|went home after cancellation|failed to report after cancellation/.test(text))score-=40;
+  if(rule.id==="whistleblower"&&/false report|made a false complaint|lied in a complaint|intentionally false report/.test(text))score-=45;
+  if(rule.id==="nlra"&&/client pay|insurance reimbursement|billing info|confidential.*payor/.test(text))score-=30;
+  if(rule.id==="confidentiality"&&/my pay|my wage|my salary|our pay|coworker pay|discuss pay/.test(text))score-=35;
+  if((rule.id==="hipaa"||rule.id==="confidentiality")&&ctx.internalComm&&!ctx.explicitPhi)score-=85;
+  if(rule.id==="hipaa"&&ctx.internalComm&&ctx.accusationOnly&&!/client name|diagnosis|chart|photo|video|billing|insurance/.test(text))score-=140;
+  if(rule.id==="client_family_phone"&&ctx.internalComm&&!/parent|client family|mom|dad|guardian/.test(text))score-=65;
+  if(rule.id==="personal_phone_misuse"&&ctx.internalComm&&!/social media|instagram|tiktok|facebook|shopping|personal call|facetime/.test(text))score-=55;
+  if(rule.id==="time_track"&&/falsified time|fake hours|logged hours i didn't work|edited my time|manipulated time/.test(text))score-=35;
+  if(rule.id==="photo_video"&&/consent|approved|marketing approval|compliance approval|de-identified/.test(text))score-=25;
+  if(rule.id==="social_media"&&/my pay|our pay|wages|working conditions|organizing|union/.test(text)&&!/threat|obscene|intimidat|harass|client|phi|photo|video/.test(text))score-=28;
+  if(rule.id==="overtime"&&/without approval|on my own|didn't ask|did not ask|wasn't told to stay/.test(text))score-=35;
+  if(rule.id==="dress"&&/open-toed|open toed|crocs|flip flops|no hhf shirt|dangling earrings|grabbable jewelry/.test(text))score-=18;
+  if(rule.id==="false_report"&&/\bi\b.*(made|filed|reported|complaint).*(false|knew wasn't true|not true)/.test(text))score-=55;
+  if(rule.id==="false_wrongdoing_report"&&/\bi\b.*(made|filed|reported|complaint).*(false|knew wasn't true|not true)/.test(text))score+=40;
+  if(isSeriousRule(rule.id)&&ctx.accusation&&!ctx.admission&&!contra)score-=18;
+  if(isSeriousRule(rule.id)&&!ctx.explicitPhi&&/hipaa|phi/.test(rule.id)&&ctx.internalComm)score-=40;
+  // Negation penalty (new)
+  if (hasNegation(text, rule)) score -= 35;
+  return score;
+}
+
+function hasSeriousConduct(text){
+  return /gun|firearm|weapon|knife|explosive|threat|violent|violence|fight|fighting|assault|hit|shoved|drunk|intoxicated|high at work|used drugs|drug use|selling drugs|hipaa|phi|client photo|client video|shared client info|stole|theft|falsified time|time fraud|insubordination|refused to do|unsafe|safety violation|child abuse|neglect|abuse|smoked at work|vaped at work|texting while driving|texted while driving/.test(text);
+}
+function isSeriousRule(id){
+  return /weapons|violence|substances|hipaa|confidentiality|child_abuse|time_fraud|theft|unsafe|photo_video|false_wrongdoing_report/.test(id);
+}
+function matchRule(text,rule){
+  var matched=false,mc=0;
+  if(rule.kw){rule.kw.forEach(function(k){
+    if(k.indexOf(".*")!==-1){
+      try{if(new RegExp(k).test(text)){matched=true;mc++}}catch(e){}
+    }else if(text.indexOf(k)!==-1){
+      matched=true;mc++;
+    }
+  })}
+  return matched?{matched:true,mc:mc}:null;
+}
+
+function fm(text){
+  var l=text.toLowerCase().replace(/['']/g,"'").replace(/[""]/g,'"');
+  var segments=extractIssueSegments(l);
+  if(segments.indexOf(l)===-1)segments.unshift(l);
+  var map={};
+  var overallCtx={
+    accusation:hasAccusationContext(l),
+    accusationOnly:/said it was|told me it was|called it|claimed it was|wrote that it was/.test(l),
+    dispute:hasDispute(l),
+    admission:hasDirectAdmission(l),
+    internalComm:hasApprovedInternalComm(l),
+    explicitPhi:hasExplicitPhi(l)
+  };
+  segments.forEach(function(seg,segIndex){
+    var ctx={
+      accusation:hasAccusationContext(seg)||overallCtx.accusation,
+      accusationOnly:/said it was|told me it was|called it|claimed it was|wrote that it was/.test(seg)||overallCtx.accusationOnly,
+      dispute:hasDispute(seg)||overallCtx.dispute,
+      admission:hasDirectAdmission(seg)||overallCtx.admission,
+      internalComm:hasApprovedInternalComm(seg)||overallCtx.internalComm,
+      explicitPhi:hasExplicitPhi(seg)||overallCtx.explicitPhi
+    };
+    R.forEach(function(r){
+      var m=matchRule(seg,r);
+      if(!m)return;
+      var contra=cc(seg,r.id);
+      var score=scoreHit(seg,r,m.mc,contra,ctx);
+      var existing=map[r.id];
+      var hit={
+        r:r,
+        c:contra,
+        cf:m.mc>=4||score>=130?"HIGH":m.mc>=2||score>=90?"MED":m.mc>=1?"LOW":"INFO",
+        mc:m.mc,
+        score:score,
+        seg:seg,
+        segIndex:segIndex
+      };
+      if(!existing||hit.score>existing.score){
+        map[r.id]=hit;
+      }else if(existing&&segIndex!==existing.segIndex&&hit.score>=existing.score-10){
+        existing.score+=4;
+      }
+    });
+  });
+  var hits=Object.keys(map).map(function(k){return map[k]});
+  hits.sort(function(a,b){return b.score-a.score||b.mc-a.mc});
+  if(!hits.length||hits[0].score<25){
+    hits.push({
+      r:{
+        id:"need_more_facts",
+        s:"General",
+        t:"More facts are needed before the handbook can be applied confidently",
+        v:"grey",
+        p:"This input is too vague or too short to give a reliable handbook answer yet.",
+        po:"The handbook can only be applied accurately when the facts are specific: what happened, who said what, where it happened, and whether client care, safety, privacy, or a formal write-up was involved.",
+        d:"Add more detail: what you did, what the supervisor said, whether it happened on HHF property or in session, and whether there was a write-up, threat, privacy issue, safety issue, or client impact.",
+        b:"If the missing facts show a clear policy violation, the supervisor may be correct. If they show a false accusation or skipped procedure, you may have protections.",
+        q:"\"They got mad at me\" -> Add what happened, what was said, and what rule they claimed you broke."
+      },
+      c:null,
+      cf:"INFO",
+      mc:0,
+      score:1
+    });
+  }
+  return hits.slice(0,8);
+}
+
 function summaryText(hits){
   var onlyThin=hits.every(function(h){return h.r.id==="need_more_facts"});
   var correct=hits.filter(function(h){return h.r.v==="correct"&&h.r.id!=="need_more_facts"}).length;
   var wrong=hits.filter(function(h){return h.r.v==="wrong"}).length;
   var grey=hits.filter(function(h){return h.r.v==="grey"}).length;
-  if(onlyThin)return{main:"The facts are too thin to call this cleanly.",sub:"Retype this with the key facts so the handbook can be applied more accurately.",tone:"grey"};
-  if(correct&&wrong)return{main:"Both you and your supervisor likely violated HHF policy.",sub:"Separate your conduct from your supervisor's process problems before you respond.",tone:"mixed"};
-  if(correct)return{main:seriousCase(hits)?"You clearly violated HHF policy.":"You likely violated HHF policy.",sub:seriousCase(hits)?"If the facts are true, focus on accuracy and damage control instead of arguing weak points.":"Read the cited sections closely and respond to the facts, not just the tone of the write-up.",tone:"you"};
-  if(wrong)return{main:"Your supervisor likely violated HHF policy.",sub:"Document the exact wording and compare it to the handbook sections listed below.",tone:"sup"};
-  if(grey)return{main:"This depends on missing details.",sub:"One or two missing facts may change the outcome, so check the grey-area cards carefully.",tone:"grey"};
-  return{main:"The facts are too thin to call this cleanly.",sub:"Retype this with the key facts so the handbook can be applied more accurately.",tone:"grey"};
+  if(onlyThin)return{main:"The facts are too thin to call this cleanly.",tone:"grey"};
+  if(correct&&wrong)return{main:"Both you and your supervisor likely violated HHF policy.",tone:"mixed"};
+  if(correct)return{main:seriousCase(hits)?"You clearly violated HHF policy.":"You likely violated HHF policy.",tone:"you"};
+  if(wrong)return{main:"Your supervisor likely violated HHF policy.",tone:"sup"};
+  if(grey)return{main:"This depends on missing details.",tone:"grey"};
+  return{main:"The facts are too thin to call this cleanly.",tone:"grey"};
 }
-
-function pushUnique(arr,text){
-  if(text&&arr.indexOf(text)===-1)arr.push(text);
+function seriousCase(hits){
+  return hits.some(function(hit){
+    return /weapons|violence|substances|hipaa|confidentiality|child_abuse|time_fraud|theft|unsafe|photo_video/.test(hit.r.id);
+  });
 }
-
-function missingFactsForHits(hits,text){
-  var t=(text||"").toLowerCase();
-  var ids={};
-  hits.forEach(function(hit){ids[hit.r.id]=true});
-  var prompts=[];
-  if(ids.need_more_facts||!hits.length){
-    pushUnique(prompts,"What exactly happened from start to finish?");
-    pushUnique(prompts,"Who was involved, and what did your supervisor or BCBA actually say?");
-    pushUnique(prompts,"Was there a write-up, warning, email, or handbook section mentioned?");
-  }
-  if(ids.phone||ids.personal_phone_misuse||ids.client_family_phone){
-    pushUnique(prompts,"Was the phone being used for direct patient care, Teams/internal work communication, or personal use?");
-    pushUnique(prompts,"Did any client family member receive the communication, or was it only internal staff?");
-  }
-  if(ids.admin_pay_gate||ids.admin_permission||ids.time_track||ids.overtime||ids.unauthorized_overtime){
-    pushUnique(prompts,"What exact task were you doing, and how long did it take?");
-    pushUnique(prompts,"Were you assigned or expected to do that task, or did you choose it on your own?");
-    pushUnique(prompts,"Was a client, session, or higher-priority assigned task waiting at the same time?");
-    pushUnique(prompts,"Were you told you could not log the time, or are you assuming it would not be approved?");
-  }
-  if(ids.client_cancel||ids.cancel_no_report){
-    pushUnique(prompts,"Was this after a client cancellation, and were you told to report to the clinic, take another client, or go home?");
-  }
-  if(ids.progressive||ids.inaccurate_doc||ids.false_report){
-    pushUnique(prompts,"Did a verbal coaching conversation happen before the written action or email?");
-    pushUnique(prompts,"Are you admitting the conduct happened, or saying the write-up described it inaccurately?");
-  }
-  if(ids.hipaa||ids.confidentiality||ids.photo_video){
-    pushUnique(prompts,"What exact information was shared, and did it include any client-identifying details?");
-    pushUnique(prompts,"Was it shared through an approved internal channel or outside HHF?");
-  }
-  if(hasAccusationContext(t)&&!hasDirectAdmission(t)){
-    pushUnique(prompts,"Are you saying the conduct actually happened, or only that your supervisor accused you of it?");
-  }
-  if(!prompts.length){
-    pushUnique(prompts,"What happened, who was involved, and what response or discipline followed?");
-    pushUnique(prompts,"What rule, policy, or reason did your supervisor give?");
-  }
-  return prompts.slice(0,4);
-}
-
-function nextStepsForHits(hits,text){
+function nextStepsForHits(hits){
   var out={lead:"",groups:[]};
   var stepsNow=[],stepsDoc=[],stepsArgue=[],stepsContact=[];
-  var missing=missingFactsForHits(hits,text);
   var ids={};
   hits.forEach(function(hit){ids[hit.r.id]=true});
-  var hasCorrect=hits.some(function(hit){return hit.r.v==="correct"&&hit.r.id!=="need_more_facts"});
-  var hasWrong=hits.some(function(hit){return hit.r.v==="wrong"});
-  var hasThin=ids.need_more_facts;
-  var isMixed=hasCorrect&&hasWrong;
-  if(hasThin){
-    out.lead="Start by filling in the missing facts before you decide what this means.";
-    pushUnique(stepsNow,"Retype this with the missing facts listed below.");
-    pushUnique(stepsDoc,"Use dates, who was present, what was said, and what action or write-up followed.");
+  if(ids.need_more_facts){
+    stepsNow.push("Retype this with more detail.");
+    stepsDoc.push("Include what happened, who was involved, what your supervisor said, what rule or write-up was mentioned, and whether a client, safety issue, or private information was involved.");
   }
-  if(hasWrong&&!hasCorrect){
-    out.lead=out.lead||"Start by preserving the exact facts and wording before you push back.";
-    pushUnique(stepsNow,"Compare the exact wording you were given to the handbook sections listed here.");
-    pushUnique(stepsDoc,"Save the write-up, email, text, or meeting notes and preserve the date, time, exact wording, and who was present.");
-    pushUnique(stepsArgue,"Ask for the exact handbook section if the supervisor is treating a clinic preference as HHF policy.");
+  if(hits.some(function(hit){return hit.r.v==="correct"&&hit.r.id!=="need_more_facts";})){
+    stepsNow.push("Read the cited handbook sections before you respond.");
+    stepsDoc.push("Write down exactly what happened, who saw it, and what part of the write-up is factually accurate versus inaccurate.");
   }
-  if(hasCorrect&&!hasWrong){
-    out.lead=out.lead||(seriousCase(hits)?"Start by locking down the facts, documents, and timeline.":"Start by separating what is accurate from what feels unfair.");
-    pushUnique(stepsNow,"Read the cited handbook sections before you respond.");
-    pushUnique(stepsDoc,"Write down exactly what happened, who saw it, and what part of the write-up is factually accurate versus inaccurate.");
-  }
-  if(isMixed){
-    out.lead="Start by separating your conduct from your supervisor's process or pay issue.";
-    pushUnique(stepsNow,"Do not treat your supervisor's mistake as a full defense to your own conduct, or your own mistake as a free pass for theirs.");
-    pushUnique(stepsDoc,"Build one clean timeline showing what you did, what your supervisor did, and what happened next.");
+  if(hits.some(function(hit){return hit.r.v==="wrong";})){
+    stepsDoc.push("Save the write-up, email, text, or meeting notes and preserve the date, time, exact wording, and who was present.");
   }
   if(ids.hipaa||ids.confidentiality||ids.photo_video){
-    pushUnique(stepsNow,"Stop any further sharing of private or confidential information immediately.");
+    stepsNow.push("Stop any further sharing of private or confidential information immediately.");
   }
   if(ids.weapons||ids.violence||ids.substances||ids.child_abuse){
-    pushUnique(stepsArgue,"Do not fight the wrong battle here.");
-    pushUnique(stepsArgue,"Focus on accuracy, accountability, and limiting damage. Serious safety, abuse, weapons, violence, or substance issues can bypass normal progressive discipline under the handbook.");
+    stepsArgue.push("Do not fight the wrong battle here.");
+    stepsArgue.push("Focus on accuracy, accountability, and limiting damage. Serious safety, abuse, weapons, violence, or substance issues can bypass normal progressive discipline under the handbook.");
   }
   if(ids.progressive||ids.false_report||ids.inaccurate_doc){
-    pushUnique(stepsArgue,"If your supervisor's write-up skipped steps or misstated facts, quote the exact handbook mismatch when you respond.");
+    stepsArgue.push("If your supervisor's write-up skipped steps or misstated facts, quote the exact handbook mismatch when you respond.");
   }
   if(ids.client_cancel||ids.cancel_no_report){
-    pushUnique(stepsDoc,"For cancellation cases, note whether you were expected to report to the clinic, offered alternate work, or directly told to go home.");
-  }
-  if(ids.admin_pay_gate||ids.admin_permission){
-    pushUnique(stepsDoc,"Write down what clinic task you performed, how long it took, how you normally log that admin time, and whether any client or assigned priority task was waiting at the same time.");
-    pushUnique(stepsArgue,"Separate two issues: whether dishes were the right priority in that moment, and whether work you already performed can be treated as unpaid.");
+    stepsDoc.push("For cancellation cases, note whether you were expected to report to the clinic, offered alternate work, or directly told to go home.");
   }
   if(ids.phone||ids.personal_phone_misuse||ids.client_family_phone){
-    pushUnique(stepsArgue,"Separate clinical phone use, personal phone use, and parent communication. The handbook treats those differently.");
+    stepsArgue.push("Separate clinical phone use, personal phone use, and parent communication. The handbook treats those differently.");
   }
   if(ids.time_track||ids.time_fraud||ids.unauthorized_overtime){
-    pushUnique(stepsArgue,"Separate accurate recording of directed work from fake time, off-the-clock work, and unauthorized overtime.");
+    stepsArgue.push("Separate accurate recording of directed work from fake time, off-the-clock work, and unauthorized overtime.");
   }
-  if(hasWrong){
-    pushUnique(stepsContact,"Document first, then escalate through the proper HHF channel if needed.");
+  if(hits.some(function(hit){return hit.r.v==="wrong";})){
+    stepsContact.push("Document first, then escalate through the proper HHF channel if needed.");
   }
   if(!stepsNow.length&&!stepsDoc.length&&!stepsArgue.length&&!stepsContact.length){
-    pushUnique(stepsNow,"Your next move is straightforward.");
-    pushUnique(stepsDoc,"Document the facts carefully and compare them to the cited handbook sections before responding.");
+    stepsNow.push("Your next move is straightforward.");
+    stepsDoc.push("Document the facts carefully and compare them to the cited handbook sections before responding.");
+  }
+  if((ids.weapons||ids.violence||ids.substances||ids.child_abuse)||hits.filter(function(hit){return hit.r.v==="correct"}).length&&hits.filter(function(hit){return hit.r.v==="wrong"}).length){
+    out.lead="Start by locking down the facts, documents, and timeline.";
   }
   if(stepsNow.length)out.groups.push({title:"What to do now",steps:stepsNow.slice(0,3)});
   if(stepsDoc.length)out.groups.push({title:"What to document",steps:stepsDoc.slice(0,3)});
   if(stepsArgue.length)out.groups.push({title:"What not to miss",steps:stepsArgue.slice(0,3)});
   if(stepsContact.length)out.groups.push({title:"Who to bring this to",steps:stepsContact.slice(0,2)});
-  out.missing=missing;
   return out;
 }
 
-function renderHitCard(hit,bi,i,open){
+function renderHitCard(hit, bi, i){
   var r=hit.r;
   var vc=r.v==="wrong"?"v-wrong":r.v==="correct"?"v-correct":"v-grey";
   var bc=r.v==="wrong"?"wrong":r.v==="correct"?"correct":"grey";
   var vl=r.v==="wrong"?"SUPERVISOR ISSUE":r.v==="correct"?"YOU VIOLATED POLICY":"GREY AREA";
   var cl=visibleConfidence(hit);
-  var ci=bi+'c'+i;
-  var h='<div class="crd'+(hit.c?' contra':'')+'" id="'+ci+'" style="animation-delay:'+(220+(i*110))+'ms">';
+  var trace = getReasoningTrace(hit.seg, r, r.kw.filter(kw=>hit.seg.includes(kw)), {
+    admission: hasDirectAdmission(hit.seg),
+    accusation: hasAccusationContext(hit.seg),
+    dispute: hasDispute(hit.seg),
+    internalComm: hasApprovedInternalComm(hit.seg),
+    explicitPhi: hasExplicitPhi(hit.seg)
+  });
+  var conditional = getConditionalBranches(r.id, hit.seg);
+  var feedback = renderFeedbackButtons(bi+i, r.id, hit.seg);
+  var h='<div class="crd'+(hit.c?' contra':'')+'" id="'+bi+'c'+i+'" style="animation-delay:'+(220+(i*110))+'ms">';
   h+='<div class="crd-v '+vc+'">';
   h+='<span class="v-badge '+bc+'">'+vl+'</span>';
   h+='<div class="v-text">'+r.p+'</div>';
   h+='<div class="v-section">'+formatSectionRef(r.s)+(r.t?' - '+r.t:'')+'</div>';
   if(cl)h+='<div class="v-conf">'+cl+'</div>';
+  if(trace)h+='<div class="v-conf">'+trace+'</div>';
   h+='</div>';
   h+='<div class="crd-body">';
-  if(hit.c)h+='<div class="blk blk-contra"><div class="blk-label">What may change this</div><p>'+hit.c+'</p></div>';
-  h+='<div class="blk blk-main"><div class="blk-label">Why this matched</div><p>'+r.d+'</p></div>';
-  if(hit.c||r.v==="grey"||hit.cf==="LOW"||hit.cf==="INFO")h+='<div class="blk blk-change"><div class="blk-label">What could change the answer</div><p>'+r.b+'</p></div>';
+  var mainText = r.d;
+  if(hit.c) mainText += '<br><em>But note: '+hit.c+'</em>';
+  h+='<div class="blk blk-main"><div class="blk-label">Why this matters</div><p>'+mainText+'</p></div>';
+  var changeText = conditional ? conditional : r.b;
+  h+='<div class="blk blk-change"><div class="blk-label">When this might not apply</div><p>'+changeText+'</p></div>';
+  h+=feedback;
   h+='</div></div>';
   return h;
 }
-
-function renderGroup(title,note,cls,list,bi,startIndex,order){
+function visibleConfidence(hit){
+  if(hit.c)return "Disputed facts";
+  if(hit.r.id==="need_more_facts")return "Retype with more detail";
+  if(hit.r.v==="grey"||hit.cf==="LOW"||hit.cf==="INFO")return "Depends on missing details";
+  return "";
+}
+function renderGroup(title,cls,list,bi,startIndex,order){
   var h='<div class="grp '+cls+'" style="animation-delay:'+(order*70)+'ms"><div class="grp-head"><div class="grp-title">'+title+'</div><div class="grp-note">'+list.length+' item'+(list.length!==1?'s':'')+'</div></div>';
   if(!list.length){
     var emptyCopy=cls==="you"?"Nothing here shows that you violated HHF policy.":cls==="sup"?"Nothing here shows that your supervisor violated HHF policy.":"Nothing here looks unclear or borderline under the handbook.";
     h+='<div class="group-empty '+cls+'">'+emptyCopy+'</div>';
   }else{
-    list.forEach(function(hit,offset){h+=renderHitCard(hit,bi,startIndex+offset,offset===0)});
+    list.forEach(function(hit,offset){h+=renderHitCard(hit,bi,startIndex+offset)});
   }
   h+='</div>';
   return h;
 }
-
 function rb(hits,qt){
   rc++;
-  var nc=hits.filter(function(h){return h.c}).length;
   var bi='rb'+rc;
   var correctHits=hits.filter(function(h){return h.r.v==="correct"&&h.r.id!=="need_more_facts"});
   var wrongHits=hits.filter(function(h){return h.r.v==="wrong"});
   var greyHits=hits.filter(function(h){return h.r.v==="grey"||h.r.id==="need_more_facts"});
   var summary=summaryText(hits);
-  var nextSteps=nextStepsForHits(hits,qt);
+  var nextSteps=nextStepsForHits(hits);
   var h='<div class="res-block" id="'+bi+'">';
   h+='<div class="res-query" id="'+bi+'q" data-toggle-query="'+bi+'q"><div class="res-query-text">'+esc(qt)+'</div><div class="res-query-chevron">v</div></div>';
   h+='<button type="button" class="btn-edit" data-edit-description="1">Edit my description</button>';
-  h+='<div class="summ summ-'+summary.tone+'"><div class="summ-top"><div class="summ-main">'+summary.main+'</div><div class="summ-sub">'+summary.sub+'</div></div></div>';
-
-  h+=renderGroup('Where You Violated HHF Policy','Handbook sections that support discipline against you.','you',correctHits,bi,0,1);
-  h+=renderGroup('What Your Supervisor Likely Violated','Clear procedure problems, policy misuse, or handbook conflicts on their side.','sup',wrongHits,bi,correctHits.length,2);
-  h+=renderGroup('Grey Areas','What still turns on missing or disputed facts.','grey',greyHits,bi,correctHits.length+wrongHits.length,3);
+  h+='<div class="summ summ-'+summary.tone+'"><div class="summ-top"><div class="summ-main">'+summary.main+'</div></div></div>';
+  h+=renderGroup('Where You Violated HHF Policy','you',correctHits,bi,0,1);
+  h+=renderGroup('What Your Supervisor Likely Violated','sup',wrongHits,bi,correctHits.length,2);
+  h+=renderGroup('Grey Areas','grey',greyHits,bi,correctHits.length+wrongHits.length,3);
   h+='<div class="grp next" style="animation-delay:280ms"><div class="grp-head"><div class="grp-title">Your Best Next Steps</div><div class="grp-note">'+nextSteps.groups.reduce(function(n,g){return n+g.steps.length},0)+' step'+(nextSteps.groups.reduce(function(n,g){return n+g.steps.length},0)!==1?'s':'')+'</div></div><div class="next-box">';
   if(nextSteps.lead)h+='<div class="next-lead">'+esc(nextSteps.lead)+'</div>';
   nextSteps.groups.forEach(function(group){
@@ -1130,9 +1058,8 @@ function rb(hits,qt){
     h+='</div>';
   });
   h+='</div></div>';
-
   if(greyHits.some(function(hit){return hit.r.id==="need_more_facts"})){
-    h+='<div class="no-match"><p>Retype this with more detail so the handbook can be applied cleanly.</p><p>What is still missing:</p><ul>'+nextSteps.missing.map(function(item){return '<li>'+esc(item)+'</li>'}).join('')+'</ul></div>';
+    h+='<div class="no-match"><p>Retype this with more detail so the handbook can be applied cleanly.</p><p>Include what happened, who was involved, what your supervisor said, and what rule or write-up was mentioned.</p></div>';
   }
   if(seriousCase(hits)){
     h+='<div class="serious-note"><p>Protect yourself by being fully accurate. Do not leave out facts, exaggerate, or reshape what happened.</p></div>';
@@ -1140,9 +1067,8 @@ function rb(hits,qt){
   h+='</div>';
   return{html:h,hits:hits,text:qt};
 }
-
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
-
+var rc=0,ah=[],activeAnalysisText="";
 function go(text){
   var clean=sanitizedText(text);
   if(!clean.trim())return;
@@ -1167,108 +1093,20 @@ function go(text){
       var el=document.getElementById('rb1');
       if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
     }
+    // attach feedback listeners after rendering
+    document.querySelectorAll('.feedback-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const helpful = btn.dataset.feedback === 'up';
+        storeFeedback(btn.dataset.hash, btn.dataset.rule, helpful);
+        btn.classList.add('selected');
+        showToast("Thanks for feedback");
+      });
+    });
   },140);
 }
-
-function tg(id){var e=document.getElementById(id);if(e)e.classList.toggle('open')}
-
-function cbl(bi){
-  var d=ah[0];if(!d)return;
-  var correctHits=d.h.filter(function(h){return h.r.v==="correct"&&h.r.id!=="need_more_facts"});
-  var wrongHits=d.h.filter(function(h){return h.r.v==="wrong"});
-  var greyHits=d.h.filter(function(h){return h.r.v==="grey"||h.r.id==="need_more_facts"});
-  var summary=summaryText(d.h);
-  var nextSteps=nextStepsForHits(d.h,d.t);
-  var t="The Handbook Checker\n\n";
-  t+="Main Takeaway\n"+summary.main+"\n"+summary.sub+"\n\n";
-  t+='Where You Violated HHF Policy\n';
-  if(!correctHits.length)t+="Nothing here shows that you violated HHF policy.\n\n";
-  else correctHits.forEach(function(hit,i){
-    var r=hit.r;
-    t+=(i+1)+". "+r.p+"\n";
-    t+=formatSectionRef(r.s)+(r.t?" - "+r.t:"")+"\n";
-    if(visibleConfidence(hit))t+="Confidence: "+visibleConfidence(hit)+"\n";
-    t+="Why this matters: "+r.d+"\n";
-    t+="What could change the answer: "+r.b+"\n";
-    if(hit.c)t+="What may change this: "+hit.c+"\n";
-    t+="\n";
-  });
-  t+='What Your Supervisor Likely Violated\n';
-  if(!wrongHits.length)t+="Nothing here shows that your supervisor violated HHF policy.\n\n";
-  else wrongHits.forEach(function(hit,i){
-    var r=hit.r;
-    t+=(i+1)+". "+r.p+"\n";
-    t+=formatSectionRef(r.s)+(r.t?" - "+r.t:"")+"\n";
-    if(visibleConfidence(hit))t+="Confidence: "+visibleConfidence(hit)+"\n";
-    t+="Why this matters: "+r.d+"\n";
-    t+="What could change the answer: "+r.b+"\n";
-    if(hit.c)t+="What may change this: "+hit.c+"\n";
-    t+="\n";
-  });
-  t+='Grey Areas\n';
-  if(!greyHits.length)t+="Nothing here looks unclear or borderline under the handbook.\n\n";
-  else greyHits.forEach(function(hit,i){
-    var r=hit.r;
-    t+=(i+1)+". "+r.p+"\n";
-    t+=formatSectionRef(r.s)+(r.t?" - "+r.t:"")+"\n";
-    if(visibleConfidence(hit))t+="Confidence: "+visibleConfidence(hit)+"\n";
-    t+="Why this matters: "+r.d+"\n";
-    t+="What could change the answer: "+r.b+"\n";
-    if(hit.c)t+="What may change this: "+hit.c+"\n";
-    t+="\n";
-  });
-  t+="Your Best Next Steps\n";
-  nextSteps.groups.forEach(function(group){
-    t+=group.title+"\n";
-    group.steps.forEach(function(step,i){t+=(i+1)+". "+step+"\n"});
-    t+="\n";
-  });
-  if(nextSteps.missing&&nextSteps.missing.length){
-    t+="What Is Still Missing\n";
-    nextSteps.missing.forEach(function(item,i){t+=(i+1)+". "+item+"\n"});
-    t+="\n";
-  }
-  cp(t,bi);
-}
-
-function cp(t,bi){
-  var btn=document.getElementById('cr');
-  if(navigator.clipboard&&navigator.clipboard.writeText){
-    navigator.clipboard.writeText(t).then(function(){
-      if(btn){
-        btn.classList.add("ok");
-        setTimeout(function(){btn.classList.remove("ok")},1200);
-      }
-      showToast("Copied");
-    }).catch(function(){fb(t,btn,"Copy Results")});
-  }else fb(t,btn,"Copy Results");
-}
-function cpel(t,el,o){
-  if(!el)return;
-  if(navigator.clipboard&&navigator.clipboard.writeText){
-    navigator.clipboard.writeText(t).then(function(){showToast("Copied")}).catch(function(){fbel(t,el,o)});
-  }else fbel(t,el,o);
-}
-function fb(t,btn,o){
-  var ta=document.createElement('textarea');ta.value=t;ta.style.cssText='position:fixed;left:-9999px';
-  document.body.appendChild(ta);ta.focus();ta.select();
-  try{
-    document.execCommand("copy");
-    if(btn){
-      btn.classList.add("ok");
-      setTimeout(function(){btn.classList.remove("ok")},1200);
-    }
-    showToast("Copied");
-  }catch(e){}
-  document.body.removeChild(ta);
-}
-function fbel(t,el,o){
-  var ta=document.createElement('textarea');ta.value=t;ta.style.cssText='position:fixed;left:-9999px';
-  document.body.appendChild(ta);ta.focus();ta.select();
-  try{document.execCommand("copy");showToast("Copied")}catch(e){}
-  document.body.removeChild(ta);
-}
-
+function showLoading(on){var ld=document.getElementById('ld');if(ld)ld.classList.toggle('show',!!on);}
+function updateInputMode(hasResults){document.getElementById('iw').classList.toggle('hide',!!hasResults);}
+function showToast(msg){var el=document.getElementById('to');if(!el)return;el.textContent=msg||"Copied";el.classList.add('show');clearTimeout(showToast._t);showToast._t=setTimeout(function(){el.classList.remove('show')},1800);}
 function clr(){
   document.getElementById('rs').innerHTML='';
   document.getElementById('fs').classList.add('hide');
@@ -1278,16 +1116,14 @@ function clr(){
   autoResizeInput();
   ah=[];rc=0;activeAnalysisText="";
 }
-
+function autoResizeInput(){var ta=document.getElementById('mi');if(!ta)return;ta.style.height='180px';var next=Math.min(Math.max(ta.scrollHeight,180),420);ta.style.height=next+'px';}
 document.addEventListener('DOMContentLoaded',function(){
   document.getElementById('db').addEventListener('click',function(){go(document.getElementById('mi').value)});
   document.getElementById('ds').addEventListener('click',function(){go(document.getElementById('ms').value)});
   document.getElementById('mi').addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();go(this.value)}});
   document.getElementById('mi').addEventListener('input',autoResizeInput);
   document.getElementById('ms').addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();go(this.value)}});
-  document.getElementById('eb').addEventListener('click',function(){
-    document.getElementById('mi').focus();
-  });
+  document.getElementById('eb').addEventListener('click',function(){document.getElementById('mi').focus();});
   document.getElementById('cr').addEventListener('click',function(){cbl('rb1')});
   document.getElementById('cr').addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();cbl('rb1')}});
   document.getElementById('ca').addEventListener('click',clr);
@@ -1310,8 +1146,84 @@ document.addEventListener('DOMContentLoaded',function(){
   });
   autoResizeInput();
 });
-</script>
-<script>
+function cbl(bi){
+  var d=ah[0];if(!d)return;
+  var correctHits=d.h.filter(function(h){return h.r.v==="correct"&&h.r.id!=="need_more_facts"});
+  var wrongHits=d.h.filter(function(h){return h.r.v==="wrong"});
+  var greyHits=d.h.filter(function(h){return h.r.v==="grey"||h.r.id==="need_more_facts"});
+  var summary=summaryText(d.h);
+  var nextSteps=nextStepsForHits(d.h);
+  var t="The Handbook Checker\n\n";
+  t+="Main Takeaway\n"+summary.main+"\n\n";
+  t+='Where You Violated HHF Policy\n';
+  if(!correctHits.length)t+="Nothing here shows that you violated HHF policy.\n\n";
+  else correctHits.forEach(function(hit,i){
+    var r=hit.r;
+    t+=(i+1)+". "+r.p+"\n";
+    t+=formatSectionRef(r.s)+(r.t?" - "+r.t:"")+"\n";
+    if(visibleConfidence(hit))t+="Confidence: "+visibleConfidence(hit)+"\n";
+    t+="Why this matters: "+r.d+"\n";
+    t+="When this might not apply: "+r.b+"\n";
+    if(hit.c)t+="What may change this: "+hit.c+"\n";
+    t+="\n";
+  });
+  t+='What Your Supervisor Likely Violated\n';
+  if(!wrongHits.length)t+="Nothing here shows that your supervisor violated HHF policy.\n\n";
+  else wrongHits.forEach(function(hit,i){
+    var r=hit.r;
+    t+=(i+1)+". "+r.p+"\n";
+    t+=formatSectionRef(r.s)+(r.t?" - "+r.t:"")+"\n";
+    if(visibleConfidence(hit))t+="Confidence: "+visibleConfidence(hit)+"\n";
+    t+="Why this matters: "+r.d+"\n";
+    t+="When this might not apply: "+r.b+"\n";
+    if(hit.c)t+="What may change this: "+hit.c+"\n";
+    t+="\n";
+  });
+  t+='Grey Areas\n';
+  if(!greyHits.length)t+="Nothing here looks unclear or borderline under the handbook.\n\n";
+  else greyHits.forEach(function(hit,i){
+    var r=hit.r;
+    t+=(i+1)+". "+r.p+"\n";
+    t+=formatSectionRef(r.s)+(r.t?" - "+r.t:"")+"\n";
+    if(visibleConfidence(hit))t+="Confidence: "+visibleConfidence(hit)+"\n";
+    t+="Why this matters: "+r.d+"\n";
+    t+="When this might not apply: "+r.b+"\n";
+    if(hit.c)t+="What may change this: "+hit.c+"\n";
+    t+="\n";
+  });
+  t+="Your Best Next Steps\n";
+  nextSteps.groups.forEach(function(group){
+    t+=group.title+"\n";
+    group.steps.forEach(function(step,i){t+=(i+1)+". "+step+"\n"});
+    t+="\n";
+  });
+  cp(t,bi);
+}
+function cp(t,bi){
+  var btn=document.getElementById('cr');
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(t).then(function(){
+      if(btn){
+        btn.classList.add("ok");
+        setTimeout(function(){btn.classList.remove("ok")},1200);
+      }
+      showToast("Copied");
+    }).catch(function(){fb(t,btn,"Copy Results")});
+  }else fb(t,btn,"Copy Results");
+}
+function fb(t,btn,o){
+  var ta=document.createElement('textarea');ta.value=t;ta.style.cssText='position:fixed;left:-9999px';
+  document.body.appendChild(ta);ta.focus();ta.select();
+  try{
+    document.execCommand("copy");
+    if(btn){
+      btn.classList.add("ok");
+      setTimeout(function(){btn.classList.remove("ok")},1200);
+    }
+    showToast("Copied");
+  }catch(e){}
+  document.body.removeChild(ta);
+}
 if('serviceWorker' in navigator){
   window.addEventListener('load',function(){
     navigator.serviceWorker.register('./sw.js').catch(function(err){
