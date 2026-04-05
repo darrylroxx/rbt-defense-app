@@ -15,7 +15,15 @@ var R = [
     kw: ["sleep", "asleep", "bean bag", "neglect", "theft", "drunk", "high", "violence", "hit", "abuse", "fighting"],
     anti_kw: ["timer", "data", "clean", "scrub", "lunch", "breakroom"]
   },
-
+{
+    id: "leave_abuse", s: "6.10", pg: 45, t: "Dishonesty & Leave Abuse", v: "correct", pri: 1000,
+    p: "Calling out for a denied PTO day is considered Gross Misconduct.",
+    d: "Section 6.10 defines 'Dishonesty' as a terminable offense. If you call out sick for a day that was explicitly denied as PTO, leadership will categorize this as falsifying the reason for your absence.",
+    b: "Even if you are actually sick, the timing creates a 'rebuttable presumption' of dishonesty that is very difficult to defend in a clinical setting.",
+    strategy: "This is a serious situation. Do not argue about the sick day itself; instead, provide a doctor's note immediately to prove the absence was legitimate and not an attempt to bypass the PTO denial.",
+    kw: ["denied", "PTO", "called out sick", "denied Friday", "denied day", "terminated for sick"],
+    anti_kw: ["16 hours", "timer", "clean"]
+  },
   // ---------------------------------------------------------
   // BUCKET 1: LEGAL & PRIVACY SHIELDS (Priority 900+)
   // ---------------------------------------------------------
