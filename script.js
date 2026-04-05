@@ -1,56 +1,74 @@
 // ==========================================
-// script.js - Arbiter v3.1 3-Gate Engine
+// script.js - Arbiter v3.2 Heuristic NLP Engine
 // ==========================================
 
 function sanitizedText(text) { return (text || "").toLowerCase().trim(); }
 
-// The 3-Gate Engine replaces the old point system
+// The advanced 3-Gate NLP Engine
 function calculateWeights(text, rule) {
   let score = 0;
-  
-  // Base check: Does the text contain the rule's keywords?
-  let hasKeyword = rule.kw.some(k => text.includes(k));
-  if (!hasKeyword) return 0; // Skip if completely irrelevant
-  
-  // GATE 1: GRAVITY CHECK (Red Zone Overrides)
-  if (rule.id === "red_zone") score += 2000; // Unbeatable score if Red Zone is triggered
+  const cleanText = sanitizedText(text);
+  const words = cleanText.split(/\W+/); // Tokenize into exact words
+  const negators = ["not", "didn't", "wasn't", "never", "no", "without"];
 
-  // GATE 2: VERACITY CHECK (Ghost Rules vs Violations)
-  if (rule.id === "dress_violation") score += 900;
-  if (rule.id === "ghost_rule_dress") {
-      // It's a ghost rule ONLY if they didn't ALSO mention a ripped/banned item
-      let mentionsBanned = ["ripped", "open-toe", "hoodie", "graphic", "crocs"].some(k => text.includes(k));
-      if (!mentionsBanned) score += 950; 
+  // 1. THE CONTEXT DAMPENER (Anti-Keywords)
+  // If the sentence contains an anti-keyword, this rule is instantly killed.
+  if (rule.anti_kw && rule.anti_kw.some(akw => cleanText.includes(akw))) {
+      return -5000; 
   }
-  
-  if (rule.id === "device_personal") score += 900;
-  if (rule.id === "device_clinical") score += 950;
-  
-  if (rule.id === "harassment") score += 850;
 
-  // GATE 3: PROCEDURAL CHECK (The Ladder)
-  if (rule.id === "procedural") score += 800;
+  // 2. NEGATION DETECTION & MATCHING
+  let matchedCount = 0;
+  rule.kw.forEach(k => {
+      if (cleanText.includes(k)) {
+          let isNegated = false;
+          let kTokens = k.split(" ");
+          let firstWordOfK = kTokens[0];
+          let idx = words.indexOf(firstWordOfK);
 
-  // Handbook Specifics Check
-  if (rule.id === "breaks" || rule.id === "attendance_excessive" || rule.id === "attendance_note" || rule.id === "cancellation") {
-      score += 700;
-  }
+          // Look at the 3 words preceding the keyword to detect negation
+          if (idx > 0) {
+              let start = Math.max(0, idx - 3);
+              let contextWindow = words.slice(start, idx);
+              if (contextWindow.some(w => negators.includes(w))) {
+                  isNegated = true;
+              }
+          }
+
+          if (isNegated) {
+              score -= 500; // Penalize because they said they DID NOT do it
+          } else {
+              score += 600; // Reward standard matches
+              matchedCount++;
+          }
+      }
+  });
+
+  // If no valid, un-negated keywords were found, skip this rule
+  if (matchedCount === 0) return 0;
+
+  // 3. BASELINE GRAVITY SCORES
+  if (rule.id === "red_zone") score += 2000; 
+  if (rule.id === "ghost_rule_dress" || rule.id === "dress_violation") score += 900;
+  if (rule.id === "device_personal" || rule.id === "device_clinical") score += 900;
+  if (rule.id === "unassigned_tasks") score += 1000; // High priority to beat generic "admin" matches
+  if (rule.id === "procedural" || rule.id === "harassment") score += 800;
+  if (rule.id === "breaks" || rule.id === "attendance_excessive" || rule.id === "attendance_note" || rule.id === "cancellation") score += 700;
 
   // Apply contextual +/- weightings from THEMES
   THEMES.SUPERVISOR_WRONG.words.forEach(w => {
-    if (text.includes(w)) {
+    if (cleanText.includes(w)) {
       if (rule.v === "wrong") score += THEMES.SUPERVISOR_WRONG.weight;
       if (rule.v === "correct") score -= THEMES.SUPERVISOR_WRONG.weight;
     }
   });
   THEMES.THERAPIST_WRONG.words.forEach(w => {
-    if (text.includes(w)) {
+    if (cleanText.includes(w)) {
       if (rule.v === "correct") score += THEMES.THERAPIST_WRONG.weight;
       if (rule.v === "wrong") score -= THEMES.THERAPIST_WRONG.weight;
     }
   });
 
-  // Base priority addition
   score += (rule.pri || 0);
   return score;
 }
@@ -65,10 +83,10 @@ function findMatches(text) {
     }
   });
   
-  // Sort by highest score (the gate that matched the strongest)
+  // Sort by highest score (the engine's confidence rating)
   results.sort((a, b) => b.score - a.score);
   
-  // If the top match is Red Zone, return ONLY Red Zone
+  // Hard override: If the top match is Red Zone, return ONLY Red Zone
   if (results.length > 0 && results[0].r.id === "red_zone") {
       return [results[0]];
   }
@@ -76,7 +94,7 @@ function findMatches(text) {
   return results.slice(0, 2);
 }
 
-// ======================== UI (UNTOUCHED) ========================
+// ======================== UI (UNTOUCHED / QUARANTINED) ========================
 function go(text, skipId = null) {
   const clean = sanitizedText(text);
   if (!clean) return;
