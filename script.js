@@ -1,18 +1,42 @@
-// ======================== ENGINE ========================
+// ==========================================
+// script.js - Arbiter v3.1 3-Gate Engine
+// ==========================================
+
 function sanitizedText(text) { return (text || "").toLowerCase().trim(); }
 
+// The 3-Gate Engine replaces the old point system
 function calculateWeights(text, rule) {
   let score = 0;
-  rule.kw.forEach(k => {
-    let regex = new RegExp("\\b" + k + "\\b", "i");
-    if (regex.test(text)) {
-      let words = text.split(/\s+/);
-      let idx = words.findIndex(w => w.includes(k));
-      let context = words.slice(Math.max(0, idx - 3), idx).join(" ");
-      if (/\b(not|never|didn't|wasn't|no)\b/.test(context)) { score -= 70; } 
-      else { score += 35; }
-    }
-  });
+  
+  // Base check: Does the text contain the rule's keywords?
+  let hasKeyword = rule.kw.some(k => text.includes(k));
+  if (!hasKeyword) return 0; // Skip if completely irrelevant
+  
+  // GATE 1: GRAVITY CHECK (Red Zone Overrides)
+  if (rule.id === "red_zone") score += 2000; // Unbeatable score if Red Zone is triggered
+
+  // GATE 2: VERACITY CHECK (Ghost Rules vs Violations)
+  if (rule.id === "dress_violation") score += 900;
+  if (rule.id === "ghost_rule_dress") {
+      // It's a ghost rule ONLY if they didn't ALSO mention a ripped/banned item
+      let mentionsBanned = ["ripped", "open-toe", "hoodie", "graphic", "crocs"].some(k => text.includes(k));
+      if (!mentionsBanned) score += 950; 
+  }
+  
+  if (rule.id === "device_personal") score += 900;
+  if (rule.id === "device_clinical") score += 950;
+  
+  if (rule.id === "harassment") score += 850;
+
+  // GATE 3: PROCEDURAL CHECK (The Ladder)
+  if (rule.id === "procedural") score += 800;
+
+  // Handbook Specifics Check
+  if (rule.id === "breaks" || rule.id === "attendance_excessive" || rule.id === "attendance_note" || rule.id === "cancellation") {
+      score += 700;
+  }
+
+  // Apply contextual +/- weightings from THEMES
   THEMES.SUPERVISOR_WRONG.words.forEach(w => {
     if (text.includes(w)) {
       if (rule.v === "wrong") score += THEMES.SUPERVISOR_WRONG.weight;
@@ -25,6 +49,8 @@ function calculateWeights(text, rule) {
       if (rule.v === "wrong") score -= THEMES.THERAPIST_WRONG.weight;
     }
   });
+
+  // Base priority addition
   score += (rule.pri || 0);
   return score;
 }
@@ -35,15 +61,22 @@ function findMatches(text) {
     let weight = calculateWeights(text, r);
     if (weight > 30) {
       let ruleCopy = JSON.parse(JSON.stringify(r));
-      if (r.id === "attendance" && text.includes("note")) ruleCopy.v = "wrong";
       results.push({ r: ruleCopy, score: weight });
     }
   });
+  
+  // Sort by highest score (the gate that matched the strongest)
   results.sort((a, b) => b.score - a.score);
+  
+  // If the top match is Red Zone, return ONLY Red Zone
+  if (results.length > 0 && results[0].r.id === "red_zone") {
+      return [results[0]];
+  }
+  
   return results.slice(0, 2);
 }
 
-// ======================== UI ========================
+// ======================== UI (UNTOUCHED) ========================
 function go(text, skipId = null) {
   const clean = sanitizedText(text);
   if (!clean) return;
@@ -64,7 +97,7 @@ function go(text, skipId = null) {
     let html = `<div class="res-block"><div class="res-query">${text}</div>`;
     
     if (matches.length === 0) {
-      html += `<div class="crd" style="padding:20px; color:#aaa; text-align:center;">I need more detail to find a specific rule match.</div>`;
+      html += `<div class="crd" style="padding:20px; color:#aaa; text-align:center;">I need more detail to find a specific rule match. Please include what you were doing or what policy was cited.</div>`;
     } else {
       matches.forEach(m => {
         const r = m.r;
@@ -124,7 +157,8 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('rs').innerHTML = '';
   });
   if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.matchMedia('(display-mode: standalone)').matches) {
-      document.getElementById('ios-prompt').classList.remove('hide');
+      const iosPrompt = document.getElementById('ios-prompt');
+      if (iosPrompt) iosPrompt.classList.remove('hide');
   }
 });
 
