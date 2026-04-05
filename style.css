@@ -127,6 +127,23 @@ body {
     cursor: pointer; 
 }
 
+/* iOS Banner Styling */
+.ios-banner {
+    position: fixed;
+    bottom: 30px;
+    left: 20px;
+    right: 20px;
+    background: #2a1b21;
+    border: 1px solid var(--brand);
+    border-radius: 12px;
+    padding: 15px;
+    z-index: 9999;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    animation: fade 0.5s ease;
+}
+.ios-banner-content { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 13px; }
+.ios-banner-content button { background: none; border: none; color: #888; cursor: pointer; font-size: 18px; }
+
 .st { text-align: center; color: #555; font-size: 10px; margin-top: 40px; padding-bottom: 20px; }
 .hide { display: none; }
 .loading { display: none; text-align: center; padding: 40px; }
