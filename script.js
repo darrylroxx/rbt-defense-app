@@ -507,7 +507,6 @@ function rb(hits,qt){
   return{html:h,hits:hits,text:qt};
 }
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
-
 var rc=0,ah=[],activeAnalysisText="";
 
 // ======================== TURBOTAX UI RENDERER ========================
@@ -722,10 +721,11 @@ function fb(t,btn,o){
   document.body.removeChild(ta);
 }
 
-if('serviceWorker' in navigator){
-  window.addEventListener('load',function(){
-    navigator.serviceWorker.register('./sw.js').catch(function(err){
-      console.warn('Service worker registration failed.', err);
-    });
+// THIS BLOCK ACTIVELY KILLS THE OLD OFFLINE CACHE
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations().then(function(registrations) {
+    for (let registration of registrations) {
+      registration.unregister();
+    }
   });
 }
