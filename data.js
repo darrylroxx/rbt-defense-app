@@ -77,7 +77,16 @@ var R = [
     kw: ["texting", "social media", "instagram", "tiktok", "facebook", "scrolling", "personal phone"],
     anti_kw: ["timer", "data", "clinical", "emergency", "clean", "dishes", "breakroom", "unpaid break"]
   },
-
+{
+    id: "reassignment_refusal", 
+    s: "2.10", pg: 14, t: "Reassignment & Refusal of Work", v: "correct", pri: 820,
+    p: "Refusing a clinic reassignment after a home cancellation is an unexcused absence.",
+    d: "Section 2.10 allows the company to reassign team members to the clinic...",
+    b: "By refusing to report to the clinic when work was available, the absence is categorized as 'unexcused' under Section 2.15.",
+    strategy: "If you cannot make it to the clinic due to commute or logistics, discuss this as a 'Barrier'...",
+    kw: ["home client canceled", "report to the clinic", "rather take it unpaid", "not an option", "unexcused absence", "reassigned"],
+    anti_kw: ["phone", "timer", "scrub", "asleep"]
+  },
   // ---------------------------------------------------------
   // BUCKET 3: PROCEDURAL & GHOST RULES (Priority 700+)
   // ---------------------------------------------------------
