@@ -1,5 +1,5 @@
 // ==========================================
-// script.js - Arbiter v3.2 Heuristic NLP Engine
+// script.js - Arbiter v3.3 Heuristic + Expand UI
 // ==========================================
 
 function sanitizedText(text) { return (text || "").toLowerCase().trim(); }
@@ -8,16 +8,13 @@ function sanitizedText(text) { return (text || "").toLowerCase().trim(); }
 function calculateWeights(text, rule) {
   let score = 0;
   const cleanText = sanitizedText(text);
-  const words = cleanText.split(/\W+/); // Tokenize into exact words
+  const words = cleanText.split(/\W+/); 
   const negators = ["not", "didn't", "wasn't", "never", "no", "without"];
 
-  // 1. THE CONTEXT DAMPENER (Anti-Keywords)
-  // If the sentence contains an anti-keyword, this rule is instantly killed.
   if (rule.anti_kw && rule.anti_kw.some(akw => cleanText.includes(akw))) {
       return -5000; 
   }
 
-  // 2. NEGATION DETECTION & MATCHING
   let matchedCount = 0;
   rule.kw.forEach(k => {
       if (cleanText.includes(k)) {
@@ -26,7 +23,6 @@ function calculateWeights(text, rule) {
           let firstWordOfK = kTokens[0];
           let idx = words.indexOf(firstWordOfK);
 
-          // Look at the 3 words preceding the keyword to detect negation
           if (idx > 0) {
               let start = Math.max(0, idx - 3);
               let contextWindow = words.slice(start, idx);
@@ -36,26 +32,23 @@ function calculateWeights(text, rule) {
           }
 
           if (isNegated) {
-              score -= 500; // Penalize because they said they DID NOT do it
+              score -= 500; 
           } else {
-              score += 600; // Reward standard matches
+              score += 600; 
               matchedCount++;
           }
       }
   });
 
-  // If no valid, un-negated keywords were found, skip this rule
   if (matchedCount === 0) return 0;
 
-  // 3. BASELINE GRAVITY SCORES
   if (rule.id === "red_zone") score += 2000; 
   if (rule.id === "ghost_rule_dress" || rule.id === "dress_violation") score += 900;
   if (rule.id === "device_personal" || rule.id === "device_clinical") score += 900;
-  if (rule.id === "unassigned_tasks") score += 1000; // High priority to beat generic "admin" matches
+  if (rule.id === "unassigned_tasks") score += 1000; 
   if (rule.id === "procedural" || rule.id === "harassment") score += 800;
   if (rule.id === "breaks" || rule.id === "attendance_excessive" || rule.id === "attendance_note" || rule.id === "cancellation") score += 700;
 
-  // Apply contextual +/- weightings from THEMES
   THEMES.SUPERVISOR_WRONG.words.forEach(w => {
     if (cleanText.includes(w)) {
       if (rule.v === "wrong") score += THEMES.SUPERVISOR_WRONG.weight;
@@ -83,10 +76,8 @@ function findMatches(text) {
     }
   });
   
-  // Sort by highest score (the engine's confidence rating)
   results.sort((a, b) => b.score - a.score);
   
-  // Hard override: If the top match is Red Zone, return ONLY Red Zone
   if (results.length > 0 && results[0].r.id === "red_zone") {
       return [results[0]];
   }
@@ -94,7 +85,27 @@ function findMatches(text) {
   return results.slice(0, 2);
 }
 
-// ======================== UI (UNTOUCHED / QUARANTINED) ========================
+// ======================== NEW UI HANDLERS ========================
+window.toggleExpand = function(btn) {
+    const queryDiv = btn.previousElementSibling;
+    if (queryDiv.classList.contains('collapsed')) {
+        queryDiv.classList.remove('collapsed');
+        btn.innerText = "Show Less";
+    } else {
+        queryDiv.classList.add('collapsed');
+        btn.innerText = "Show More";
+    }
+};
+
+window.inlineEdit = function() {
+    document.getElementById('iw').classList.remove('hide');
+    document.getElementById('fs').classList.add('hide');
+    document.getElementById('rs').innerHTML = '';
+    // Optional: auto-focus the text box when they hit edit
+    document.getElementById('mi').focus();
+};
+
+// ======================== CORE UI ========================
 function go(text, skipId = null) {
   const clean = sanitizedText(text);
   if (!clean) return;
@@ -112,7 +123,17 @@ function go(text, skipId = null) {
     }
 
     let matches = findMatches(clean);
-    let html = `<div class="res-block"><div class="res-query">${text}</div>`;
+    
+    // NEW: Check length to trigger the accordion (150 chars is a good visual cutoff)
+    const isLong = text.length > 150;
+    
+    let html = `
+    <div class="res-block">
+        <div class="res-query-wrap">
+            <div class="res-query ${isLong ? 'collapsed' : ''}">${text}</div>
+            ${isLong ? `<button class="expand-btn" onclick="toggleExpand(this)">Show More</button><br>` : ''}
+            <button class="inline-edit-btn" onclick="inlineEdit()">✎ Edit description</button>
+        </div>`;
     
     if (matches.length === 0) {
       html += `<div class="crd" style="padding:20px; color:#aaa; text-align:center;">I need more detail to find a specific rule match. Please include what you were doing or what policy was cited.</div>`;
@@ -139,6 +160,8 @@ function go(text, skipId = null) {
           </div>`;
       });
     }
+    
+    html += `</div>`; // Close res-block
     document.getElementById('rs').innerHTML = html;
     document.getElementById('ld').classList.remove('show');
     document.getElementById('fs').classList.remove('hide');
@@ -147,9 +170,14 @@ function go(text, skipId = null) {
 
 function renderQuestion(c, text) {
   document.getElementById('ld').classList.remove('show');
+  
+  // Also adding the edit button to the Clarification screen so they aren't trapped
   let h = `
     <div class="res-block">
-      <div class="res-query">${text}</div>
+      <div class="res-query-wrap">
+          <div class="res-query">${text}</div>
+          <button class="inline-edit-btn" onclick="inlineEdit()">✎ Edit description</button>
+      </div>
       <div class="followup-wrap">
         <div class="followup-q">${c.q}</div>
         <div class="followup-opts">
@@ -169,11 +197,7 @@ window.answer = function(t, a, id) {
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('db').addEventListener('click', () => go(document.getElementById('mi').value));
   document.getElementById('ca').addEventListener('click', () => location.reload());
-  document.getElementById('eb').addEventListener('click', () => {
-      document.getElementById('iw').classList.remove('hide');
-      document.getElementById('fs').classList.add('hide');
-      document.getElementById('rs').innerHTML = '';
-  });
+  document.getElementById('eb').addEventListener('click', () => inlineEdit());
   if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.matchMedia('(display-mode: standalone)').matches) {
       const iosPrompt = document.getElementById('ios-prompt');
       if (iosPrompt) iosPrompt.classList.remove('hide');
