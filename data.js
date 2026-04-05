@@ -76,7 +76,15 @@ var R = [
     kw: ["watched me", "saw me", "witnessed", "permitted"],
     anti_kw: ["stopped me", "told me to stop", "phone", "timer", "device", "scrub", "color", "late", "absent", "asleep", "sleeping", "neglect", "breakroom"]
   },
-
+  {
+    id: "mandatory_notes_pay", s: "2.4 / 3.1", pg: 12, t: "Mandatory Notes & Overtime", v: "wrong", pri: 965,
+    p: "All time spent on required clinical notes MUST be compensated.",
+    d: "Section 2.4 requires pay for all hours worked. While Section 2.10 requires 'prior approval' for overtime, they cannot legally withhold pay for work already performed—especially mandatory clinical documentation required by Section 3.1.",
+    b: "Federal law (FLSA) prevents employers from 'grooming' the clock. If you were required to do the notes and had no other time to do them, the company must pay for that 45 minutes.",
+    strategy: "State clearly: 'I was performing mandatory clinical documentation required by Section 3.1. While I understand the overtime wasn't pre-approved, Section 2.4 and FLSA require that all time worked be compensated.'",
+    kw: ["stayed late", "finishing notes", "back-to-back", "not approving overtime", "prior approval", "session notes"],
+    anti_kw: ["cleaning", "asleep", "phone", "breakroom"]
+  },
   // ---------------------------------------------------------
   // BUCKET 2: HANDBOOK POLICY VIOLATIONS (Priority 800+)
   // ---------------------------------------------------------
