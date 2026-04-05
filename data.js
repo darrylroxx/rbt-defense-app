@@ -1,5 +1,5 @@
 // ==========================================
-// data.js - HHF Handbook 2025-2027 Dictionary (v3.2 Heuristic)
+// data.js - HHF Handbook 2025-2027 Dictionary (v3.4 Final)
 // ==========================================
 
 var R = [
@@ -52,15 +52,24 @@ var R = [
     anti_kw: ["timer", "data", "reinforcer"]
   },
 
-  // GATE 3: PROCEDURAL LADDER & UNASSIGNED TASKS
+  // GATE 3: PROCEDURAL LADDER & ADMIN/LABOR RULES
+  {
+    id: "permitted_work", s: "2.4", pg: 12, t: "Compensated Time (FLSA)", v: "wrong", pri: 950,
+    p: "If a supervisor permits you to work, they MUST pay you for that time.",
+    d: "Section 2.4 states that all hours worked must be compensated. Under Labor Law ('Suffer or Permit'), if a supervisor witnesses you performing work and does not stop you, the company is legally required to pay for that time.",
+    b: "While you should have asked for an assignment per Section 2.10, the supervisor's silence constitutes 'permission' to work in the eyes of the law.",
+    strategy: "If pay is threatened, escalate immediately: 'Section 2.4 and FLSA standards require compensation for all work performed. Since the work was performed in the presence of a supervisor who did not intervene, I am requesting that this time be approved as required by law.'",
+    kw: ["watched me", "saw me", "didn't say anything", "let me clean", "stood there", "witnessed", "didn't stop me", "permitted"],
+    anti_kw: ["stopped me", "told me to stop", "intervened"]
+  },
   {
     id: "unassigned_tasks", s: "2.10", pg: 14, t: "Self-Assigned Admin Tasks", v: "correct", pri: 850,
     p: "Administrative tasks and cleaning must be explicitly assigned by a leader.",
     d: "Section 2.10 outlines that admin tasks are provided to maintain hours, but they must be 'assigned by the BCBA or clinic leader.' You cannot self-assign chores to claim admin pay.",
     b: "A supervisor verbally stopping you from unapproved tasks is a standard operational correction, not formal discipline.",
     strategy: "Accept the correction gracefully: 'Understood. Are there any approved admin tasks or materials you would like me to work on instead?'",
-    kw: ["cleaning", "kitchen", "sweep", "chore", "unassigned", "floor", "clean"],
-    anti_kw: []
+    kw: ["cleaning", "kitchen", "sweep", "chore", "unassigned", "floor", "clean", "dishes"],
+    anti_kw: ["watched me", "didn't stop me"]
   },
   {
     id: "procedural", s: "2.18", pg: 21, t: "Progressive Discipline Steps", v: "grey", pri: 600,
@@ -121,8 +130,8 @@ var R = [
 ];
 
 const THEMES = {
-  SUPERVISOR_WRONG: { words: ["timer", "data", "teams", "note", "doctor", "clinical", "approved", "first time", "reinforcer", "lunch", "break"], weight: 125 },
-  THERAPIST_WRONG: { words: ["instagram", "tiktok", "facebook", "scrolling", "social media", "personal", "netflix", "sleep", "theft", "drug", "ripped", "open-toe", "cleaning", "kitchen"], weight: 125 }
+  SUPERVISOR_WRONG: { words: ["timer", "data", "teams", "note", "doctor", "clinical", "approved", "first time", "reinforcer", "lunch", "break", "watched me", "didn't stop me"], weight: 125 },
+  THERAPIST_WRONG: { words: ["instagram", "tiktok", "facebook", "scrolling", "social media", "personal", "netflix", "sleep", "theft", "drug", "ripped", "open-toe", "cleaning", "kitchen", "dishes", "unassigned"], weight: 125 }
 };
 
 const CLARIFICATIONS = [
