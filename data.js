@@ -1,137 +1,167 @@
 // ==========================================
-// data.js - HHF Handbook 2025-2027 Dictionary (v3.4 Final)
+// data.js - Arbiter v4.0 "Triple-Bucket" Logic
 // ==========================================
 
 var R = [
-  // GATE 1: RED ZONE (Gross Misconduct)
+  // ---------------------------------------------------------
+  // CATEGORY 1: ATTENDANCE & LEAVE (2.15)
+  // ---------------------------------------------------------
   {
-    id: "red_zone", s: "2.18 & 6.10", pg: 21, t: "Gross Misconduct & Safety", v: "correct", pri: 1000,
-    p: "Gross Misconduct bypasses the progressive discipline ladder.",
-    d: "Behaviors involving illegal activities, theft, violence, substance abuse, client neglect, or sleeping during session require immediate action. Section 2.18 explicitly states HHF can bypass the progressive process for these offenses.",
-    b: "If you committed a severe safety or ethical violation, HHF reserves the right to terminate immediately.",
-    strategy: "Take this seriously and accept the feedback. In these cases, receiving a verbal or written warning instead of immediate termination is considered lenient.",
-    kw: ["sleep", "asleep", "steal", "theft", "drug", "alcohol", "drunk", "high", "hit", "abuse", "neglect", "violence", "weapon"],
+    id: "att_policy", s: "2.15", pg: 17, t: "Excessive Absenteeism", v: "correct", pri: 800,
+    p: "Missing 16 hours in 30 days is a violation of attendance standards.",
+    d: "Section 2.15 defines 'excessive' as 16 hours of missed work within a rolling 30-day period. This triggers the performance management process.",
+    b: "Regular attendance is essential for clinical consistency for our clients.",
+    strategy: "If you have reached this limit, focus on the 'Partnership Plan' required by the handbook to address your barriers.",
+    kw: ["16 hours", "missed shift", "call out", "absent", "too many days", "attendance"],
+    anti_kw: ["doctor", "note", "consecutive", "partnership", "emergency"]
+  },
+  {
+    id: "att_medical", s: "2.15", pg: 17, t: "Protected Medical Absence", v: "wrong", pri: 900,
+    p: "Consecutive sick days with a note must count as a SINGLE occurrence.",
+    d: "Section 2.15 states that absences due to illness count as one occurrence, regardless of days, if a note is provided. They cannot 'stack' multiple hits for one illness.",
+    b: "Supervisors often count every day missed as a separate hit; the handbook explicitly forbids this if you have a note.",
+    strategy: "Provide your medical documentation and cite Section 2.15: 'Because these were consecutive days for a single illness and I provided a note, this should be recorded as one occurrence.'",
+    kw: ["doctor", "note", "consecutive", "sick for 3 days", "medical", "hospital"],
+    anti_kw: ["no note", "forgot my note"]
+  },
+  {
+    id: "att_procedural", s: "2.15", pg: 17, t: "Missing Partnership Plan", v: "grey", pri: 700,
+    p: "Discipline for attendance requires a 'Partnership Plan' first.",
+    d: "Section 2.15 mandates that leadership must 'partner with the team member' to create a plan to overcome barriers before moving to formal discipline.",
+    b: "If they went straight to a write-up without a coaching meeting about your barriers, they skipped a step.",
+    strategy: "Ask: 'I noticed we haven't created the Partnership Plan mentioned in Section 2.15 yet. Can we sit down to discuss my barriers so I can improve my attendance?'",
+    kw: ["partnership", "barriers", "straight to write up", "no coaching"],
     anti_kw: []
   },
 
-  // GATE 2: GHOST RULES vs POLICY VIOLATIONS
-  {
-    id: "ghost_rule_dress", s: "2.16", pg: 18, t: "Appropriate Attire (Ghost Rule)", v: "wrong", pri: 700,
-    p: "The handbook does NOT restrict scrub colors or specific shoe brands.",
-    d: "Section 2.16 requires an HHF-branded shirt, but the policy is explicitly silent on the color of scrubs/pants and the brand of your sneakers. This is a supervisor's personal preference, not HHF policy.",
-    b: "HHF allows 'reasonable self-expression' as long as it does not conflict with safety.",
-    strategy: "Ask your supervisor: 'I reviewed Section 2.16 and couldn't find a restriction on this specific color/brand. Could you point me to the policy so I can ensure I am in full compliance?'",
-    kw: ["blue", "black", "pink", "color", "brand", "nike", "figs", "hoka", "scrubs", "scrub", "sneaker", "shoe color"],
-    anti_kw: ["ripped", "open-toe", "crocs", "slipper", "hoodie", "drawstring", "graphic", "dangling"]
-  },
-  {
-    id: "dress_violation", s: "2.16", pg: 19, t: "Dress Code Violation", v: "correct", pri: 800,
-    p: "The handbook explicitly prohibits this specific attire.",
-    d: "Section 2.16 strictly prohibits ripped jeans, open-toed shoes, slippers, crop tops, graphic tees, hoodies with drawstrings, and dangling jewelry for safety and professional reasons.",
-    b: "If you were wearing an item on the prohibited list, or failed to wear your HHF-branded top, the supervisor is enforcing a legitimate policy.",
-    strategy: "Acknowledge the oversight, ensure you have the required HHF-branded tops, and adhere to the safety guidelines regarding jewelry and footwear moving forward.",
-    kw: ["ripped", "open-toe", "crocs", "slipper", "hoodie", "drawstring", "graphic", "dangling", "lanyard", "crop top", "flip-flops"],
-    anti_kw: []
-  },
-  {
-    id: "device_clinical", s: "6.5", pg: 43, t: "Clinical Device Exception", v: "wrong", pri: 750,
-    p: "Clinical device use is protected under Section 6.5.",
-    d: "The handbook prohibits personal use, but explicitly protects device usage for 'direct patient care'. This includes timers, data collection, and client reinforcers.",
-    b: "If personal apps were open simultaneously, the supervisor may still enforce the ban.",
-    strategy: "Highlight the exception: 'I was using the device specifically for a clinical timer/data as permitted by Section 6.5 for direct patient care.'",
-    kw: ["timer", "data", "teams", "clock", "music", "youtube", "reward", "clinical device", "ipad timer"],
-    anti_kw: ["texting", "social media", "netflix"]
-  },
-  {
-    id: "device_personal", s: "6.5", pg: 43, t: "Personal Device Misuse", v: "correct", pri: 800,
-    p: "Personal device use during a session is a severe safety violation.",
-    d: "Section 6.5 states that cell phone usage when with a client is 'strictly prohibited' and detrimental to the safety and quality of care for our clients.",
-    b: "Even taking a quick personal text takes your eyes off a potentially vulnerable client.",
-    strategy: "Do not make excuses. Acknowledge the distraction and cite your commitment to the safety standards outlined in Section 6.5 moving forward.",
-    kw: ["scrolling", "social media", "instagram", "tiktok", "facebook", "texting", "personal text", "netflix"],
-    anti_kw: ["timer", "data", "reinforcer"]
-  },
-
-  // GATE 3: PROCEDURAL LADDER & ADMIN/LABOR RULES
-  {
-    id: "permitted_work", s: "2.4", pg: 12, t: "Compensated Time (FLSA)", v: "wrong", pri: 950,
-    p: "If a supervisor permits you to work, they MUST pay you for that time.",
-    d: "Section 2.4 states that all hours worked must be compensated. Under Labor Law ('Suffer or Permit'), if a supervisor witnesses you performing work and does not stop you, the company is legally required to pay for that time.",
-    b: "While you should have asked for an assignment per Section 2.10, the supervisor's silence constitutes 'permission' to work in the eyes of the law.",
-    strategy: "If pay is threatened, escalate immediately: 'Section 2.4 and FLSA standards require compensation for all work performed. Since the work was performed in the presence of a supervisor who did not intervene, I am requesting that this time be approved as required by law.'",
-    kw: ["watched me", "saw me", "didn't say anything", "let me clean", "stood there", "witnessed", "didn't stop me", "permitted"],
-    anti_kw: ["stopped me", "told me to stop", "intervened"]
-  },
+  // ---------------------------------------------------------
+  // CATEGORY 2: ADMIN & CLEANING (2.10 / 2.4)
+  // ---------------------------------------------------------
   {
     id: "unassigned_tasks", s: "2.10", pg: 14, t: "Self-Assigned Admin Tasks", v: "correct", pri: 850,
-    p: "Administrative tasks and cleaning must be explicitly assigned by a leader.",
-    d: "Section 2.10 outlines that admin tasks are provided to maintain hours, but they must be 'assigned by the BCBA or clinic leader.' You cannot self-assign chores to claim admin pay.",
-    b: "A supervisor verbally stopping you from unapproved tasks is a standard operational correction, not formal discipline.",
-    strategy: "Accept the correction gracefully: 'Understood. Are there any approved admin tasks or materials you would like me to work on instead?'",
-    kw: ["cleaning", "kitchen", "sweep", "chore", "unassigned", "floor", "clean", "dishes"],
-    anti_kw: ["watched me", "didn't stop me"]
+    p: "Admin tasks and cleaning must be explicitly assigned by a leader.",
+    d: "Section 2.10 states admin tasks are 'assigned by the BCBA or clinic leader.' You cannot independently decide to clean to stay on the clock.",
+    b: "A supervisor stopping you from unapproved chores is an operational correction.",
+    strategy: "Accept the correction: 'I understand. Are there any approved admin tasks available for me to work on now?'",
+    kw: ["cleaning", "kitchen", "sweep", "dishes", "unassigned", "chores"],
+    anti_kw: ["watched me", "didn't stop me", "saw me"]
   },
   {
-    id: "procedural", s: "2.18", pg: 21, t: "Progressive Discipline Steps", v: "grey", pri: 600,
-    p: "Supervisors must provide 'Verbal Coaching' before a written warning.",
-    d: "For standard performance issues, Section 2.18 mandates a specific sequence: 1. Verbal Coaching, 2. Written Guidance, 3. Final Written Notice. Skipping straight to a write-up for a first-time minor issue is a procedural error.",
-    b: "Gross misconduct (safety risks, harassment) allows the company to bypass this stage entirely.",
-    strategy: "Ask for clarification: 'Since this is a first-time issue, I wanted to ask why the Verbal Coaching step outlined in Section 2.18 was bypassed? I value the supportive feedback phase.'",
-    kw: ["write up", "written warning", "coaching", "first time", "email warning", "final notice"],
-    anti_kw: ["cleaning", "kitchen", "chore", "floor", "stopped me"]
+    id: "permitted_work", s: "2.4", pg: 12, t: "Compensated Time (FLSA)", v: "wrong", pri: 950,
+    p: "Work performed while a supervisor watches MUST be paid.",
+    d: "Section 2.4 and Labor Law require pay for all work 'permitted.' If a supervisor witnesses you working and does not stop you, they cannot later deny the pay.",
+    b: "Silence from a supervisor while you work constitutes legal permission.",
+    strategy: "Escalate: 'Since the work was performed in the presence of a supervisor who did not intervene, Section 2.4 and FLSA require this time to be compensated.'",
+    kw: ["watched me", "saw me", "didn't say anything", "let me clean", "witnessed"],
+    anti_kw: ["stopped me", "told me to stop"]
   },
 
-  // HANDBOOK SPECIFICS
+  // ---------------------------------------------------------
+  // CATEGORY 3: DEVICES & PHONES (6.5)
+  // ---------------------------------------------------------
   {
-    id: "breaks", s: "2.3", pg: 12, t: "Meals and Rest Breaks", v: "wrong", pri: 650,
-    p: "Unpaid meal breaks must be completely free of work duties.",
-    d: "Section 2.3 mandates a 30-minute unpaid break for shifts 6+ hours. During this time, you must be 'completely relieved of all work duties.' Doing session notes during lunch is prohibited.",
-    b: "If you are required to perform ANY work during this break, you must be compensated for it.",
-    strategy: "Inform the supervisor: 'Under Section 2.3, I must be completely relieved of work duties during my unpaid break. If I need to complete notes now, how should I log this compensated time?'",
-    kw: ["lunch", "break", "eat", "meal", "working lunch", "notes during lunch"],
-    anti_kw: []
+    id: "device_personal", s: "6.5", pg: 43, t: "Personal Device Misuse", v: "correct", pri: 800,
+    p: "Personal device use during sessions is strictly prohibited.",
+    d: "Section 6.5 states cell phone use while with a client is 'strictly prohibited.' This is a safety and quality of care violation.",
+    b: "Even a 'quick text' is considered a safety risk in a clinical setting.",
+    strategy: "Acknowledge the safety risk and commit to leaving the device in your bag or a designated area per Section 6.5.",
+    kw: ["texting", "social media", "instagram", "tiktok", "facebook", "scrolling", "personal phone"],
+    anti_kw: ["timer", "data", "clinical", "emergency"]
   },
   {
-    id: "attendance_excessive", s: "2.15", pg: 17, t: "Excessive Absenteeism", v: "correct", pri: 500,
-    p: "Missing 16 hours in 30 days triggers performance management.",
-    d: "Section 2.15 defines excessive absenteeism as missing 16 hours of scheduled work within a 30-day period.",
-    b: "During the first 30 days this is observed, the leader MUST partner with you to address barriers before moving to formal discipline.",
-    strategy: "If you are within the 16-hour limit, ask to review the hours. If you are over, focus on creating the required 'partnership plan' with your leader to overcome barriers.",
-    kw: ["late", "tardy", "call out", "absent", "missed shift", "16 hours"],
-    anti_kw: ["doctor", "note"]
+    id: "device_clinical", s: "6.5", pg: 43, t: "Clinical Device Exception", v: "wrong", pri: 850,
+    p: "Device use for 'Direct Patient Care' is protected.",
+    d: "Section 6.5 allows device usage for clinical purposes like timers, data collection, and client reinforcers. It is not a violation if used for these tasks.",
+    b: "Supervisors sometimes issue blanket 'no phone' bans that ignore this specific clinical exception.",
+    strategy: "Clarify the use: 'I was using my device as a clinical timer/data tool as permitted by the Direct Patient Care exception in Section 6.5.'",
+    kw: ["timer", "data", "clock", "clinical use", "reinforcer", "youtube for client"],
+    anti_kw: ["texting", "social media"]
+  },
+
+  // ---------------------------------------------------------
+  // CATEGORY 4: BREAKS & LUNCH (2.3)
+  // ---------------------------------------------------------
+  {
+    id: "break_interrupted", s: "2.3", pg: 12, t: "Unpaid Meal Period", v: "wrong", pri: 850,
+    p: "Unpaid breaks must be 'completely relieved of all duties.'",
+    d: "Section 2.3 states that if you are not relieved of all work duties (e.g., asked to watch a client or do notes), the break must be compensated.",
+    b: "If you are 'working' while eating, that 30 minutes must be paid at your hourly rate.",
+    strategy: "Request compensation: 'Because I was not relieved of duties during my break per Section 2.3, I am logging this as worked time.'",
+    kw: ["working lunch", "notes during break", "watch a client", "stayed in the room"],
+    anti_kw: ["left the floor", "off the clock"]
+  },
+
+  // ---------------------------------------------------------
+  // CATEGORY 5: DRESS CODE (2.16)
+  // ---------------------------------------------------------
+  {
+    id: "dress_ghost", s: "2.16", pg: 18, t: "Dress Code (Ghost Rule)", v: "wrong", pri: 700,
+    p: "Color/Brand restrictions are NOT in the handbook.",
+    d: "Section 2.16 requires an HHF shirt, but is silent on scrub color or sneaker brands. Personal preference of a supervisor is not a policy.",
+    b: "HHF allows 'reasonable self-expression' as long as it is safe.",
+    strategy: "Ask: 'Could you show me where in Section 2.16 it restricts this color? I want to ensure my apparel is in line with the written policy.'",
+    kw: ["color", "brand", "sneakers", "figs", "hoka", "scrubs color"],
+    anti_kw: ["ripped", "open-toe", "hoodie", "lanyard"]
   },
   {
-    id: "attendance_note", s: "2.15", pg: 17, t: "Medical Absences & Notes", v: "wrong", pri: 550,
-    p: "Consecutive medical absences with a note count as ONE occurrence.",
-    d: "Section 2.15 states that an unexcused absence due to illness counts as a single occurrence, regardless of the number of consecutive days, provided a note is given (max 2 per month).",
-    b: "Without a medical note, every missed shift is logged individually.",
-    strategy: "If 3 consecutive sick days were counted as 3 separate hits, provide your doctor's note and respectfully ask them to consolidate it as a single medical event per Section 2.15.",
-    kw: ["doctor", "note", "consecutive", "flu", "sick days"],
-    anti_kw: []
+    id: "dress_violation", s: "2.16", pg: 19, t: "Actual Safety Violation", v: "correct", pri: 800,
+    p: "Safety-related attire is strictly enforced.",
+    d: "Section 2.16 explicitly bans ripped clothing, open-toed shoes, hoodies with drawstrings, and dangling jewelry for safety reasons.",
+    b: "These items pose a risk during physical interventions or client behaviors.",
+    strategy: "Correct the attire immediately to ensure safety compliance per Section 2.16.",
+    kw: ["ripped", "open-toe", "hoodie", "drawstring", "dangling", "jewelry", "crocs"],
+    anti_kw: ["color", "brand"]
   },
+
+  // ---------------------------------------------------------
+  // CATEGORY 6: CANCELLATIONS (2.10)
+  // ---------------------------------------------------------
   {
-    id: "cancellation", s: "2.10", pg: 14, t: "Client Cancellation Policy", v: "grey", pri: 500,
-    p: "Full-time staff are prioritized for admin tasks; you cannot decline clients.",
-    d: "Section 2.10 states that full-time staff (30+ hours) will be assigned another client or admin tasks. However, team members are 'not allowed to decline clients'.",
-    b: "If you refuse a fill-in client, you will face unapproved absence discipline.",
-    strategy: "If told to go home unpaid, politely remind them of your FT status: 'As a full-time employee, Section 2.10 prioritizes me for admin tasks. Are there any available to maintain my hours?'",
-    kw: ["cancel", "cancellation", "admin", "go home unpaid", "fill in", "refuse client"],
-    anti_kw: ["cleaning", "kitchen", "chore", "sweep", "floor"]
+    id: "cancel_ft_rights", s: "2.10", pg: 14, t: "FT Pay Protection", v: "wrong", pri: 800,
+    p: "Full-time staff are prioritized for admin/fill-in tasks.",
+    d: "Section 2.10 states that for cancellations, FT staff (30+ hrs) will be prioritized for other assignments to maintain their scheduled hours.",
+    b: "Being sent home unpaid as a FT employee without the offer of admin work may violate this priority status.",
+    strategy: "Remind them of your status: 'As a FT employee, Section 2.10 notes I should be prioritized for admin or fill-in work. Are there any tasks available?'",
+    kw: ["sent home unpaid", "no admin offered", "cancel", "full time"],
+    anti_kw: ["refused a client", "part time"]
   },
+
+  // ---------------------------------------------------------
+  // CATEGORY 7: PROGRESSIVE DISCIPLINE (2.18)
+  // ---------------------------------------------------------
   {
-    id: "harassment", s: "6.2", pg: 41, t: "Anti-Bullying & Retaliation", v: "wrong", pri: 900,
-    p: "False discipline and humiliation are prohibited handbook violations.",
-    d: "Section 6.2 prohibits 'falsely reporting team members for discipline' and 'constantly putting team members down in meetings through humiliation'.",
-    b: "Supervisors are held to the same Code of Conduct as RBTs.",
-    strategy: "Do not engage in an argument. Document the dates/times and escalate via the Section 1.8 Open Door Policy or call the Anonymous Complaint Line at 520-521-2222.",
-    kw: ["bully", "harass", "retaliation", "humiliate", "target", "unfairly", "false discipline"],
+    id: "procedural_skip", s: "2.18", pg: 21, t: "Skipped Coaching Step", v: "grey", pri: 750,
+    p: "The handbook requires 'Verbal Coaching' as Step 1.",
+    d: "Unless it is Gross Misconduct, Section 2.18 mandates a sequence: 1. Verbal Coaching, 2. Written Guidance. Skipping to a write-up for a minor first-time issue is a procedural error.",
+    b: "The coaching step is designed to be supportive, not punitive.",
+    strategy: "Ask for procedural clarity: 'Since this is a first-time minor issue, can we follow the Verbal Coaching step outlined in Section 2.18?'",
+    kw: ["first time", "no warning", "straight to write up", "procedural"],
+    anti_kw: ["sleep", "theft", "abuse", "hit", "drunk"]
+  },
+
+  // ---------------------------------------------------------
+  // CATEGORY 8: HARASSMENT & OPEN DOOR (1.8 / 6.2)
+  // ---------------------------------------------------------
+  {
+    id: "harassment", s: "6.2", pg: 41, t: "Bullying & Retaliation", v: "wrong", pri: 900,
+    p: "Retaliation and humiliation are strictly prohibited.",
+    d: "Section 6.2 prohibits 'falsely reporting' or 'humiliating' team members. Supervisors are not exempt from the Code of Conduct.",
+    b: "HHF maintains an Open Door Policy (Section 1.8) for these issues.",
+    strategy: "Escalate via the Open Door Policy or call the Anonymous Complaint Line at 520-521-2222.",
+    kw: ["bully", "harass", "retaliation", "humiliate", "target", "mean"],
     anti_kw: []
   }
 ];
 
 const THEMES = {
-  SUPERVISOR_WRONG: { words: ["timer", "data", "teams", "note", "doctor", "clinical", "approved", "first time", "reinforcer", "lunch", "break", "watched me", "didn't stop me"], weight: 125 },
-  THERAPIST_WRONG: { words: ["instagram", "tiktok", "facebook", "scrolling", "social media", "personal", "netflix", "sleep", "theft", "drug", "ripped", "open-toe", "cleaning", "kitchen", "dishes", "unassigned"], weight: 125 }
+  SUPERVISOR_WRONG: { 
+    words: ["timer", "data", "clinical", "approved", "note", "doctor", "watched me", "didn't stop me", "sent home unpaid", "first time", "no coaching", "working lunch", "color", "brand"], 
+    weight: 150 
+  },
+  THERAPIST_WRONG: { 
+    words: ["instagram", "tiktok", "facebook", "scrolling", "personal", "ripped", "open-toe", "cleaning", "kitchen", "unassigned", "no note", "16 hours"], 
+    weight: 150 
+  }
 };
 
 const CLARIFICATIONS = [
@@ -140,17 +170,17 @@ const CLARIFICATIONS = [
     triggers: ["phone", "device", "tablet", "ipad"],
     q: "How exactly was the device being used?",
     opts: [
-      { label: "Clinical (Timer, Data, or Client Reinforcer)", append: " I was using the device for a clinical timer." },
-      { label: "Personal (Social Media, Texts, or Music)", append: " I was using the device for personal texting." }
+      { label: "Clinical (Timer, Data, Reinforcer)", append: " I was using the device for a clinical timer." },
+      { label: "Personal (Social Media, Texts)", append: " I was using the device for personal texting." }
     ]
   },
   {
     id: "dress_context",
-    triggers: ["scrub", "shirt", "pants", "shoes", "sneaker", "dress"],
-    q: "What specifically were you warned about regarding your attire?",
+    triggers: ["scrub", "shirt", "pants", "shoes", "sneaker"],
+    q: "What specifically was the issue with your attire?",
     opts: [
-      { label: "A specific color or shoe brand", append: " I was told my specific color or brand was wrong." },
-      { label: "A prohibited item (ripped, open-toe, no HHF shirt)", append: " I was wearing a ripped item or open-toe shoes." }
+      { label: "Specific color or brand", append: " It was about the specific color or brand." },
+      { label: "Safety (ripped, open-toe, hoodie)", append: " It was a safety issue like ripped clothes or open-toe shoes." }
     ]
   },
   {
