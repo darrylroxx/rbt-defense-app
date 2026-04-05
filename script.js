@@ -4,18 +4,17 @@ function sanitizedText(text) { return (text || "").toLowerCase().trim(); }
 function calculateWeights(text, rule) {
   let score = 0;
   
-  // 1. Keyword Strength
+  // 1. Keyword Strength with Negation Handling
   rule.kw.forEach(k => {
     let regex = new RegExp("\\b" + k + "\\b", "i");
     if (regex.test(text)) {
-      // Negation check: Look for "not", "never", "didn't" before the word
       let words = text.split(/\s+/);
       let idx = words.findIndex(w => w.includes(k));
       let context = words.slice(Math.max(0, idx - 3), idx).join(" ");
       if (/\b(not|never|didn't|wasn't|no)\b/.test(context)) {
-        score -= 50; // Negation found, flip the weight
+        score -= 60; // Flip score if "not" is present
       } else {
-        score += 30;
+        score += 35;
       }
     }
   });
@@ -43,9 +42,8 @@ function findMatches(text) {
   let results = [];
   R.forEach(r => {
     let weight = calculateWeights(text, r);
-    if (weight > 20) {
+    if (weight > 25) {
       let ruleCopy = JSON.parse(JSON.stringify(r));
-      // Special logic: Auto-flip attendance to "Wrong" if a note is mentioned
       if (r.id === "attendance" && text.includes("note")) ruleCopy.v = "wrong";
       results.push({ r: ruleCopy, score: weight });
     }
@@ -92,9 +90,7 @@ function go(text, skipId = null) {
               <div class="v-section">Section ${r.s} (Page ${r.pg}) - ${r.t}</div>
             </div>
             <div class="blk"><div class="blk-label">Handbook Analysis</div><p>${r.d}</p></div>
-            <div class="blk" style="background:rgba(255,255,255,0.02);">
-              <div class="blk-label">When this might not apply</div><p>${r.b}</p>
-            </div>
+            <div class="blk" style="background:rgba(255,255,255,0.02);"><div class="blk-label">When this might not apply</div><p>${r.b}</p></div>
           </div>`;
       });
     }
@@ -127,12 +123,22 @@ window.answer = function(t, a, id) {
   go(combined, id);
 };
 
+// DEVICE DETECTION (iOS Banner)
+function detectiOS() {
+    const isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+    if (isiOS && !isStandalone) {
+        document.getElementById('ios-prompt').classList.remove('hide');
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('db').addEventListener('click', () => go(document.getElementById('mi').value));
   document.getElementById('ca').addEventListener('click', () => location.reload());
+  detectiOS();
 });
 
-// KILL CACHE
+// Cache Killer
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.getRegistrations().then(rs => rs.forEach(r => r.unregister()));
 }
