@@ -1,50 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="The Handbook Checker">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#1c1115">
-<meta name="description" content="RBT Handbook Checker for reviewing workplace situations against the HHF handbook.">
-<link rel="manifest" href="./manifest.webmanifest">
-<link rel="icon" href="./icon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="./icon.svg">
-<title>The Handbook Checker</title>
-<link rel="stylesheet" href="style.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1c1115">
+    <title>The Handbook Checker</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="./manifest.webmanifest">
+    <link rel="icon" href="./icon.svg" type="image/svg+xml">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
 </head>
 <body>
-<div class="hdr"><div class="hdr-inner">
-<h1>The Handbook Checker</h1>
-<p>For RBTs navigating workplace issues with the HHF handbook.</p>
-</div></div>
-<div class="mn">
-<div class="inp-wrap" id="iw">
-<div class="inp-inner" id="ii">
-<div class="inp-full" id="if">
-<textarea class="inp-ta" id="mi" placeholder="Describe what happened, who was involved, what your supervisor said, and what rule or write-up you were given."></textarea>
-<button class="btn-def" id="db">Check My Situation</button>
-<div class="handbook-link-wrap"><a class="handbook-link" href="./hhf-handbook-2025-2027.pdf" target="_blank" rel="noopener" download="HHF-Handbook-2025-2027.pdf"><span>Open HHF Handbook PDF</span><span>v</span></a></div>
-</div>
-<div class="inp-row" id="ic">
-<textarea class="inp-ta-sm" id="ms" placeholder="Type next quote..."></textarea>
-<button class="btn-def-sm" id="ds">GO</button>
-</div>
-<button class="inp-expand" id="eb">Expand input</button>
-</div></div>
-<div class="loading" id="ld"><div class="spinner" aria-hidden="true"></div></div>
-<div id="rs"></div>
-<div id="fs" class="hide">
-<a class="text-link" id="cr" role="button" tabindex="0">Copy Results</a>
-<button class="btn-clr" id="ca">Start new situation</button>
-<div class="disc">HHF Handbook guidance tool only. Not legal advice.</div>
-</div></div>
-<div class="st"><span class="sd"></span> v2.2 - Interactive Fix</div>
-<div class="toast" id="to">Copied</div>
-<script src="data.js"></script>
-<script src="script.js"></script>
+    <div class="hdr">
+        <div class="hdr-inner">
+            <h1>The Handbook Checker</h1>
+            <p>Fair Arbiter Edition: Logic-based handbook analysis.</p>
+        </div>
+    </div>
+
+    <div class="mn">
+        <div class="inp-wrap" id="iw">
+            <div class="inp-inner">
+                <textarea class="inp-ta" id="mi" placeholder="Describe the situation... (e.g., 'I was on my phone using a timer and my BCBA wrote me up.')"></textarea>
+                <button class="btn-def" id="db">Check My Situation</button>
+                <div class="handbook-link-wrap">
+                    <a class="handbook-link" href="./hhf-handbook-2025-2027.pdf" target="_blank">Open HHF Handbook PDF</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="loading" id="ld">
+            <div class="spinner"></div>
+            <p style="color: #aaa; margin-top: 10px; font-size: 14px;">Analyzing context...</p>
+        </div>
+
+        <div id="rs"></div>
+
+        <div id="fs" class="hide">
+            <button class="btn-clr" id="ca">Start New Search</button>
+        </div>
+    </div>
+
+    <div class="st">v2.5 - Fair Arbiter Engine Active</div>
+
+    <script src="data.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
