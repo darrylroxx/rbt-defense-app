@@ -24,7 +24,7 @@ var R = [
     kw: ["denied", "PTO", "called out sick", "denied Friday", "denied day", "terminated for sick"],
     anti_kw: ["16 hours", "timer", "clean"]
   },
-// ---------------------------------------------------------
+  // ---------------------------------------------------------
   // BUCKET 0.5: PRIVACY & HIPAA (Priority 990)
   // ---------------------------------------------------------
   {
