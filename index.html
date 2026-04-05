@@ -7,24 +7,25 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#1c1115">
     <title>The Handbook Checker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="./manifest.webmanifest">
     <link rel="icon" href="./icon.svg" type="image/svg+xml">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
 </head>
 <body>
     <div class="hdr">
         <div class="hdr-inner">
             <h1>The Handbook Checker</h1>
-            <p>Fair Arbiter Edition: Logic-based handbook analysis.</p>
+            <p>A tool for RBTs to navigate workplace issues against the HHF handbook.</p>
         </div>
     </div>
 
     <div class="mn">
         <div class="inp-wrap" id="iw">
             <div class="inp-inner">
-                <textarea class="inp-ta" id="mi" placeholder="Describe the situation... (e.g., 'I was on my phone using a timer and my BCBA wrote me up.')"></textarea>
+                <textarea class="inp-ta" id="mi" placeholder="Example: 'I was on my phone using a timer for DTT and my BCBA wrote me up.'"></textarea>
                 <button class="btn-def" id="db">Check My Situation</button>
+                <div class="privacy-shield">This app is 100% private. Your data never leaves your phone.</div>
                 <div class="handbook-link-wrap">
                     <a class="handbook-link" href="./hhf-handbook-2025-2027.pdf" target="_blank">Open HHF Handbook PDF</a>
                 </div>
@@ -33,13 +34,13 @@
 
         <div class="loading" id="ld">
             <div class="spinner"></div>
-            <p style="color: #aaa; margin-top: 10px; font-size: 14px;">Analyzing context...</p>
+            <p style="color: #aaa; margin-top: 10px; font-size: 14px;">Fair Arbiter is analyzing context...</p>
         </div>
 
         <div id="rs"></div>
 
         <div id="fs" class="hide">
-            <button class="btn-clr" id="ca">Start New Search</button>
+            <button class="btn-clr" id="ca">Start New Situation</button>
         </div>
     </div>
 
@@ -50,7 +51,7 @@
         </div>
     </div>
 
-    <div class="st">v2.6 - Fair Arbiter + iOS Smart Banner</div>
+    <div class="st">v2.7 - Fair Arbiter Engine Active</div>
 
     <script src="data.js"></script>
     <script src="script.js"></script>
