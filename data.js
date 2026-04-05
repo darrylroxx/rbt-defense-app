@@ -1,59 +1,135 @@
+// ==========================================
+// data.js - HHF Handbook 2025-2027 Dictionary
+// ==========================================
+
 var R = [
+  // GATE 1: RED ZONE (Gross Misconduct)
   {
-    id: "phone", s: "2.0 & 6.5", pg: 22, t: "Clinical Phone Use Exception", v: "wrong", pri: 50,
-    p: "Clinical phone use is protected as an exception to the device ban.",
-    d: "Section 6.5 explicitly allows devices when used for 'direct patient care.' This includes timers, data collection apps, client reinforcers (like YouTube/Music rewards), and clinical communication via Teams.",
-    b: "If personal apps were open or if the device wasn't being used for a specific client task, the supervisor may enforce the standard ban.",
-    strategy: "Highlight that your device use falls under the 'Direct Patient Care' exception in Section 6.5. Focus on the specific clinical function (timer/reinforcer/data) you were performing at that exact moment.",
-    kw: ["phone", "cell", "device", "mobile", "timer", "data", "teams", "clock", "music", "youtube", "reward"]
+    id: "red_zone", s: "2.18 & 6.10", pg: 21, t: "Gross Misconduct & Safety", v: "correct", pri: 1000,
+    p: "Gross Misconduct bypasses the progressive discipline ladder.",
+    d: "Behaviors involving illegal activities, theft, violence, substance abuse, client neglect, or sleeping during session require immediate action. Section 2.18 explicitly states HHF can bypass the progressive process for these offenses .",
+    b: "If you committed a severe safety or ethical violation, HHF reserves the right to terminate immediately.",
+    strategy: "Take this seriously and accept the feedback. In these cases, receiving a verbal or written warning instead of immediate termination is considered lenient.",
+    kw: ["sleep", "asleep", "steal", "theft", "drug", "alcohol", "drunk", "high", "hit", "abuse", "neglect", "violence", "weapon"]
+  },
+
+  // GATE 2: GHOST RULES vs POLICY VIOLATIONS
+  {
+    id: "ghost_rule_dress", s: "2.16", pg: 18, t: "Appropriate Attire (Ghost Rule)", v: "wrong", pri: 700,
+    p: "The handbook does NOT restrict scrub colors or specific shoe brands.",
+    d: "Section 2.16 requires an HHF-branded shirt, but the policy is explicitly silent on the color of scrubs/pants and the brand of your sneakers . This is a supervisor's personal preference, not HHF policy.",
+    b: "HHF allows 'reasonable self-expression' as long as it does not conflict with safety[cite: 369].",
+    strategy: "Ask your supervisor: 'I reviewed Section 2.16 and couldn't find a restriction on this specific color/brand. Could you point me to the policy so I can ensure I am in full compliance?'",
+    kw: ["blue", "black", "pink", "color", "brand", "nike", "figs", "hoka", "scrubs", "scrub", "sneaker", "shoe color"]
   },
   {
-    id: "personal_phone", s: "6.5", pg: 22, t: "Personal Phone Misuse", v: "correct", pri: 40,
-    p: "Personal device use during session is a handbook violation.",
-    d: "The handbook prohibits personal use while with a client to ensure safety and engagement. This covers social media, personal texts, and entertainment.",
-    b: "In cases of true emergencies or pre-approved medical accommodations, the strictness of this rule may be reconsidered.",
-    strategy: "If the use was personal, the best path is acknowledging the distraction and citing your commitment to Section 6.5's safety standards moving forward. Avoid making excuses unless it was a documented emergency.",
-    kw: ["scrolling", "social media", "instagram", "tiktok", "facebook", "snapchat", "spotify", "music", "podcast", "distracted"]
+    id: "dress_violation", s: "2.16", pg: 19, t: "Dress Code Violation", v: "correct", pri: 800,
+    p: "The handbook explicitly prohibits this specific attire.",
+    d: "Section 2.16 strictly prohibits ripped jeans, open-toed shoes, slippers, crop tops, graphic tees, hoodies with drawstrings, and dangling jewelry for safety and professional reasons [cite: 389-393, 398-403].",
+    b: "If you were wearing an item on the prohibited list, or failed to wear your HHF-branded top, the supervisor is enforcing a legitimate policy.",
+    strategy: "Acknowledge the oversight, ensure you have the required HHF-branded tops, and adhere to the safety guidelines regarding jewelry and footwear moving forward.",
+    kw: ["ripped", "open-toe", "crocs", "slipper", "hoodie", "drawstring", "graphic", "dangling", "lanyard", "crop top", "flip-flops"]
   },
   {
-    id: "attendance", s: "2.15", pg: 14, t: "Attendance & Doctor's Notes", v: "grey", pri: 30,
-    p: "Medical absences with a note count as ONE occurrence, not multiple.",
-    d: "Section 2.15 states that multiple sick days for the same illness count as a single occurrence if a doctor's note is provided.",
-    b: "Without a medical note, every missed shift is typically logged as an individual occurrence.",
-    strategy: "Verify how the occurrences were logged. If 3 days were counted as 3 hits, use Section 2.15 to show they should be consolidated into one medical event.",
-    kw: ["sick", "flu", "missed", "absent", "call out", "occurrence", "note", "doctor"]
+    id: "device_clinical", s: "6.5", pg: 43, t: "Clinical Device Exception", v: "wrong", pri: 750,
+    p: "Clinical device use is protected under Section 6.5.",
+    d: "The handbook prohibits personal use, but explicitly protects device usage for 'direct patient care' [cite: 148, 991-996]. This includes timers, data collection, and client reinforcers.",
+    b: "If personal apps were open simultaneously, the supervisor may still enforce the ban.",
+    strategy: "Highlight the exception: 'I was using the device specifically for a clinical timer/data as permitted by Section 6.5 for direct patient care.'",
+    kw: ["timer", "data", "teams", "clock", "music", "youtube", "reward", "clinical device", "ipad timer"]
   },
   {
-    id: "progressive", s: "2.18", pg: 18, t: "Progressive Discipline Steps", v: "wrong", pri: 60,
-    p: "Handbook requires Verbal Coaching before a formal Written Warning.",
-    d: "For minor issues, Section 2.18 mandates a sequence: Verbal Coaching -> Written Guidance -> Final Notice. Skipping to a write-up is a procedural error.",
-    b: "Severe conduct (safety risks, HIPAA, harassment) allows the company to bypass the coaching stage entirely.",
-    strategy: "Ask for clarification on why the Verbal Coaching stage was bypassed. Mention that you value the supportive, constructive intent of the coaching step outlined in Section 2.18.",
-    kw: ["write up", "warning", "verbal", "coaching", "first time", "email", "paper trail"]
+    id: "device_personal", s: "6.5", pg: 43, t: "Personal Device Misuse", v: "correct", pri: 800,
+    p: "Personal device use during a session is a severe safety violation.",
+    d: "Section 6.5 states that cell phone usage when with a client is 'strictly prohibited' and detrimental to the safety and quality of care for our clients [cite: 993-996].",
+    b: "Even taking a quick personal text takes your eyes off a potentially vulnerable client.",
+    strategy: "Do not make excuses. Acknowledge the distraction and cite your commitment to the safety standards outlined in Section 6.5 moving forward.",
+    kw: ["scrolling", "social media", "instagram", "tiktok", "facebook", "texting", "personal text", "netflix"]
+  },
+
+  // GATE 3: PROCEDURAL LADDER
+  {
+    id: "procedural", s: "2.18", pg: 21, t: "Progressive Discipline Steps", v: "grey", pri: 600,
+    p: "Supervisors must provide 'Verbal Coaching' before a written warning.",
+    d: "For standard performance issues, Section 2.18 mandates a specific sequence: 1. Verbal Coaching, 2. Written Guidance, 3. Final Written Notice [cite: 433-442]. Skipping straight to a write-up for a first-time minor issue is a procedural error.",
+    b: "Gross misconduct (safety risks, harassment) allows the company to bypass this stage entirely .",
+    strategy: "Ask for clarification: 'Since this is a first-time issue, I wanted to ask why the Verbal Coaching step outlined in Section 2.18 was bypassed? I value the supportive feedback phase.'",
+    kw: ["write up", "written warning", "verbal", "coaching", "first time", "email warning", "final notice"]
+  },
+
+  // HANDBOOK SPECIFICS (Breaks, Attendance, Cancellations, Bullying)
+  {
+    id: "breaks", s: "2.3", pg: 12, t: "Meals and Rest Breaks", v: "wrong", pri: 650,
+    p: "Unpaid meal breaks must be completely free of work duties.",
+    d: "Section 2.3 mandates a 30-minute unpaid break for shifts 6+ hours. During this time, you must be 'completely relieved of all work duties.' Doing session notes during lunch is prohibited .",
+    b: "If you are required to perform ANY work during this break, you must be compensated for it [cite: 195-196].",
+    strategy: "Inform the supervisor: 'Under Section 2.3, I must be completely relieved of work duties during my unpaid break. If I need to complete notes now, how should I log this compensated time?'",
+    kw: ["lunch", "break", "eat", "meal", "working lunch", "notes during lunch"]
+  },
+  {
+    id: "attendance_excessive", s: "2.15", pg: 17, t: "Excessive Absenteeism", v: "correct", pri: 500,
+    p: "Missing 16 hours in 30 days triggers performance management.",
+    d: "Section 2.15 defines excessive absenteeism as missing 16 hours of scheduled work within a 30-day period[cite: 340].",
+    b: "During the first 30 days this is observed, the leader MUST partner with you to address barriers before moving to formal discipline [cite: 341-342].",
+    strategy: "If you are within the 16-hour limit, ask to review the hours. If you are over, focus on creating the required 'partnership plan' with your leader to overcome barriers.",
+    kw: ["late", "tardy", "call out", "absent", "missed shift", "16 hours"]
+  },
+  {
+    id: "attendance_note", s: "2.15", pg: 17, t: "Medical Absences & Notes", v: "wrong", pri: 550,
+    p: "Consecutive medical absences with a note count as ONE occurrence.",
+    d: "Section 2.15 states that an unexcused absence due to illness counts as a single occurrence, regardless of the number of consecutive days, provided a note is given (max 2 per month) [cite: 320-321, 344].",
+    b: "Without a medical note, every missed shift is logged individually.",
+    strategy: "If 3 consecutive sick days were counted as 3 separate hits, provide your doctor's note and respectfully ask them to consolidate it as a single medical event per Section 2.15.",
+    kw: ["doctor", "note", "consecutive", "flu", "sick days"]
+  },
+  {
+    id: "cancellation", s: "2.10", pg: 14, t: "Client Cancellation Policy", v: "grey", pri: 500,
+    p: "Full-time staff are prioritized for admin tasks; you cannot decline clients.",
+    d: "Section 2.10 states that full-time staff (30+ hours) will be assigned another client or admin tasks. However, team members are 'not allowed to decline clients' .",
+    b: "If you refuse a fill-in client, you will face unapproved absence discipline [cite: 256-257].",
+    strategy: "If told to go home unpaid, politely remind them of your FT status: 'As a full-time employee, Section 2.10 prioritizes me for admin tasks. Are there any available to maintain my hours?'",
+    kw: ["cancel", "cancellation", "admin", "go home unpaid", "fill in", "refuse client"]
+  },
+  {
+    id: "harassment", s: "6.2", pg: 41, t: "Anti-Bullying & Retaliation", v: "wrong", pri: 900,
+    p: "False discipline and humiliation are prohibited handbook violations.",
+    d: "Section 6.2 prohibits 'falsely reporting team members for discipline' and 'constantly putting team members down in meetings through humiliation' [cite: 946-951].",
+    b: "Supervisors are held to the same Code of Conduct as RBTs.",
+    strategy: "Do not engage in an argument. Document the dates/times and escalate via the Section 1.8 Open Door Policy or call the Anonymous Complaint Line at 520-521-2222.",
+    kw: ["bully", "harass", "retaliation", "humiliate", "target", "unfairly", "false discipline"]
   }
 ];
 
 const THEMES = {
-  SUPERVISOR_WRONG: { words: ["timer", "data", "teams", "note", "doctor", "clinical", "approved", "verbal", "first time", "reinforcer"], weight: 125 },
-  THERAPIST_WRONG: { words: ["instagram", "tiktok", "facebook", "scrolling", "social media", "personal", "spotify", "music", "vape"], weight: 125 }
+  SUPERVISOR_WRONG: { words: ["timer", "data", "teams", "note", "doctor", "clinical", "approved", "verbal", "first time", "reinforcer", "lunch", "break", "color", "brand"], weight: 125 },
+  THERAPIST_WRONG: { words: ["instagram", "tiktok", "facebook", "scrolling", "social media", "personal", "netflix", "sleep", "theft", "drug", "ripped", "open-toe"], weight: 125 }
 };
 
 const CLARIFICATIONS = [
   {
     id: "phone_context",
-    triggers: ["phone", "device", "music"],
+    triggers: ["phone", "device", "tablet", "ipad"],
     q: "How exactly was the device being used?",
     opts: [
-      { label: "Clinical (Timer, Data, Teams, or Client Reinforcer)", append: " I was using the device for clinical patient care." },
-      { label: "Personal (Social Media, Texts, or Music)", append: " I was using the device for personal entertainment." }
+      { label: "Clinical (Timer, Data, or Client Reinforcer)", append: " I was using the device for a clinical timer." },
+      { label: "Personal (Social Media, Texts, or Music)", append: " I was using the device for personal texting." }
     ]
   },
   {
-    id: "note_context",
-    triggers: ["sick", "missed", "absent"],
+    id: "dress_context",
+    triggers: ["scrub", "shirt", "pants", "shoes", "sneaker", "dress"],
+    q: "What specifically were you warned about regarding your attire?",
+    opts: [
+      { label: "A specific color or shoe brand", append: " I was told my specific color or brand was wrong." },
+      { label: "A prohibited item (ripped, open-toe, no HHF shirt)", append: " I was wearing a ripped item or open-toe shoes." }
+    ]
+  },
+  {
+    id: "attendance_context",
+    triggers: ["sick", "missed", "absent", "call out"],
     q: "Did you provide a doctor's note for this absence?",
     opts: [
-      { label: "Yes, I provided a note", append: " I brought a doctor's note for my absence." },
+      { label: "Yes, I provided a note", append: " I brought a doctor's note for my consecutive absence." },
       { label: "No, I did not have a note", append: " I did not provide a medical note." }
     ]
   }
