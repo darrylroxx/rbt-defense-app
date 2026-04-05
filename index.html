@@ -5,45 +5,90 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HHF Arbiter v3.1</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; line-height: 1.6; max-width: 800px; margin: auto; }
-        textarea { width: 100%; height: 100px; margin-bottom: 10px; }
-        button { padding: 10px 20px; background: #007bff; color: white; border: none; cursor: pointer; }
-        #results { margin-top: 20px; padding: 15px; border: 1px solid #ccc; display: none; }
-        .red-zone { background: #ffebeb; border-left: 5px solid red; }
-        .ghost-rule { background: #f0f4ff; border-left: 5px solid blue; }
-        .procedural { background: #fffdf0; border-left: 5px solid orange; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; color: #333; padding: 40px; line-height: 1.6; max-width: 900px; margin: auto; }
+        .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+        p.subtitle { color: #7f8c8d; margin-bottom: 25px; }
+        textarea { width: 100%; height: 120px; padding: 15px; border: 2px solid #dfe6e9; border-radius: 8px; font-size: 16px; box-sizing: border-box; margin-bottom: 20px; resize: vertical; }
+        button { background-color: #3498db; color: white; padding: 12px 30px; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; transition: background 0.3s; }
+        button:hover { background-color: #2980b9; }
+        
+        #results { margin-top: 30px; padding: 20px; border-radius: 8px; display: none; }
+        .red-zone { background: #fff5f5; border: 1px solid #feb2b2; }
+        .ghost-rule { background: #ebf8ff; border: 1px solid #bee3f8; }
+        .procedural { background: #fffaf0; border: 1px solid #fbd38d; }
+        .analysis { background: #f7fafc; border: 1px solid #e2e8f0; }
+
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-weight: bold; text-transform: uppercase; font-size: 12px; margin-bottom: 10px; }
+        .red-badge { background: #f56565; color: white; }
+        .blue-badge { background: #4299e1; color: white; }
+        .orange-badge { background: #ed8936; color: white; }
+
+        .footer-note { margin-top: 40px; font-size: 13px; color: #a0aec0; border-top: 1px solid #edf2f7; padding-top: 20px; }
     </style>
 </head>
 <body>
+
+<div class="container">
     <h1>HHF Arbiter v3.1</h1>
-    <p>Type your situation below (e.g., "I wore navy scrubs" or "My Lead gave me a write-up"):</p>
-    
-    <textarea id="userInput" placeholder="What happened at the clinic today?"></textarea>
+    <p class="subtitle">Enter the situation or discipline you faced for a literal handbook audit.</p>
+
+    <textarea id="userInput" placeholder="Example: 'My lead gave me a written warning for wearing navy blue scrubs...'"></textarea>
+    <br>
     <button onclick="runAudit()">Check Situation</button>
 
     <div id="results">
-        <h2 id="statusHeader"></h2>
-        <p id="verdictText"></p>
-        <p><strong>Recommended Action:</strong> <span id="actionText"></span></p>
-        <hr>
-        <small><em>Disclaimer: HHF is an at-will employer [cite: 1210-1213]. Use this info professionally to seek clinical clarification, not to start an argument [cite: 132-133, 953-954].</em></small>
+        <div id="badgeArea" class="badge"></div>
+        <h2 id="statusHeader" style="margin-top: 0;"></h2>
+        <p id="verdictText" style="font-size: 18px;"></p>
+        <div style="background: rgba(255,255,255,0.5); padding: 15px; border-radius: 8px;">
+            <strong>Recommended Action / Script:</strong>
+            <p id="actionText" style="margin-bottom: 0;"></p>
+        </div>
     </div>
 
-    <script src="data.js"></script>
-    <script src="logic.js"></script>
-    <script>
-        function runAudit() {
-            const text = document.getElementById('userInput').value;
-            const result = auditSituation(text); // This calls the brain in logic.js
-            
-            const box = document.getElementById('results');
-            box.style.display = "block";
-            box.className = result.status.toLowerCase().replace(" ", "-");
-            
-            document.getElementById('statusHeader').innerText = result.status;
-            document.getElementById('verdictText').innerText = result.verdict;
-            document.getElementById('actionText').innerText = result.script || result.action;
+    <div class="footer-note">
+        <strong>Accountability Tools:</strong> Open Door Policy (Sec 1.8) [cite: 108] | Anonymous Line: 520-521-2222 [cite: 899] | Anti-Bullying (Sec 6.2) [cite: 931]<br><br>
+        <em>Disclaimer: HHF is an at-will employer[cite: 1210]. Use this data to seek clinical clarification professionally[cite: 133].</em>
+    </div>
+</div>
+
+<script src="data.js"></script>
+<script src="logic.js"></script>
+
+<script>
+    function runAudit() {
+        const text = document.getElementById('userInput').value;
+        if (!text) return;
+
+        // This calls the auditSituation function inside your logic.js
+        const result = auditSituation(text);
+        
+        const box = document.getElementById('results');
+        const badge = document.getElementById('badgeArea');
+        
+        box.style.display = "block";
+        
+        // Dynamic styling based on the result status
+        if (result.status.includes("RED")) {
+            box.className = "red-zone";
+            badge.className = "badge red-badge";
+            badge.innerText = "Urgent";
+        } else if (result.status.includes("GHOST") || result.status.includes("EXCEPTION")) {
+            box.className = "ghost-rule";
+            badge.className = "badge blue-badge";
+            badge.innerText = "Policy Shield";
+        } else {
+            box.className = "procedural";
+            badge.className = "badge orange-badge";
+            badge.innerText = "Audit";
         }
-    </script>
+        
+        document.getElementById('statusHeader').innerText = result.status;
+        document.getElementById('verdictText').innerText = result.verdict;
+        document.getElementById('actionText').innerText = result.script || result.action;
+    }
+</script>
+
 </body>
 </html>
