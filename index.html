@@ -2,93 +2,62 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HHF Arbiter v3.1</title>
-    <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; color: #333; padding: 40px; line-height: 1.6; max-width: 900px; margin: auto; }
-        .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h1 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
-        p.subtitle { color: #7f8c8d; margin-bottom: 25px; }
-        textarea { width: 100%; height: 120px; padding: 15px; border: 2px solid #dfe6e9; border-radius: 8px; font-size: 16px; box-sizing: border-box; margin-bottom: 20px; resize: vertical; }
-        button { background-color: #3498db; color: white; padding: 12px 30px; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; transition: background 0.3s; }
-        button:hover { background-color: #2980b9; }
-        
-        #results { margin-top: 30px; padding: 20px; border-radius: 8px; display: none; }
-        .red-zone { background: #fff5f5; border: 1px solid #feb2b2; }
-        .ghost-rule { background: #ebf8ff; border: 1px solid #bee3f8; }
-        .procedural { background: #fffaf0; border: 1px solid #fbd38d; }
-        .analysis { background: #f7fafc; border: 1px solid #e2e8f0; }
-
-        .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-weight: bold; text-transform: uppercase; font-size: 12px; margin-bottom: 10px; }
-        .red-badge { background: #f56565; color: white; }
-        .blue-badge { background: #4299e1; color: white; }
-        .orange-badge { background: #ed8936; color: white; }
-
-        .footer-note { margin-top: 40px; font-size: 13px; color: #a0aec0; border-top: 1px solid #edf2f7; padding-top: 20px; }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1c1115">
+    <title>The Handbook Checker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="./manifest.webmanifest">
+    <link rel="icon" href="./icon.svg" type="image/svg+xml">
 </head>
 <body>
-
-<div class="container">
-    <h1>HHF Arbiter v3.1</h1>
-    <p class="subtitle">Enter the situation or discipline you faced for a literal handbook audit.</p>
-
-    <textarea id="userInput" placeholder="Example: 'My lead gave me a written warning for wearing navy blue scrubs...'"></textarea>
-    <br>
-    <button onclick="runAudit()">Check Situation</button>
-
-    <div id="results">
-        <div id="badgeArea" class="badge"></div>
-        <h2 id="statusHeader" style="margin-top: 0;"></h2>
-        <p id="verdictText" style="font-size: 18px;"></p>
-        <div style="background: rgba(255,255,255,0.5); padding: 15px; border-radius: 8px;">
-            <strong>Recommended Action / Script:</strong>
-            <p id="actionText" style="margin-bottom: 0;"></p>
+    <div class="hdr">
+        <div class="hdr-inner">
+            <h1>The Handbook Checker</h1>
+            <p>A tool for RBTs to navigate workplace issues against the HHF handbook.</p>
         </div>
     </div>
 
-    <div class="footer-note">
-        <strong>Accountability Tools:</strong> Open Door Policy (Sec 1.8) [cite: 108] | Anonymous Line: 520-521-2222 [cite: 899] | Anti-Bullying (Sec 6.2) [cite: 931]<br><br>
-        <em>Disclaimer: HHF is an at-will employer[cite: 1210]. Use this data to seek clinical clarification professionally[cite: 133].</em>
+    <div class="mn">
+        <div class="inp-wrap" id="iw">
+            <div class="inp-inner">
+                <textarea class="inp-ta" id="mi" placeholder="Example: 'I was on my phone using a timer for DTT and my BCBA wrote me up.'"></textarea>
+                <button class="btn-def" id="db">Check My Situation</button>
+                <div class="privacy-shield">This app is 100% private. Your data never leaves your device.</div>
+                
+                <div class="pdf-btn-wrap">
+                    <a class="btn-pdf" href="./hhf-handbook-2025-2027.pdf" target="_blank">Open HHF Handbook PDF</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="loading" id="ld">
+            <div class="spinner"></div>
+            <p style="color: #aaa; margin-top: 10px; font-size: 14px;">Analyzing context...</p>
+        </div>
+
+        <div id="rs"></div>
+
+        <div id="fs" class="hide">
+            <div class="footer-btns">
+                <button class="btn-edit" id="eb">Edit Description</button>
+                <button class="btn-clr" id="ca">New Situation</button>
+            </div>
+        </div>
     </div>
-</div>
 
-<script src="data.js"></script>
-<script src="logic.js"></script>
+    <div id="ios-prompt" class="ios-banner hide">
+        <div class="ios-banner-content">
+            <span>Install as an app: Tap <strong>Share</strong> then <strong>'Add to Home Screen'</strong></span>
+            <button onclick="document.getElementById('ios-prompt').remove()">✕</button>
+        </div>
+    </div>
 
-<script>
-    function runAudit() {
-        const text = document.getElementById('userInput').value;
-        if (!text) return;
+    <div class="st">v2.8</div>
 
-        // This calls the auditSituation function inside your logic.js
-        const result = auditSituation(text);
-        
-        const box = document.getElementById('results');
-        const badge = document.getElementById('badgeArea');
-        
-        box.style.display = "block";
-        
-        // Dynamic styling based on the result status
-        if (result.status.includes("RED")) {
-            box.className = "red-zone";
-            badge.className = "badge red-badge";
-            badge.innerText = "Urgent";
-        } else if (result.status.includes("GHOST") || result.status.includes("EXCEPTION")) {
-            box.className = "ghost-rule";
-            badge.className = "badge blue-badge";
-            badge.innerText = "Policy Shield";
-        } else {
-            box.className = "procedural";
-            badge.className = "badge orange-badge";
-            badge.innerText = "Audit";
-        }
-        
-        document.getElementById('statusHeader').innerText = result.status;
-        document.getElementById('verdictText').innerText = result.verdict;
-        document.getElementById('actionText').innerText = result.script || result.action;
-    }
-</script>
-
+    <script src="data.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
