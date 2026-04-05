@@ -24,7 +24,27 @@ var R = [
     kw: ["denied", "PTO", "called out sick", "denied Friday", "denied day", "terminated for sick"],
     anti_kw: ["16 hours", "timer", "clean"]
   },
-
+// ---------------------------------------------------------
+  // BUCKET 0.5: PRIVACY & HIPAA (Priority 990)
+  // ---------------------------------------------------------
+  {
+    id: "hipaa_violation", s: "6.1 / 6.4", pg: 40, t: "HIPAA & Client Confidentiality", v: "correct", pri: 990,
+    p: "Sharing client info or photos on personal devices is a major violation.",
+    d: "Section 6.1 and 6.4 prohibit the disclosure of Protected Health Information (PHI). This includes taking photos of clients, using their names on social media, or discussing cases in public.",
+    b: "HIPAA is a federal law. HHF has a zero-tolerance policy for digital privacy breaches to protect the identity and dignity of our clients.",
+    strategy: "This is a 'Final Warning' or 'Termination' level event. If you have already posted or shared info, delete it immediately and self-report to your BCBA. Honesty is your only potential mitigator here.",
+    kw: ["photo of client", "posted on story", "instagram", "facebook", "client name", "shared a video", "recorded a session", "confidentiality"],
+    anti_kw: ["timer", "data", "breakroom", "unpaid lunch"]
+  },
+  {
+    id: "social_media_vent", s: "6.3", pg: 42, t: "Social Media Policy (Public Image)", v: "correct", pri: 830,
+    p: "Venting about work/clients online violates the Social Media Policy.",
+    d: "Section 6.3 states that while you have a right to discuss working conditions, disparaging clients or sharing internal clinic photos is prohibited.",
+    b: "HHF monitors public mentions to ensure clinical professionalism. Even 'vague-posting' about a difficult session can be traced back and result in discipline.",
+    strategy: "Keep work complaints private. If you've posted a vent, archive it. If confronted, cite that you were expressing 'concerted activity' regarding working conditions, but apologize for any clinical unprofessionalism.",
+    kw: ["posted about work", "venting online", "tweeted", "work is annoying", "boss is mean", "social media post"],
+    anti_kw: ["photo of client", "timer", "data"]
+  },
   // ---------------------------------------------------------
   // BUCKET 1: LEGAL & PRIVACY SHIELDS (Priority 900+)
   // ---------------------------------------------------------
