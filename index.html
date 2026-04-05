@@ -8,16 +8,12 @@
 <meta name="apple-mobile-web-app-title" content="The Handbook Checker">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#1c1115">
-<meta name="description" content="Offline-friendly RBT Handbook Checker for reviewing workplace situations against the HHF handbook on iPhone, Android, and desktop.">
+<meta name="description" content="RBT Handbook Checker for reviewing workplace situations against the HHF handbook.">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" href="./icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="./icon.svg">
 <title>The Handbook Checker</title>
-
-<!-- External CSS -->
 <link rel="stylesheet" href="style.css">
-
-<!-- pdf.js for handbook lookup -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
 </head>
 <body>
@@ -29,7 +25,7 @@
 <div class="inp-wrap" id="iw">
 <div class="inp-inner" id="ii">
 <div class="inp-full" id="if">
-<textarea class="inp-ta" id="mi" placeholder="Describe what happened, who was involved, what your supervisor said, and what rule or write-up you were given. You can also paste a write-up email."></textarea>
+<textarea class="inp-ta" id="mi" placeholder="Describe what happened, who was involved, what your supervisor said, and what rule or write-up you were given."></textarea>
 <button class="btn-def" id="db">Check My Situation</button>
 <div class="handbook-link-wrap"><a class="handbook-link" href="./hhf-handbook-2025-2027.pdf" target="_blank" rel="noopener" download="HHF-Handbook-2025-2027.pdf"><span>Open HHF Handbook PDF</span><span>v</span></a></div>
 </div>
@@ -46,10 +42,8 @@
 <button class="btn-clr" id="ca">Start new situation</button>
 <div class="disc">HHF Handbook guidance tool only. Not legal advice.</div>
 </div></div>
-<div class="st"><span class="sd"></span> v2.1 - Interactive Offline Mode</div>
+<div class="st"><span class="sd"></span> v2.2 - Interactive Fix</div>
 <div class="toast" id="to">Copied</div>
-
-<!-- External JS Scripts -->
 <script src="data.js"></script>
 <script src="script.js"></script>
 </body>
