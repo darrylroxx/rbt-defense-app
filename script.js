@@ -1,10 +1,85 @@
 // ==========================================
-// script.js - Arbiter v3.3 Heuristic + Expand UI
+// script.js - Arbiter v4.8 Hybrid (Fuzzy Matching + Engine Preservation)
 // ==========================================
+
+// --- THE TRANSLATION HELMET (Slang, Grammar, & Auto-Correct) ---
+const SYNONYMS = {
+  "sleep": ["doze", "nap", "pass out", "snooze", "nod", "dozed"],
+  "neglect": ["ignore", "left alone", "unsupervised"],
+  "denied PTO": ["refused time off", "vacation denied", "denied my request", "denied friday", "denied day"],
+  "photo of client": ["picture", "snapchat", "video", "recording", "camera", "snap"],
+  "breakroom": ["lounge", "kitchen", "staff room", "staff area"],
+  "unpaid break": ["my lunch", "off the clock", "my 30 minutes", "meal break"],
+  "timer": ["stopwatch", "counting down", "tracking time"],
+  "stayed late": ["stayed after", "worked past my shift", "stayed behind"],
+  "cleaning": ["chores", "sweeping", "wiping down", "trash", "swept"],
+  "texting": ["messaging", "imessage", "sms"],
+  "social media": ["tiktok", "instagram", "snapchat", "twitter", "ig", "scrolling", "finsta", "facebook"],
+  "ripped": ["torn", "hole", "frayed", "tore"],
+  "crocs": ["clog", "slipper"],
+  "nails": ["acrylic", "gel", "claw", "manicure", "fake nail", "acrylics"],
+  "late": ["tardy", "missed alarm", "oversleep", "traffic", "behind", "running late", "overslept"],
+  "home client canceled": ["session cancelled", "client called out", "parent cancelled", "cancellation"]
+};
+
+function translateInput(text) {
+    if (!text) return "";
+    let processed = text.toLowerCase();
+
+    // 1. Replace Slang with Exact Keywords (Preserves sentence structure)
+    for (const [target, slangs] of Object.entries(SYNONYMS)) {
+        slangs.forEach(slang => {
+            let escapedSlang = slang.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            let regex = new RegExp("\\b" + escapedSlang + "\\b", "gi");
+            processed = processed.replace(regex, target);
+        });
+    }
+
+    // 2. Grammar Normalization (Compromise.js)
+    if (window.nlp) {
+        let doc = window.nlp(processed);
+        doc.verbs().toPresentTense();
+        doc.nouns().toSingular();
+        processed = doc.text();
+    }
+
+    // 3. Typo Corrector (Fuse.js)
+    if (window.Fuse && typeof R !== 'undefined') {
+        // Collect every valid keyword your app knows about
+        let allValidWords = new Set();
+        R.forEach(r => {
+            r.kw.forEach(k => k.split(/\s+/).forEach(w => allValidWords.add(w.toLowerCase())));
+            if(r.anti_kw) r.anti_kw.forEach(k => k.split(/\s+/).forEach(w => allValidWords.add(w.toLowerCase())));
+        });
+        CLARIFICATIONS.forEach(c => c.triggers.forEach(t => allValidWords.add(t.toLowerCase())));
+        THEMES.SUPERVISOR_WRONG.words.forEach(w => w.split(/\s+/).forEach(x => allValidWords.add(x.toLowerCase())));
+        THEMES.THERAPIST_WRONG.words.forEach(w => w.split(/\s+/).forEach(x => allValidWords.add(x.toLowerCase())));
+
+        let dict = Array.from(allValidWords).map(w => ({ word: w }));
+        let typoEngine = new Fuse(dict, { keys: ['word'], threshold: 0.3 }); // 0.3 allows for moderate spelling errors
+
+        // Replace typos inline so your "negator" logic stays perfectly intact
+        let words = processed.split(/\b/); 
+        for (let i = 0; i < words.length; i++) {
+            let w = words[i];
+            if (w.match(/^[a-z]{4,}$/i)) { // Only spellcheck words 4 letters or longer
+                if (!allValidWords.has(w)) {
+                    let res = typoEngine.search(w);
+                    if (res.length > 0) {
+                        words[i] = res[0].item.word; // Swap typo for correct keyword
+                    }
+                }
+            }
+        }
+        processed = words.join('');
+    }
+
+    return processed;
+}
 
 function sanitizedText(text) { return (text || "").toLowerCase().trim(); }
 
-// The advanced 3-Gate NLP Engine
+// --- YOUR EXISTING ENGINE (UNTOUCHED!) ---
 function calculateWeights(text, rule) {
   let score = 0;
   const cleanText = sanitizedText(text);
@@ -101,14 +176,17 @@ window.inlineEdit = function() {
     document.getElementById('iw').classList.remove('hide');
     document.getElementById('fs').classList.add('hide');
     document.getElementById('rs').innerHTML = '';
-    // Optional: auto-focus the text box when they hit edit
     document.getElementById('mi').focus();
 };
 
 // ======================== CORE UI ========================
 function go(text, skipId = null) {
-  const clean = sanitizedText(text);
-  if (!clean) return;
+  if (!text) return;
+  
+  // ---> THE HELMET: Pass the raw text through our new auto-corrector! <---
+  const processedText = translateInput(text);
+  const clean = sanitizedText(processedText);
+  
   document.getElementById('rs').innerHTML = '';
   document.getElementById('ld').classList.add('show');
   document.getElementById('iw').classList.add('hide');
@@ -117,14 +195,14 @@ function go(text, skipId = null) {
     if (!skipId) {
       let clarification = CLARIFICATIONS.find(c => c.triggers.some(t => clean.includes(t)));
       if (clarification && !clarification.opts.some(o => clean.includes(o.append.toLowerCase()))) {
-        renderQuestion(clarification, clean);
+        // Use the original text for the UI so the user doesn't see our auto-corrected robot text
+        renderQuestion(clarification, text); 
         return;
       }
     }
 
     let matches = findMatches(clean);
     
-    // NEW: Check length to trigger the accordion (150 chars is a good visual cutoff)
     const isLong = text.length > 150;
     
     let html = `
@@ -136,6 +214,7 @@ function go(text, skipId = null) {
         </div>`;
     
     if (matches.length === 0) {
+      // NOTE: This is where the TurboTax Fallback will eventually go in Phase 2!
       html += `<div class="crd" style="padding:20px; color:#aaa; text-align:center;">I need more detail to find a specific rule match. Please include what you were doing or what policy was cited.</div>`;
     } else {
       matches.forEach(m => {
@@ -161,7 +240,7 @@ function go(text, skipId = null) {
       });
     }
     
-    html += `</div>`; // Close res-block
+    html += `</div>`; 
     document.getElementById('rs').innerHTML = html;
     document.getElementById('ld').classList.remove('show');
     document.getElementById('fs').classList.remove('hide');
@@ -171,7 +250,6 @@ function go(text, skipId = null) {
 function renderQuestion(c, text) {
   document.getElementById('ld').classList.remove('show');
   
-  // Also adding the edit button to the Clarification screen so they aren't trapped
   let h = `
     <div class="res-block">
       <div class="res-query-wrap">
