@@ -1,8 +1,7 @@
 // ==========================================
-// script.js - Arbiter v4.8 Hybrid (Fuzzy Matching + Engine Preservation)
+// script.js - Arbiter v5.0 Hybrid Engine
 // ==========================================
 
-// --- THE TRANSLATION HELMET (Slang, Grammar, & Auto-Correct) ---
 const SYNONYMS = {
   "sleep": ["doze", "nap", "pass out", "snooze", "nod", "dozed"],
   "neglect": ["ignore", "left alone", "unsupervised"],
@@ -22,20 +21,35 @@ const SYNONYMS = {
   "home client canceled": ["session cancelled", "client called out", "parent cancelled", "cancellation"]
 };
 
+// --- TURBOTAX MENU DATA ---
+const MENU_DATA = {
+    "Attendance, Leave & Cancellations": [
+        { label: "Client canceled & refusing clinic shift", trigger: "home client canceled report to the clinic rather take it unpaid" },
+        { label: "Calling out sick after denied PTO", trigger: "denied PTO called out sick" },
+        { label: "Gross Misconduct / Job Abandonment", trigger: "sleep neglect hit" }
+    ],
+    "Time, Pay & Breaks": [
+        { label: "Unpaid overtime for clinical notes", trigger: "stayed late finishing notes prior approval" },
+        { label: "Working during an unpaid break", trigger: "unpaid break breakroom" },
+        { label: "Doing unassigned chores/cleaning", trigger: "cleaning kitchen unassigned" }
+    ],
+    "Phones, Dress Code & Privacy": [
+        { label: "Using phone for clinical reasons (Timer/Data)", trigger: "timer data clinical" },
+        { label: "Using phone for personal reasons", trigger: "texting social media" },
+        { label: "Dress Code (Color or Brand rules)", trigger: "color brand sneakers" },
+        { label: "HIPAA / Taking photos of clients", trigger: "photo of client" }
+    ],
+    "Discipline & Supervisor Coaching": [
+        { label: "Written up with no prior verbal warning", trigger: "first time no warning" },
+        { label: "Supervisor watched me work but denied pay", trigger: "watched me didn't stop me" }
+    ]
+};
+
 function translateInput(text) {
     if (!text) return "";
     let processed = text.toLowerCase();
 
-    // 1. Replace Slang with Exact Keywords (Preserves sentence structure)
-    for (const [target, slangs] of Object.entries(SYNONYMS)) {
-        slangs.forEach(slang => {
-            let escapedSlang = slang.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-            let regex = new RegExp("\\b" + escapedSlang + "\\b", "gi");
-            processed = processed.replace(regex, target);
-        });
-    }
-
-    // 2. Grammar Normalization (Compromise.js)
+    // 1. Grammar Normalization
     if (window.nlp) {
         let doc = window.nlp(processed);
         doc.verbs().toPresentTense();
@@ -43,43 +57,44 @@ function translateInput(text) {
         processed = doc.text();
     }
 
-    // 3. Typo Corrector (Fuse.js)
+    // 2. Typo Corrector (Fuse.js) runs FIRST
     if (window.Fuse && typeof R !== 'undefined') {
-        // Collect every valid keyword your app knows about
         let allValidWords = new Set();
         R.forEach(r => {
             r.kw.forEach(k => k.split(/\s+/).forEach(w => allValidWords.add(w.toLowerCase())));
             if(r.anti_kw) r.anti_kw.forEach(k => k.split(/\s+/).forEach(w => allValidWords.add(w.toLowerCase())));
         });
         CLARIFICATIONS.forEach(c => c.triggers.forEach(t => allValidWords.add(t.toLowerCase())));
-        THEMES.SUPERVISOR_WRONG.words.forEach(w => w.split(/\s+/).forEach(x => allValidWords.add(x.toLowerCase())));
-        THEMES.THERAPIST_WRONG.words.forEach(w => w.split(/\s+/).forEach(x => allValidWords.add(x.toLowerCase())));
-
         let dict = Array.from(allValidWords).map(w => ({ word: w }));
-        let typoEngine = new Fuse(dict, { keys: ['word'], threshold: 0.3 }); // 0.3 allows for moderate spelling errors
+        let typoEngine = new Fuse(dict, { keys: ['word'], threshold: 0.3 }); 
 
-        // Replace typos inline so your "negator" logic stays perfectly intact
         let words = processed.split(/\b/); 
         for (let i = 0; i < words.length; i++) {
             let w = words[i];
-            if (w.match(/^[a-z]{4,}$/i)) { // Only spellcheck words 4 letters or longer
+            if (w.match(/^[a-z]{4,}$/i)) { 
                 if (!allValidWords.has(w)) {
                     let res = typoEngine.search(w);
-                    if (res.length > 0) {
-                        words[i] = res[0].item.word; // Swap typo for correct keyword
-                    }
+                    if (res.length > 0) words[i] = res[0].item.word; 
                 }
             }
         }
         processed = words.join('');
     }
 
+    // 3. Slang Expansion runs SECOND
+    for (const [target, slangs] of Object.entries(SYNONYMS)) {
+        slangs.forEach(slang => {
+            let escapedSlang = slang.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            let regex = new RegExp("\\b" + escapedSlang + "\\b", "gi");
+            processed = processed.replace(regex, target);
+        });
+    }
     return processed;
 }
 
 function sanitizedText(text) { return (text || "").toLowerCase().trim(); }
 
-// --- YOUR EXISTING ENGINE (UNTOUCHED!) ---
+// --- FIXED MATH ENGINE ---
 function calculateWeights(text, rule) {
   let score = 0;
   const cleanText = sanitizedText(text);
@@ -87,7 +102,7 @@ function calculateWeights(text, rule) {
   const negators = ["not", "didn't", "wasn't", "never", "no", "without"];
 
   if (rule.anti_kw && rule.anti_kw.some(akw => cleanText.includes(akw))) {
-      return -5000; 
+      return -5000; // Silo Kill-Switch
   }
 
   let matchedCount = 0;
@@ -95,48 +110,21 @@ function calculateWeights(text, rule) {
       if (cleanText.includes(k)) {
           let isNegated = false;
           let kTokens = k.split(" ");
-          let firstWordOfK = kTokens[0];
-          let idx = words.indexOf(firstWordOfK);
+          let idx = words.indexOf(kTokens[0]);
 
           if (idx > 0) {
               let start = Math.max(0, idx - 3);
-              let contextWindow = words.slice(start, idx);
-              if (contextWindow.some(w => negators.includes(w))) {
-                  isNegated = true;
-              }
+              if (words.slice(start, idx).some(w => negators.includes(w))) isNegated = true;
           }
 
-          if (isNegated) {
-              score -= 500; 
-          } else {
-              score += 600; 
-              matchedCount++;
-          }
+          if (isNegated) score -= 500; 
+          else { score += 600; matchedCount++; }
       }
   });
 
   if (matchedCount === 0) return 0;
-
-  if (rule.id === "red_zone") score += 2000; 
-  if (rule.id === "ghost_rule_dress" || rule.id === "dress_violation") score += 900;
-  if (rule.id === "device_personal" || rule.id === "device_clinical") score += 900;
-  if (rule.id === "unassigned_tasks") score += 1000; 
-  if (rule.id === "procedural" || rule.id === "harassment") score += 800;
-  if (rule.id === "breaks" || rule.id === "attendance_excessive" || rule.id === "attendance_note" || rule.id === "cancellation") score += 700;
-
-  THEMES.SUPERVISOR_WRONG.words.forEach(w => {
-    if (cleanText.includes(w)) {
-      if (rule.v === "wrong") score += THEMES.SUPERVISOR_WRONG.weight;
-      if (rule.v === "correct") score -= THEMES.SUPERVISOR_WRONG.weight;
-    }
-  });
-  THEMES.THERAPIST_WRONG.words.forEach(w => {
-    if (cleanText.includes(w)) {
-      if (rule.v === "correct") score += THEMES.THERAPIST_WRONG.weight;
-      if (rule.v === "wrong") score -= THEMES.THERAPIST_WRONG.weight;
-    }
-  });
-
+  
+  // Flattened scoring: No more +1000 bonuses. Just the rule's natural priority.
   score += (rule.pri || 0);
   return score;
 }
@@ -145,22 +133,43 @@ function findMatches(text) {
   let results = [];
   R.forEach(r => {
     let weight = calculateWeights(text, r);
-    if (weight > 30) {
-      let ruleCopy = JSON.parse(JSON.stringify(r));
-      results.push({ r: ruleCopy, score: weight });
-    }
+    if (weight > 30) results.push({ r: JSON.parse(JSON.stringify(r)), score: weight });
   });
-  
   results.sort((a, b) => b.score - a.score);
-  
-  if (results.length > 0 && results[0].r.id === "red_zone") {
-      return [results[0]];
-  }
-  
+  if (results.length > 0 && results[0].r.id === "red_zone") return [results[0]];
   return results.slice(0, 2);
 }
 
-// ======================== NEW UI HANDLERS ========================
+// ======================== TURBOTAX UI HANDLERS ========================
+function loadTurboTaxCategories() {
+    const container = document.getElementById('tt-content');
+    container.innerHTML = '';
+    Object.keys(MENU_DATA).forEach(category => {
+        let btn = document.createElement('button');
+        btn.className = 'followup-opt';
+        btn.innerText = category;
+        btn.onclick = () => loadTurboTaxSub(category);
+        container.appendChild(btn);
+    });
+}
+
+function loadTurboTaxSub(category) {
+    const container = document.getElementById('tt-content');
+    container.innerHTML = `<p style="color:#aaa; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px;">${category}</p>`;
+    MENU_DATA[category].forEach(item => {
+        let btn = document.createElement('button');
+        btn.className = 'followup-opt';
+        btn.style.background = '#444'; 
+        btn.innerText = item.label;
+        btn.onclick = () => {
+            document.getElementById('tt-wrap').classList.add('hide');
+            go(item.trigger, null, true); // Process it as a perfect prompt
+        };
+        container.appendChild(btn);
+    });
+}
+
+// ======================== CORE UI ========================
 window.toggleExpand = function(btn) {
     const queryDiv = btn.previousElementSibling;
     if (queryDiv.classList.contains('collapsed')) {
@@ -174,28 +183,27 @@ window.toggleExpand = function(btn) {
 
 window.inlineEdit = function() {
     document.getElementById('iw').classList.remove('hide');
+    document.getElementById('tt-wrap').classList.add('hide');
     document.getElementById('fs').classList.add('hide');
     document.getElementById('rs').innerHTML = '';
     document.getElementById('mi').focus();
 };
 
-// ======================== CORE UI ========================
-function go(text, skipId = null) {
+function go(text, skipId = null, fromMenu = false) {
   if (!text) return;
   
-  // ---> THE HELMET: Pass the raw text through our new auto-corrector! <---
   const processedText = translateInput(text);
   const clean = sanitizedText(processedText);
   
   document.getElementById('rs').innerHTML = '';
   document.getElementById('ld').classList.add('show');
   document.getElementById('iw').classList.add('hide');
+  document.getElementById('tt-wrap').classList.add('hide');
 
   setTimeout(() => {
-    if (!skipId) {
+    if (!skipId && !fromMenu) {
       let clarification = CLARIFICATIONS.find(c => c.triggers.some(t => clean.includes(t)));
       if (clarification && !clarification.opts.some(o => clean.includes(o.append.toLowerCase()))) {
-        // Use the original text for the UI so the user doesn't see our auto-corrected robot text
         renderQuestion(clarification, text); 
         return;
       }
@@ -203,21 +211,24 @@ function go(text, skipId = null) {
 
     let matches = findMatches(clean);
     
+    // TRIGGER TURBOTAX IF NOTHING FOUND
+    if (matches.length === 0) {
+        document.getElementById('ld').classList.remove('show');
+        document.getElementById('tt-wrap').classList.remove('hide');
+        loadTurboTaxCategories();
+        return;
+    }
+
     const isLong = text.length > 150;
-    
     let html = `
     <div class="res-block">
         <div class="res-query-wrap">
-            <div class="res-query ${isLong ? 'collapsed' : ''}">${text}</div>
-            ${isLong ? `<button class="expand-btn" onclick="toggleExpand(this)">Show More</button><br>` : ''}
-            <button class="inline-edit-btn" onclick="inlineEdit()">✎ Edit description</button>
+            <div class="res-query ${isLong ? 'collapsed' : ''}">${fromMenu ? "I selected this topic from the menu." : text}</div>
+            ${isLong && !fromMenu ? `<button class="expand-btn" onclick="toggleExpand(this)">Show More</button><br>` : ''}
+            <button class="inline-edit-btn" onclick="inlineEdit()">✎ Start Over / Edit</button>
         </div>`;
     
-    if (matches.length === 0) {
-      // NOTE: This is where the TurboTax Fallback will eventually go in Phase 2!
-      html += `<div class="crd" style="padding:20px; color:#aaa; text-align:center;">I need more detail to find a specific rule match. Please include what you were doing or what policy was cited.</div>`;
-    } else {
-      matches.forEach(m => {
+    matches.forEach(m => {
         const r = m.r;
         const typeCls = r.v === "wrong" ? "v-wrong" : r.v === "correct" ? "v-correct" : "v-grey";
         const badgeCls = r.v === "wrong" ? "wrong" : r.v === "correct" ? "correct" : "grey";
@@ -237,8 +248,7 @@ function go(text, skipId = null) {
             </div>
             <div class="blk" style="background:rgba(255,255,255,0.01);"><div class="blk-label">Context</div><p>${r.b}</p></div>
           </div>`;
-      });
-    }
+    });
     
     html += `</div>`; 
     document.getElementById('rs').innerHTML = html;
@@ -249,7 +259,6 @@ function go(text, skipId = null) {
 
 function renderQuestion(c, text) {
   document.getElementById('ld').classList.remove('show');
-  
   let h = `
     <div class="res-block">
       <div class="res-query-wrap">
@@ -281,8 +290,3 @@ document.addEventListener('DOMContentLoaded', () => {
       if (iosPrompt) iosPrompt.classList.remove('hide');
   }
 });
-
-// Cache Killer
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.getRegistrations().then(rs => rs.forEach(r => r.unregister()));
-}
