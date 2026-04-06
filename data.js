@@ -1,11 +1,8 @@
 // ==========================================
-// data.js - Arbiter v4.7 FIXED (Context Restored + Leave Abuse)
+// data.js - Arbiter v5.0 (Silos Patched)
 // ==========================================
 
 var R = [
-  // ---------------------------------------------------------
-  // BUCKET 0: THE RED ZONE (Gross Misconduct - Priority 1000)
-  // ---------------------------------------------------------
   {
     id: "red_zone", s: "2.18 & 6.10", pg: 21, t: "Gross Misconduct & Safety", v: "correct", pri: 1000,
     p: "Gross Misconduct allows for immediate termination, bypassing coaching.",
@@ -24,10 +21,6 @@ var R = [
     kw: ["denied", "PTO", "called out sick", "denied Friday", "denied day", "terminated for sick"],
     anti_kw: ["16 hours", "timer", "clean"]
   },
-  
-  // ---------------------------------------------------------
-  // BUCKET 0.5: PRIVACY & HIPAA (Priority 990)
-  // ---------------------------------------------------------
   {
     id: "hipaa_violation", s: "6.1 / 6.4", pg: 40, t: "HIPAA & Client Confidentiality", v: "correct", pri: 990,
     p: "Sharing client info or photos on personal devices is a major violation.",
@@ -46,9 +39,6 @@ var R = [
     kw: ["posted about work", "venting online", "tweeted", "work is annoying", "boss is mean", "social media post"],
     anti_kw: ["photo of client", "timer", "data"]
   },
-  // ---------------------------------------------------------
-  // BUCKET 1: LEGAL & PRIVACY SHIELDS (Priority 900+)
-  // ---------------------------------------------------------
   {
     id: "breakroom_rights", s: "2.3", pg: 12, t: "Breakroom Privacy", v: "wrong", pri: 980, 
     p: "Supervisors cannot restrict personal device use during UNPAID breaks.",
@@ -56,7 +46,7 @@ var R = [
     b: "If a supervisor controls your activities during an unpaid break, the company may be legally required to pay you for that time.",
     strategy: "Clarify status: 'Under Section 2.3, I am currently on my unpaid break and relieved of all duties. I will follow device policy once I clock back in.'",
     kw: ["breakroom", "unpaid break", "scrolling on my break", "on my lunch", "off the clock"],
-    anti_kw: ["during session", "with my client", "at the table", "timer", "data", "asleep", "neglect"]
+    anti_kw: ["during session", "with my client", "at the table", "timer", "data", "asleep", "neglect", "canceled", "cancelled", "cancellation"]
   },
   {
     id: "device_clinical", s: "6.5", pg: 43, t: "Clinical Device Exception", v: "wrong", pri: 970,
@@ -85,9 +75,6 @@ var R = [
     kw: ["stayed late", "finishing notes", "back-to-back", "not approving overtime", "prior approval", "session notes"],
     anti_kw: ["cleaning", "asleep", "phone", "breakroom"]
   },
-  // ---------------------------------------------------------
-  // BUCKET 2: HANDBOOK POLICY VIOLATIONS (Priority 800+)
-  // ---------------------------------------------------------
   {
     id: "unassigned_tasks", s: "2.10", pg: 14, t: "Self-Assigned Admin Tasks", v: "correct", pri: 850,
     p: "Admin tasks and cleaning must be explicitly assigned by a leader.",
@@ -95,7 +82,7 @@ var R = [
     b: "A supervisor stopping you from unapproved chores is an operational correction, not necessarily a formal discipline.",
     strategy: "Accept correction: 'Understood. Are there any approved admin tasks available for me to work on now?'",
     kw: ["cleaning", "kitchen", "sweep", "dishes", "unassigned", "chores"],
-    anti_kw: ["watched me", "didn't stop me", "saw me", "phone", "timer", "absent", "late", "scrub", "asleep"]
+    anti_kw: ["watched me", "didn't stop me", "saw me", "phone", "timer", "absent", "late", "scrub", "asleep", "canceled", "cancelled", "cancellation"]
   },
   {
     id: "device_personal", s: "6.5", pg: 43, t: "Personal Device Misuse", v: "correct", pri: 810,
@@ -106,19 +93,15 @@ var R = [
     kw: ["texting", "social media", "instagram", "tiktok", "facebook", "scrolling", "personal phone"],
     anti_kw: ["timer", "data", "clinical", "emergency", "clean", "dishes", "breakroom", "unpaid break"]
   },
-{
-    id: "reassignment_refusal", 
-    s: "2.10", pg: 14, t: "Reassignment & Refusal of Work", v: "correct", pri: 820,
+  {
+    id: "reassignment_refusal", s: "2.10", pg: 14, t: "Reassignment & Refusal of Work", v: "correct", pri: 820,
     p: "Refusing a clinic reassignment after a home cancellation is an unexcused absence.",
-    d: "Section 2.10 allows the company to reassign team members to the clinic...",
+    d: "Section 2.10 allows the company to reassign team members to the clinic or other tasks if their primary session cancels. Choosing to stay home unpaid is only an option if leadership explicitly approves it.",
     b: "By refusing to report to the clinic when work was available, the absence is categorized as 'unexcused' under Section 2.15.",
-    strategy: "If you cannot make it to the clinic due to commute or logistics, discuss this as a 'Barrier'...",
+    strategy: "If you cannot make it to the clinic due to commute or logistics, discuss this as a 'Barrier' under the Partnership Plan. Otherwise, reporting to the clinic is a requirement of the role when a cancellation occurs.",
     kw: ["home client canceled", "report to the clinic", "rather take it unpaid", "not an option", "unexcused absence", "reassigned"],
     anti_kw: ["phone", "timer", "scrub", "asleep"]
   },
-  // ---------------------------------------------------------
-  // BUCKET 3: PROCEDURAL & GHOST RULES (Priority 700+)
-  // ---------------------------------------------------------
   {
     id: "procedural_skip", s: "2.18", pg: 21, t: "Skipped Coaching Step", v: "grey", pri: 750,
     p: "The handbook requires 'Verbal Coaching' as Step 1.",
